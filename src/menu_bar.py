@@ -6,8 +6,6 @@ class MenuBtn:
 	def __init__(self, text, font, white, pos):
 		self.width = 36
 		self.text = text
-		self.font = font
-		self.pos = pos
 
 		self.hover_bg_color = pg.Color("cyan4")
 
@@ -31,8 +29,6 @@ class SubMenuBtn:
 	def __init__(self, text, font, white, pos):
 		self.width = 220
 		self.text = text
-		self.font = font
-		self.pos = pos
 		self.margin_left = 6
 
 		self.hover_bg_color = pg.Color("cyan4")
@@ -83,20 +79,17 @@ class ImageMenuBtn:
 class SubMenu:
 	def __init__(self, parent_btn, options, font, white):
 		self.parent_btn = parent_btn
-		self.options = options
-		self.font = font
-		self.white = white
 		self.btns = []
 		self.visible = False
 
 		bg_height = 1
-		for i, option in enumerate(self.options):
+		for i, option in enumerate(options):
 			bg_height += 21
 			pos_x, pos_y = self.parent_btn.rect.topleft
 			btn = SubMenuBtn(
 				option,
-				self.font,
-				self.white,
+				font,
+				white,
 				(pos_x, pos_y + (i+1)*self.parent_btn.rect.height))
 			self.btns.append(btn)
 
