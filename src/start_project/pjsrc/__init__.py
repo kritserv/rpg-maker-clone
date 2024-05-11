@@ -8,6 +8,11 @@ from .opengl_stuff import ctx, \
 
 from .player import Player
 
+from .dt import DeltaTime
+from .pg_event import PygameEvent
+
+from .blit_text import blit_text
+
 __all__ = [
 	ctx, 
 	quad_buffer, 
@@ -16,5 +21,8 @@ __all__ = [
 	program, 
 	render_object, 
 	surf_to_texture,
-	Player
+	Player,
+	DeltaTime,
+	PygameEvent,
+	blit_text
 	]
