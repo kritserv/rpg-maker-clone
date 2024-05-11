@@ -30,7 +30,11 @@ def main():
 
 		mouse_pos = pg.mouse.get_pos()
 		pygame_event.check()
-		menu_bar.update(pygame_event.click, mouse_pos)
+		return_value = menu_bar.update(pygame_event.click, mouse_pos)
+		if return_value == 0:
+			pass
+		else:
+			break
 
 		screen.fill(black)
 
@@ -40,8 +44,6 @@ def main():
 		draw_fps_pos = (screen.get_width()-100, 0)
 		blit_text(screen, curr_fps, default_font, white, draw_fps_pos)
 
-		blit_text(screen, f"click: {pygame_event.click}", default_font, white, (draw_fps_pos[0], draw_fps_pos[1]+20))
-		blit_text(screen, f"submenu: {menu_bar.any_submenu_opened}", default_font, white, (draw_fps_pos[0], draw_fps_pos[1]+40))
 		pg.display.update()
 
 	pg.quit()
