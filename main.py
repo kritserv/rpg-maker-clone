@@ -9,12 +9,12 @@ from src import DeltaTime, PygameEvent, MenuBar, blit_text
 
 def main():
 
-	pg.display.set_icon(pg.image.load("assets/imgs/icon.png"))
+	pg.display.set_icon(pg.image.load("src/assets/imgs/icon.png"))
 	pg.display.set_caption("RPPYG Maker")
 
 	screen = pg.display.set_mode((865, 660), pg.RESIZABLE)
 
-	default_font = pg.font.Font("assets/fonts/IBMPlexSans-Regular.ttf", 13)
+	default_font = pg.font.Font("src/assets/fonts/IBMPlexSans-Regular.ttf", 13)
 	black = pg.Color("black")
 	white = pg.Color("white")
 
