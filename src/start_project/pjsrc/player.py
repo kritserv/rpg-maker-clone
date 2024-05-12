@@ -6,7 +6,7 @@ class Player(pg.sprite.Sprite):
 
 		self.speed = 220
 
-		self.images = {
+		self.imgs = {
 			"bottom": [],
 			"top": [],
 			"left": [],
@@ -14,35 +14,62 @@ class Player(pg.sprite.Sprite):
 			}
 		self.load_sprites()
 
-		self.current_image = 0
-		self.image = self.images["bottom"][self.current_image]
+		self.current_img = 0
+		self.img = self.imgs["bottom"][self.current_img]
 
 		self.direction = "bottom"
 		self.animation_time = 0.15
 		self.current_frame = 0
 
-		self.rect = self.image.get_rect()
+		self.rect = self.img.get_rect()
 
 		self.pos = pg.math.Vector2(self.rect.topleft)
 		self.pos[0] = x
 		self.pos[1] = y
 
 	def load_sprites(self):
-		load_spritesheet = pg.image.load("asset/img/player.png")
+		load_spritesheet = pg.image.load(
+			"assets/img/player.png"
+			)
 		sprite_width = 16
 		sprite_height = 24
-		directions = ["bottom", "top", "left", "right"]
+		directions = [
+			"bottom", 
+			"top", 
+			"left", 
+			"right"
+			]
+		frames = [
+			"stand_still",  
+			"left_leg_forward",  
+			"right_leg_forward"
+			]
 		for row, direction in enumerate(directions):
-			for column in range(4):
-				image = pg.Surface((sprite_width, sprite_height))
-				image.fill((255, 0, 255))
-				image.blit(load_spritesheet, (0, 0), (column*sprite_width, row*sprite_height, sprite_width, sprite_height))
-				image.set_colorkey((255, 0, 255))
-				image = pg.transform.scale(image, (48, 64))
-				image = image.convert_alpha()
-				self.images[direction].append(image)
+			for i, frame in enumerate(frames):
+				img = pg.Surface(
+					(sprite_width, sprite_height)
+					)
+				img.fill((255, 0, 255))
+				img.blit(
+					load_spritesheet, 
+					(0, 0), 
+					(
+						i*sprite_width, 
+						row*sprite_height, 
+						sprite_width, 
+						sprite_height
+					)
+				)
+				img.set_colorkey((255, 0, 255))
+				img = pg.transform.scale(img, (48, 64))
+				img = img.convert_alpha()
+				self.imgs[direction].append(img)
+				if frame == "left_leg_forward":
+					self.imgs[direction].append(
+						self.imgs[direction][0]
+						)
 
-	def calculate_value_from_key_pressed(self, key, display):
+	def calculate_val_from_key(self, key, display):
 		dx = 0
 		dy = 0
 		
@@ -76,15 +103,15 @@ class Player(pg.sprite.Sprite):
 
 	def animate(self, dx, dy, dt):
 		if dx == 0 and dy == 0:
-			self.current_image = 0
+			self.current_img = 0
 		else:
 			self.current_frame += dt
 			if self.current_frame >= self.animation_time:
 				self.current_frame -= self.animation_time
-				self.current_image = (self.current_image + 1) % len(self.images[self.direction])
-		self.image = self.images[self.direction][self.current_image]
+				self.current_img = (self.current_img + 1) % len(self.imgs[self.direction])
+		self.img = self.imgs[self.direction][self.current_img]
 
 	def update(self, key, dt, display):
-		dx, dy = self.calculate_value_from_key_pressed(key, display)
+		dx, dy = self.calculate_val_from_key(key, display)
 		self.move(dx, dy, dt)
 		self.animate(dx, dy, dt)

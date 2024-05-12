@@ -30,7 +30,7 @@ from pjsrc import Player, \
 
 pg.display.set_icon(
 	pg.image.load(
-		"asset/icon.png"
+		"assets/icon.png"
 		).convert_alpha()
 	)
 
@@ -69,7 +69,7 @@ def main():
 
 		display.fill(grey)
 
-		display.blit(player.image, (player.pos))
+		display.blit(player.img, (player.pos))
 		
 		frame_tex = surf_to_texture(display)
 		frame_tex.use(0)
