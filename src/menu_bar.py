@@ -54,6 +54,8 @@ class SubMenuBtn:
 			print(f"click {self.text}")
 			if self.text == "Exit (Ctrl + Q)":
 				return 1
+			elif self.text == "Play Test (F12)":
+				return 2
 
 class ImageMenuBtn:
 	def __init__(self, image_name, pos):
@@ -74,6 +76,8 @@ class ImageMenuBtn:
 	def update(self, click, mouse_pos):
 		if self.rect.collidepoint(mouse_pos) and click:
 			print(f"click {self.image_name}")
+			if self.image_name == "play_test":
+				return 2
 
 
 class SubMenu:
@@ -287,14 +291,16 @@ class MenuBar:
 
 			if not self.any_submenu_opened:
 				for btn in self.image_btns:
-					btn.update(click, mouse_pos)
+					return_value = btn.update(click, mouse_pos)
+					if return_value:
+						return return_value
 
 			for submenu in self.submenus:
 				if submenu.visible:
 					for btn in submenu.btns:
-						do = btn.update(click, mouse_pos)
-						if do == 1:
-							return 1
+						return_value = btn.update(click, mouse_pos)
+						if return_value:
+							return return_value
 			
 		if self.any_submenu_opened and click:
 			for submenu in self.submenus:

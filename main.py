@@ -6,6 +6,7 @@ pg.init()
 from sys import exit
 
 from src import DeltaTime, PygameEvent, MenuBar, blit_text
+from subprocess import call
 
 def main():
 
@@ -31,10 +32,12 @@ def main():
 		mouse_pos = pg.mouse.get_pos()
 		pygame_event.check()
 		return_value = menu_bar.update(pygame_event.click, mouse_pos)
-		if return_value == 0:
-			pass
-		else:
+		if return_value == 2:
+			call("cd src/start_project && python main.py", shell=True)
+		elif return_value == 1:
 			break
+		else:
+			pass
 
 		screen.fill(black)
 
