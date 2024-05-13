@@ -8,10 +8,13 @@ pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 pg.display.set_caption("Game Title")
 
-window_size = (640, 360)
+game_size = (240, 135)
 
+native_res_multiplier = 3
 screen = pg.display.set_mode(
-	(window_size), 
+	(
+		game_size[0]*native_res_multiplier, 
+		game_size[1]*native_res_multiplier), 
 	pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
 	)
 
@@ -36,9 +39,9 @@ pg.display.set_icon(
 
 def main():
 	display = pg.Surface(
-		(window_size))
+		(game_size))
 
-	player = Player(display.get_width()/2-16, display.get_height()/2-24)
+	player = Player(0, 64)
 
 	clock = pg.time.Clock()
 
@@ -46,13 +49,13 @@ def main():
 
 	delta_time = DeltaTime()
 
-	pygame_event = PygameEvent(window_size)
+	pygame_event = PygameEvent(game_size)
 
 	prev_time = time()
 	while pygame_event.running:
 
 		dt = delta_time.get()
-		clock.tick()
+		clock.tick(60)
 
 		# Input
 
@@ -63,7 +66,7 @@ def main():
 
 		# Logic
 
-		player.update(key, dt, display)
+		player.update(key, dt)
 
 		# Graphic
 

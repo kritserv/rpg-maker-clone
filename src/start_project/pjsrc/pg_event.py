@@ -1,8 +1,8 @@
 import pygame as pg
 
 class PygameEvent:
-	def __init__(self, window_size):
-		self.window_size = window_size
+	def __init__(self, game_size):
+		self.game_size = game_size
 		self.running = True
 		self.click = False
 		self.keydown, self.keyup = False, False
@@ -27,9 +27,9 @@ class PygameEvent:
 			click = True
 		else:
 			if event.type == pg.VIDEORESIZE:
-				ratio = event.w / self.window_size[0]
+				ratio = event.w / self.game_size[0]
 				new_height = int(event.h / ratio)
-				new_size = pg.Surface((self.window_size[0], new_height))
+				new_size = pg.Surface((self.game_size[0], new_height))
 				return new_size
 			else:
 				return None

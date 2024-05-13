@@ -1,10 +1,11 @@
 import pygame as pg
+from math import floor, ceil
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, x, y):
 		pg.sprite.Sprite.__init__(self)
 
-		self.speed = 220
+		self.speed = 90
 
 		self.imgs = {
 			"bottom": [],
@@ -18,14 +19,19 @@ class Player(pg.sprite.Sprite):
 		self.img = self.imgs["bottom"][self.current_img]
 
 		self.direction = "bottom"
-		self.animation_time = 0.15
+		self.animation_time = 0.09
 		self.current_frame = 0
 
 		self.rect = self.img.get_rect()
 
-		self.pos = pg.math.Vector2(self.rect.topleft)
-		self.pos[0] = x
-		self.pos[1] = y
+		self.pos = pg.math.Vector2([x, y])
+
+		self.finish_pos = [self.pos[0], self.pos[1]]
+		self.diff_x, self.diff_y = 0, 0
+		self.finished_x_move = True
+		self.finished_y_move = True
+		self.last_dx, self.last_dy = 0, 0
+		self.key_pressed = False
 
 	def load_sprites(self):
 		load_spritesheet = pg.image.load(
@@ -61,7 +67,6 @@ class Player(pg.sprite.Sprite):
 					)
 				)
 				img.set_colorkey((255, 0, 255))
-				img = pg.transform.scale(img, (48, 64))
 				img = img.convert_alpha()
 				self.imgs[direction].append(img)
 				if frame == "left_leg_forward":
@@ -69,41 +74,95 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key, display):
+	def calculate_val_from_key(self, key):
 		dx = 0
 		dy = 0
+		self.key_pressed = False
 		
-		if key[pg.K_LEFT]:
-			self.direction = "left"
-			if self.rect.left > 0:
-				dx = -1
+		if key[pg.K_LEFT] or key[pg.K_RIGHT]:
+			if self.finished_y_move:
+				if key[pg.K_LEFT]:
+					self.direction = "left"
+					dx = -1
 
-		elif key[pg.K_RIGHT]:
-			self.direction = "right"
-			if self.rect.right < display.get_width():
-				dx = 1
+				elif key[pg.K_RIGHT]:
+					self.direction = "right"
+					dx = 1
 
-		elif key[pg.K_UP]:
-			self.direction = "top"
-			if self.rect.top > 70:
-				dy = -1
+				if dx != 0:
+					self.last_dx = dx
+					self.key_pressed = True
+					self.finished_x_move = False
 
-		elif key[pg.K_DOWN]:
-			self.direction = "bottom"
-			if self.rect.bottom < display.get_height():
-				dy = 1
+		elif key[pg.K_UP] or key[pg.K_DOWN]:
+			if self.finished_x_move:
+				if key[pg.K_UP]:
+					self.direction = "top"
+					dy = -1
+
+				elif key[pg.K_DOWN]:
+					self.direction = "bottom"
+					dy = 1
+
+				if dy != 0:
+					self.last_dy = dy
+					self.key_pressed = True
+					self.finished_y_move = False
 		
 		return dx, dy
 
-	def move(self, dx, dy, dt):
-		self.pos.x += dx * self.speed * dt
-		self.rect.x = round(self.pos.x)
-		self.pos.y += dy * self.speed * dt
-		self.rect.y = round(self.pos.y)
+	def make_divisible_by_16(self, num):
+		if num > 0:
+			while num % 16 != 0:
+				num += 1
+		elif num < 0:
+			while num % 16 != 0:
+				num -= 1
+		return num
 
-	def animate(self, dx, dy, dt):
-		if dx == 0 and dy == 0:
+	def expect_finish_x_pos(self, one_move):
+
+		if self.last_dx < 0:
+			check = floor(self.pos[0])
+		elif self.last_dx > 0:
+			check = ceil(self.pos[0])
+		else:
+			check = 0
+
+		if -one_move < check < one_move:
+			expect_x = 0
+		else:
+			expect_x = self.make_divisible_by_16(check)
+
+		return expect_x
+
+	def expect_finish_y_pos(self, one_move, tile_size=16):
+
+		if self.last_dy < 0:
+			check = floor(self.pos[1])
+		elif self.last_dy > 0:
+			check = ceil(self.pos[1])
+		else:
+			check = 0
+
+		if -one_move < check < one_move:
+			expect_y = 0
+		else:
+			expect_y = self.make_divisible_by_16(check)
+
+		return expect_y
+
+	def move(self, dx, dy, dt):
+		self.pos[0] += dx * self.speed * dt
+		self.pos[1] += dy * self.speed * dt
+		self.rect.x = self.pos[0]
+		self.rect.y = self.pos[1]
+
+	def animate(self, idle, dt):
+
+		if idle:
 			self.current_img = 0
+
 		else:
 			self.current_frame += dt
 			if self.current_frame >= self.animation_time:
@@ -111,7 +170,42 @@ class Player(pg.sprite.Sprite):
 				self.current_img = (self.current_img + 1) % len(self.imgs[self.direction])
 		self.img = self.imgs[self.direction][self.current_img]
 
-	def update(self, key, dt, display):
-		dx, dy = self.calculate_val_from_key(key, display)
-		self.move(dx, dy, dt)
-		self.animate(dx, dy, dt)
+	def update(self, key, dt):
+		dx, dy = self.calculate_val_from_key(key)
+
+		if self.key_pressed:
+			self.move(dx, dy, dt)
+
+		idle = not dx and not dy
+
+		one_move = self.speed * dt
+		if one_move == 0.0:
+			one_move = 0.01
+
+		if not self.key_pressed:
+			self.finish_pos[0]= self.expect_finish_x_pos(one_move)
+			self.finish_pos[1] =  self.expect_finish_y_pos(one_move)
+
+			if self.finish_pos[0]<= self.pos[0]:
+				self.diff_x = self.pos[0]- self.finish_pos[0]
+			else:
+				self.diff_x = self.finish_pos[0]- self.pos[0]
+
+			if self.finish_pos[1] <= self.pos[1]:
+				self.diff_y = self.pos[1] - self.finish_pos[1]
+			else:
+				self.diff_y = self.finish_pos[1] - self.pos[1]
+
+			if self.diff_x > one_move:
+				self.move(self.last_dx, 0, dt)
+			elif self.diff_x <= one_move:
+				self.pos[0]= self.finish_pos[0]
+				self.finished_x_move = True
+
+			if self.diff_y > one_move:
+				self.move(0, self.last_dy, dt)
+			elif self.diff_y <= one_move:
+				self.pos[1] = self.finish_pos[1]
+				self.finished_y_move = True
+
+		self.animate(idle, dt)
