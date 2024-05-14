@@ -179,8 +179,6 @@ class Player(pg.sprite.Sprite):
 		idle = not dx and not dy
 
 		one_move = self.speed * dt
-		if one_move == 0.0:
-			one_move = 0.01
 
 		if not self.key_pressed:
 			self.finish_pos[0]= self.expect_finish_x_pos(one_move)

@@ -55,7 +55,7 @@ def main():
 	while pygame_event.running:
 
 		dt = delta_time.get()
-		clock.tick(60)
+		clock.tick()
 
 		# Input
 
