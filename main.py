@@ -5,13 +5,17 @@ pg.init()
 
 from sys import exit
 
-from src import DeltaTime, PygameEvent, MenuBar, blit_text
-from subprocess import call
+from src import DeltaTime, \
+	PygameEvent, \
+	MenuBar, Terminal, \
+	blit_text
 
 def main():
 
 	pg.display.set_icon(pg.image.load("src/assets/imgs/icon.png"))
 	pg.display.set_caption("RPPYG Maker")
+
+	terminal = Terminal()
 
 	screen = pg.display.set_mode((865, 660), pg.RESIZABLE)
 
@@ -33,7 +37,7 @@ def main():
 		pygame_event.check()
 		return_value = menu_bar.update(pygame_event.click, mouse_pos)
 		if return_value == 2:
-			call("cd src/start_project && python main.py", shell=True)
+			terminal.run_project()
 		elif return_value == 1:
 			break
 		else:
