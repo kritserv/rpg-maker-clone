@@ -53,7 +53,7 @@ render_object = ctx.vertex_array(
 	]
 	)
 
-def surf_to_texture(surf):
+def surf_to_texture(surf) -> object:
 	tex = ctx.texture(surf.get_size(), 4)
 	tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
 	tex.swizzle = "BGRA"

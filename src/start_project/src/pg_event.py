@@ -9,7 +9,7 @@ class PygameEvent:
 		self.up, self.down, self.left, self.right = False, False, False, False
 		self.interact, self.cancel = False, False
 
-	def check_type(self, event):
+	def check_type(self, event) -> object:
 		keydown, \
 		keyup, \
 		running, \
@@ -95,7 +95,7 @@ class PygameEvent:
 		except AttributeError:
 			return False
 
-	def check(self):
+	def check(self) -> object:
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)

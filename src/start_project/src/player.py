@@ -33,7 +33,7 @@ class Player(pg.sprite.Sprite):
 		self.last_dx, self.last_dy = 0, 0
 		self.key_pressed = False
 
-	def load_sprites(self):
+	def load_sprites(self) -> None:
 		load_spritesheet = pg.image.load(
 			"assets/img/sprite/player.png"
 			)
@@ -74,7 +74,7 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key) -> list:
+	def calculate_val_from_key(self, key) -> tuple:
 		dx = 0
 		dy = 0
 		self.key_pressed = False

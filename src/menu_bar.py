@@ -14,7 +14,7 @@ class MenuBtn:
 			)
 		self.rect = pg.Rect(pos[0], pos[1], self.width, self.text_surface.get_height()+4)
 
-	def draw(self, display, mouse_pos):
+	def draw(self, display, mouse_pos) -> None:
 		if self.rect.collidepoint(mouse_pos):
 			pg.draw.rect(display, self.hover_bg_color, self.rect)
 
@@ -38,7 +38,7 @@ class SubMenuBtn:
 			)
 		self.rect = pg.Rect(pos[0], pos[1], self.width, self.text_surface.get_height()+4)
 
-	def draw(self, display, mouse_pos):
+	def draw(self, display, mouse_pos) -> None:
 		if self.rect.collidepoint(mouse_pos):
 			pg.draw.rect(display, self.hover_bg_color, self.rect)
 
@@ -49,7 +49,7 @@ class SubMenuBtn:
 
 		display.blit(self.text_surface, text_pos)
 
-	def update(self, click, mouse_pos):
+	def update(self, click, mouse_pos) -> int:
 		if self.rect.collidepoint(mouse_pos) and click:
 			print(f"click {self.text}")
 			if self.text == "Exit (Ctrl + Q)":
@@ -67,13 +67,13 @@ class ImageMenuBtn:
 		self.image_hover.fill(pg.Color("cyan4"))
 		self.image_hover.blit(self.image, (1, 1))
 
-	def draw(self, display, mouse_pos, any_submenu_opened):
+	def draw(self, display, mouse_pos, any_submenu_opened) -> None:
 		if self.rect.collidepoint(mouse_pos) and not any_submenu_opened:
 			display.blit(self.image_hover, self.rect)
 		else:
 			display.blit(self.image, (self.rect[0]+1, self.rect[1]+1))
 
-	def update(self, click, mouse_pos):
+	def update(self, click, mouse_pos) -> int:
 		if self.rect.collidepoint(mouse_pos) and click:
 			print(f"click {self.image_name}")
 			if self.image_name == "play_test":
@@ -100,7 +100,7 @@ class SubMenu:
 		self.bg = pg.Surface((220, bg_height))
 		self.bg.fill(pg.Color("grey30"))
 
-	def draw(self, display, mouse_pos):
+	def draw(self, display, mouse_pos) -> None:
 		if self.visible:
 			display.blit(self.bg, self.parent_btn.rect.bottomleft)
 			for btn in self.btns:
@@ -274,7 +274,7 @@ class MenuBar:
 			game_submenu
 			]
 
-	def draw(self, display, mouse_pos):
+	def draw(self, display, mouse_pos) -> None:
 		display.blit(self.bg, (0, 0))
 		for btn in self.btns:
 			btn.draw(display, mouse_pos)
@@ -285,7 +285,7 @@ class MenuBar:
 		for submenu in self.submenus:
 			submenu.draw(display, mouse_pos)
 
-	def update(self, click, mouse_pos):
+	def update(self, click, mouse_pos) -> int:
 		if click and self.click_cooldown.now()>=0.2:
 			self.click_cooldown.restart()
 

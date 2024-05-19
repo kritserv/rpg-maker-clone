@@ -7,7 +7,7 @@ class PygameEvent:
 		self.click = False
 		self.keydown, self.keyup = False, False
 
-	def check_type(self, event):
+	def check_type(self, event) -> object:
 		keydown, \
 		keyup, \
 		running , \
@@ -40,7 +40,7 @@ class PygameEvent:
 			running, \
 			click
 
-	def check_quit_game(self, event, key):
+	def check_quit_game(self, event, key) -> None:
 		running = True
 		if self.keydown:
 			if key == pg.K_q and pg.key.get_mods() & pg.KMOD_CTRL: # Ctrl + Q
@@ -49,14 +49,14 @@ class PygameEvent:
 				running = False
 		self.running = running
 
-	def check_key(self, event):
+	def check_key(self, event) -> bool:
 		try:
 			key = event.key
 			return key
 		except AttributeError:
 			return False
 
-	def check(self):
+	def check(self) -> object:
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
