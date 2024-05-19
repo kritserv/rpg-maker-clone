@@ -3,7 +3,24 @@ pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
+import moderngl
 from sys import exit
+
+game_size = (865, 660)
+screen = pg.display.set_mode(
+		(
+			game_size[0], 
+			game_size[1]), 
+		pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
+		)
+
+from src import ctx, \
+	quad_buffer, \
+	vert_shader, \
+	frag_shader, \
+	program, \
+	render_object, \
+	surf_to_texture
 
 from src import DeltaTime, \
 	PygameEvent, \
@@ -17,7 +34,8 @@ def main():
 
 	terminal = Terminal()
 
-	screen = pg.display.set_mode((865, 660), pg.RESIZABLE)
+	display = pg.Surface(
+			(game_size))
 
 	default_font = pg.font.Font("src/assets/fonts/IBMPlexSans-Regular.ttf", 13)
 	black = pg.Color("black")
@@ -27,14 +45,22 @@ def main():
 	menu_bar = MenuBar(default_font, white)
 	delta_time = DeltaTime()
 
-	pygame_event = PygameEvent()
+	pygame_event = PygameEvent(game_size)
 
 	while pygame_event.running:
+
 		dt = delta_time.get()
 		clock.tick()
 
+		# Input
+
 		mouse_pos = pg.mouse.get_pos()
-		pygame_event.check()
+		new_size = pygame_event.check()
+		if new_size:
+			display = new_size
+
+		# Logic
+
 		return_value = menu_bar.update(pygame_event.click, mouse_pos)
 		if return_value == 2:
 			terminal.run_project()
@@ -43,15 +69,26 @@ def main():
 		else:
 			pass
 
-		screen.fill(black)
+		# Graphic
 
-		menu_bar.draw(screen, mouse_pos)
+		display.fill(black)
+
+		menu_bar.draw(display, mouse_pos)
 
 		curr_fps = f"fps: {str(clock.get_fps() // 0.1 / 10)}"
-		draw_fps_pos = (screen.get_width()-100, 0)
-		blit_text(screen, curr_fps, default_font, white, draw_fps_pos)
+		draw_fps_pos = (display.get_width()-100, 0)
+		blit_text(display, curr_fps, default_font, white, draw_fps_pos)
 
-		pg.display.update()
+		frame_tex = surf_to_texture(display)
+		frame_tex.use(0)
+		program["tex"] = 0
+		render_object.render(
+			mode=moderngl.TRIANGLE_STRIP
+			)
+
+		pg.display.flip()
+
+		frame_tex.release()
 
 	pg.quit()
 	exit()

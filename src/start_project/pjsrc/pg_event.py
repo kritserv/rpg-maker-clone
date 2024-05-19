@@ -25,6 +25,8 @@ class PygameEvent:
 			running = False
 		elif event.type == pg.MOUSEBUTTONDOWN:
 			click = True
+		elif event.type == pg.MOUSEBUTTONUP:
+			click = False
 		else:
 			if event.type == pg.VIDEORESIZE:
 				ratio = event.w / self.game_size[0]

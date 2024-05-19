@@ -1,11 +1,14 @@
 import numpy as np
-import moderngl
 import pygame as pg
 from time import time
 
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
+
+import moderngl
+from sys import exit
+
 pg.display.set_caption("Game Title")
 
 game_size = (240, 135)
@@ -86,7 +89,7 @@ def main():
 		frame_tex.release()
 
 	pg.quit()
-
+	exit()
 
 if __name__ == "__main__":
 	main()

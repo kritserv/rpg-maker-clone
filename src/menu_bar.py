@@ -14,16 +14,16 @@ class MenuBtn:
 			)
 		self.rect = pg.Rect(pos[0], pos[1], self.width, self.text_surface.get_height()+4)
 
-	def draw(self, screen, mouse_pos):
+	def draw(self, display, mouse_pos):
 		if self.rect.collidepoint(mouse_pos):
-			pg.draw.rect(screen, self.hover_bg_color, self.rect)
+			pg.draw.rect(display, self.hover_bg_color, self.rect)
 
 		text_pos = (
 			self.rect.x + (self.rect.width - self.text_surface.get_width()) // 2,
 			self.rect.y + (self.rect.height - self.text_surface.get_height()) // 2
 			)
 
-		screen.blit(self.text_surface, text_pos)
+		display.blit(self.text_surface, text_pos)
 
 class SubMenuBtn:
 	def __init__(self, text, font, white, pos):
@@ -38,16 +38,16 @@ class SubMenuBtn:
 			)
 		self.rect = pg.Rect(pos[0], pos[1], self.width, self.text_surface.get_height()+4)
 
-	def draw(self, screen, mouse_pos):
+	def draw(self, display, mouse_pos):
 		if self.rect.collidepoint(mouse_pos):
-			pg.draw.rect(screen, self.hover_bg_color, self.rect)
+			pg.draw.rect(display, self.hover_bg_color, self.rect)
 
 		text_pos = (
 			self.rect.x + self.margin_left,
 			self.rect.y
 			)
 
-		screen.blit(self.text_surface, text_pos)
+		display.blit(self.text_surface, text_pos)
 
 	def update(self, click, mouse_pos):
 		if self.rect.collidepoint(mouse_pos) and click:
@@ -67,11 +67,11 @@ class ImageMenuBtn:
 		self.image_hover.fill(pg.Color("cyan4"))
 		self.image_hover.blit(self.image, (1, 1))
 
-	def draw(self, screen, mouse_pos, any_submenu_opened):
+	def draw(self, display, mouse_pos, any_submenu_opened):
 		if self.rect.collidepoint(mouse_pos) and not any_submenu_opened:
-			screen.blit(self.image_hover, self.rect)
+			display.blit(self.image_hover, self.rect)
 		else:
-			screen.blit(self.image, (self.rect[0]+1, self.rect[1]+1))
+			display.blit(self.image, (self.rect[0]+1, self.rect[1]+1))
 
 	def update(self, click, mouse_pos):
 		if self.rect.collidepoint(mouse_pos) and click:
@@ -100,16 +100,16 @@ class SubMenu:
 		self.bg = pg.Surface((220, bg_height))
 		self.bg.fill(pg.Color("grey30"))
 
-	def draw(self, screen, mouse_pos):
+	def draw(self, display, mouse_pos):
 		if self.visible:
-			screen.blit(self.bg, self.parent_btn.rect.bottomleft)
+			display.blit(self.bg, self.parent_btn.rect.bottomleft)
 			for btn in self.btns:
-				btn.draw(screen, mouse_pos)
+				btn.draw(display, mouse_pos)
 
 class MenuBar:
 	def __init__(self, default_font, white):
-		max_screen_width = pg.display.get_desktop_sizes()[0][0]
-		self.bg = pg.Surface((max_screen_width, 64))
+		max_display_width = pg.display.get_desktop_sizes()[0][0]
+		self.bg = pg.Surface((max_display_width, 64))
 		self.bg.fill(pg.Color("grey20"))
 		self.btns = []
 		self.image_btns = []
@@ -274,16 +274,16 @@ class MenuBar:
 			game_submenu
 			]
 
-	def draw(self, screen, mouse_pos):
-		screen.blit(self.bg, (0, 0))
+	def draw(self, display, mouse_pos):
+		display.blit(self.bg, (0, 0))
 		for btn in self.btns:
-			btn.draw(screen, mouse_pos)
+			btn.draw(display, mouse_pos)
 
 		for btn in self.image_btns:
-			btn.draw(screen, mouse_pos, self.any_submenu_opened)
+			btn.draw(display, mouse_pos, self.any_submenu_opened)
 
 		for submenu in self.submenus:
-			submenu.draw(screen, mouse_pos)
+			submenu.draw(display, mouse_pos)
 
 	def update(self, click, mouse_pos):
 		if click and self.click_cooldown.now()>=0.2:
