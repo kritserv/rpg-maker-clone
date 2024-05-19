@@ -19,7 +19,7 @@ class RpgMap:
 
 		for elem in map_json:
 			name = elem["name"]
-			path = "game_data/data/"+elem["path"]
+			path = "game_data/data/maps/"+elem["path"]
 			tileset = elem["tileset"]
 
 			current_tiles = []

@@ -6,7 +6,7 @@
 	"maps": [
 		{
 			"name":"map001",
-			"path":"maps/map001.csv", 
+			"path":"map001.csv", 
 			"tileset": "forests"
 		}
 	]
