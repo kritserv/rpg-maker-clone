@@ -11,7 +11,9 @@ screen = pg.display.set_mode(
 		(
 			game_size[0], 
 			game_size[1]), 
-		pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
+		pg.RESIZABLE | \
+		pg.OPENGL | \
+		pg.DOUBLEBUF
 		)
 
 from src import ctx, \
@@ -29,7 +31,11 @@ from src import DeltaTime, \
 
 def main():
 
-	pg.display.set_icon(pg.image.load("src/assets/imgs/icon.png"))
+	pg.display.set_icon(
+		pg.image.load(
+			"assets/imgs/icon.png"
+			)
+		)
 	pg.display.set_caption("RPPYG Maker")
 
 	terminal = Terminal()
@@ -37,7 +43,10 @@ def main():
 	display = pg.Surface(
 			(game_size))
 
-	default_font = pg.font.Font("src/assets/fonts/IBMPlexSans-Regular.ttf", 13)
+	default_font = pg.font.Font(
+		"assets/fonts/IBMPlexSans-Regular.ttf", 
+		13
+		)
 	black = pg.Color("black")
 	white = pg.Color("white")
 
@@ -61,7 +70,10 @@ def main():
 
 		# Logic
 
-		return_value = menu_bar.update(pygame_event.click, mouse_pos)
+		return_value = menu_bar.update(
+			pygame_event.click, 
+			mouse_pos
+			)
 		if return_value == 2:
 			terminal.run_project()
 		elif return_value == 1:
@@ -75,9 +87,15 @@ def main():
 
 		menu_bar.draw(display, mouse_pos)
 
-		curr_fps = f"fps: {str(clock.get_fps() // 0.1 / 10)}"
+		curr_fps = "fps:"+str(clock.get_fps()//0.1/10)
 		draw_fps_pos = (display.get_width()-100, 0)
-		blit_text(display, curr_fps, default_font, white, draw_fps_pos)
+		blit_text(
+			display, 
+			curr_fps, 
+			default_font, 
+			white, 
+			draw_fps_pos
+			)
 
 		frame_tex = surf_to_texture(display)
 		frame_tex.use(0)

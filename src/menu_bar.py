@@ -60,7 +60,7 @@ class SubMenuBtn:
 class ImageMenuBtn:
 	def __init__(self, image_name, pos):
 		self.image_name = image_name
-		image_path = f"src/assets/imgs/{image_name}.png"
+		image_path = f"assets/imgs/{image_name}.png"
 		self.image = pg.image.load(image_path).convert_alpha()
 		self.rect = self.image.get_rect(topleft=pos)
 		self.image_hover = pg.Surface((self.rect.width + 2, self.rect.height + 2))
