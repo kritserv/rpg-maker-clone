@@ -43,7 +43,7 @@ class PygameEvent:
 			running, \
 			click
 
-	def check_arrow_key(self, event, key):
+	def check_arrow_key(self, event, key) -> None:
 		up, down, left, right = False, False, False, False
 		if self.keydown:
 			if key == pg.K_UP:
@@ -59,7 +59,7 @@ class PygameEvent:
 				up, down, left, right = False, False, False, False
 		self.up, self.down, self.left, self.right = up, down, left, right
 
-	def check_interact(self, event, key):
+	def check_interact(self, event, key) -> None:
 		interact = False
 		if self.keydown:
 			if key == pg.K_RETURN:
@@ -69,7 +69,7 @@ class PygameEvent:
 				interact = True
 		self.interact = interact
 
-	def check_cancel(self, event, key):
+	def check_cancel(self, event, key) -> None:
 		cancel = False
 		if self.keydown:
 			if key == pg.K_ESCAPE:
@@ -79,7 +79,7 @@ class PygameEvent:
 				cancel = True
 		self.cancel = cancel
 
-	def check_quit_game(self, event, key):
+	def check_quit_game(self, event, key) -> None:
 		running = True
 		if self.keydown:
 			if key == pg.K_q and pg.key.get_mods() & pg.KMOD_CTRL: # Ctrl + Q
@@ -88,7 +88,7 @@ class PygameEvent:
 				running = False
 		self.running = running
 
-	def check_key(self, event):
+	def check_key(self, event) -> bool:
 		try:
 			key = event.key
 			return key

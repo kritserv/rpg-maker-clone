@@ -35,7 +35,7 @@ class Player(pg.sprite.Sprite):
 
 	def load_sprites(self):
 		load_spritesheet = pg.image.load(
-			"assets/img/player.png"
+			"assets/img/sprite/player.png"
 			)
 		sprite_width = 16
 		sprite_height = 24
@@ -74,7 +74,7 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key):
+	def calculate_val_from_key(self, key) -> list:
 		dx = 0
 		dy = 0
 		self.key_pressed = False
@@ -111,7 +111,7 @@ class Player(pg.sprite.Sprite):
 		
 		return dx, dy
 
-	def make_divisible_by_16(self, num):
+	def make_divisible_by_16(self, num) -> int:
 		if num > 0:
 			while num % 16 != 0:
 				num += 1
@@ -120,7 +120,7 @@ class Player(pg.sprite.Sprite):
 				num -= 1
 		return num
 
-	def expect_finish_x_pos(self, one_move):
+	def expect_finish_x_pos(self, one_move) -> int:
 
 		if self.last_dx < 0:
 			check = floor(self.pos[0])
@@ -136,7 +136,7 @@ class Player(pg.sprite.Sprite):
 
 		return expect_x
 
-	def expect_finish_y_pos(self, one_move, tile_size=16):
+	def expect_finish_y_pos(self, one_move, tile_size=16) -> int:
 
 		if self.last_dy < 0:
 			check = floor(self.pos[1])
@@ -152,13 +152,13 @@ class Player(pg.sprite.Sprite):
 
 		return expect_y
 
-	def move(self, dx, dy, dt):
+	def move(self, dx, dy, dt) -> None:
 		self.pos[0] += dx * self.speed * dt
 		self.pos[1] += dy * self.speed * dt
 		self.rect.x = self.pos[0]
 		self.rect.y = self.pos[1]
 
-	def animate(self, idle, dt):
+	def animate(self, idle, dt) -> None:
 
 		if idle:
 			self.current_img = 0
@@ -170,7 +170,7 @@ class Player(pg.sprite.Sprite):
 				self.current_img = (self.current_img + 1) % len(self.imgs[self.direction])
 		self.img = self.imgs[self.direction][self.current_img]
 
-	def update(self, key, dt):
+	def update(self, key, dt) -> None:
 		dx, dy = self.calculate_val_from_key(key)
 
 		if self.key_pressed:

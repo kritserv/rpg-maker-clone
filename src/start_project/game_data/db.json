@@ -1,0 +1,13 @@
+{
+	"main": {
+		"main_title": "Game Title"
+	},
+
+	"maps": [
+		{
+			"name":"map001",
+			"path":"maps/map001.csv", 
+			"tileset": "forests"
+		}
+	]
+}

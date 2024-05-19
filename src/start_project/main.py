@@ -9,8 +9,6 @@ pg.init()
 import moderngl
 from sys import exit
 
-pg.display.set_caption("Game Title")
-
 game_size = (240, 135)
 
 native_res_multiplier = 3
@@ -21,7 +19,7 @@ screen = pg.display.set_mode(
 	pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
 	)
 
-from pjsrc import ctx, \
+from src import ctx, \
 	quad_buffer, \
 	vert_shader, \
 	frag_shader, \
@@ -29,7 +27,9 @@ from pjsrc import ctx, \
 	render_object, \
 	surf_to_texture
 
-from pjsrc import Player, \
+from src import json_loader, \
+	Player, \
+	RpgMap, \
 	DeltaTime, \
 	PygameEvent, \
 	blit_text
@@ -44,7 +44,14 @@ def main():
 	display = pg.Surface(
 		(game_size))
 
+	db = json_loader("game_data/db.json")
+
+	pg.display.set_caption(db["main"]["main_title"])
+
 	player = Player(0, 64)
+
+	rpgmap = RpgMap()
+	rpgmap.load_map_data(db["maps"])
 
 	clock = pg.time.Clock()
 
@@ -74,6 +81,7 @@ def main():
 		# Graphic
 
 		display.fill(grey)
+		rpgmap.draw(display)
 
 		display.blit(player.img, (player.pos))
 		

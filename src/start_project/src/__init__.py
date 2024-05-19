@@ -6,7 +6,10 @@ from .opengl_stuff import ctx, \
 	render_object, \
 	surf_to_texture
 
+from .load_json import json_loader
+
 from .player import Player
+from .rpgmap import RpgMap
 
 from .dt import DeltaTime
 from .pg_event import PygameEvent
@@ -21,7 +24,9 @@ __all__ = [
 	program, 
 	render_object, 
 	surf_to_texture,
+	json_loader, 
 	Player,
+	RpgMap,
 	DeltaTime,
 	PygameEvent,
 	blit_text
