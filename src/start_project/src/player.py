@@ -120,27 +120,42 @@ class Player(pg.sprite.Sprite):
 				num -= 1
 		return num
 
-	def expect_finish_pos(self, one_move, axis) -> int:
-		if axis == 1:
-			last_val = self.last_dy
-			pos = self.pos[1]
-		else:
-			last_val = self.last_dx
-			pos = self.pos[0]
+	def expect_finish_pos(self, one_move) -> [int, int]:
+		expect_pos = []
+		for axis in [0, 1]:
+			if axis == 1:
+				last_val = self.last_dy
+				pos = self.pos[1]
+			else:
+				last_val = self.last_dx
+				pos = self.pos[0]
 
-		if last_val < 0:
-			check = floor(pos)
-		elif last_val > 0:
-			check = ceil(pos)
-		else:
-			check = 0
+			if last_val < 0:
+				check = floor(pos)
+			elif last_val > 0:
+				check = ceil(pos)
+			else:
+				check = 0
 
-		if -one_move < check < one_move:
-			expect_val = 0
-		else:
-			expect_val = self.make_divisible_by(16, check)
+			if -one_move < check < one_move:
+				expect_val = 0
+			else:
+				expect_val = self.make_divisible_by(16, check)
 
-		return expect_val
+			expect_pos.append(expect_val)
+
+		return expect_pos
+
+	def calculate_distant_to_finish(self) -> (float, float):
+		distant_to_finish_x = self.pos[0] - self.finish_pos[0]
+		distant_to_finish_y = self.pos[1] - self.finish_pos[1]
+
+		if distant_to_finish_x < 0:
+			distant_to_finish_x *= -1
+		if distant_to_finish_y < 0:
+			distant_to_finish_y *= -1
+
+		return distant_to_finish_x, distant_to_finish_y
 
 	def move(self, dx, dy, dt) -> None:
 		self.pos[0] += dx * self.speed * dt
@@ -148,8 +163,8 @@ class Player(pg.sprite.Sprite):
 		self.rect.x = self.pos[0]
 		self.rect.y = self.pos[1]
 
-	def animate(self, idle, dt) -> None:
-		if idle:
+	def animate(self, is_idle, dt) -> None:
+		if is_idle:
 			self.current_img = 0
 
 		else:
@@ -165,28 +180,20 @@ class Player(pg.sprite.Sprite):
 		if self.key_pressed:
 			self.move(dx, dy, dt)
 
-		idle = not dx and not dy
+		is_idle = not dx and not dy
 
 		one_move = self.speed * dt
 
 		if not self.key_pressed:
-			self.finish_pos[0]= self.expect_finish_pos(one_move, 0)
-			self.finish_pos[1] =  self.expect_finish_pos(one_move, 1)
+			self.finish_pos = self.expect_finish_pos(one_move)
 
-			if self.finish_pos[0]<= self.pos[0]:
-				self.distant_to_finish_x = self.pos[0]- self.finish_pos[0]
-			else:
-				self.distant_to_finish_x = self.finish_pos[0]- self.pos[0]
-
-			if self.finish_pos[1] <= self.pos[1]:
-				self.distant_to_finish_y = self.pos[1] - self.finish_pos[1]
-			else:
-				self.distant_to_finish_y = self.finish_pos[1] - self.pos[1]
+			self.distant_to_finish_x ,\
+			self.distant_to_finish_y = self.calculate_distant_to_finish()
 
 			if self.distant_to_finish_x > one_move:
 				self.move(self.last_dx, 0, dt)
 			elif self.distant_to_finish_x <= one_move:
-				self.pos[0]= self.finish_pos[0]
+				self.pos[0] = self.finish_pos[0]
 				self.finished_x_move = True
 
 			if self.distant_to_finish_y > one_move:
@@ -195,4 +202,4 @@ class Player(pg.sprite.Sprite):
 				self.pos[1] = self.finish_pos[1]
 				self.finished_y_move = True
 
-		self.animate(idle, dt)
+		self.animate(is_idle, dt)
