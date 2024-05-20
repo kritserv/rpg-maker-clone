@@ -111,12 +111,12 @@ class Player(pg.sprite.Sprite):
 		
 		return dx, dy
 
-	def make_divisible_by_16(self, num) -> int:
+	def make_divisible_by(self, tile_size, num) -> int:
 		if num > 0:
-			while num % 16 != 0:
+			while num % tile_size != 0:
 				num += 1
 		elif num < 0:
-			while num % 16 != 0:
+			while num % tile_size != 0:
 				num -= 1
 		return num
 
@@ -132,11 +132,11 @@ class Player(pg.sprite.Sprite):
 		if -one_move < check < one_move:
 			expect_x = 0
 		else:
-			expect_x = self.make_divisible_by_16(check)
+			expect_x = self.make_divisible_by(16, check)
 
 		return expect_x
 
-	def expect_finish_y_pos(self, one_move, tile_size=16) -> int:
+	def expect_finish_y_pos(self, one_move) -> int:
 
 		if self.last_dy < 0:
 			check = floor(self.pos[1])
@@ -148,7 +148,7 @@ class Player(pg.sprite.Sprite):
 		if -one_move < check < one_move:
 			expect_y = 0
 		else:
-			expect_y = self.make_divisible_by_16(check)
+			expect_y = self.make_divisible_by(16, check)
 
 		return expect_y
 
