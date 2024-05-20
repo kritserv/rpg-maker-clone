@@ -10,6 +10,7 @@ from .dt import DeltaTime
 from .pg_event import PygameEvent
 from .menu_bar import MenuBar
 from .terminal import Terminal
+from .timer import Timer
 
 from .blit_text import blit_text
 
@@ -25,5 +26,6 @@ __all__ = [
 	PygameEvent, 
 	MenuBar, 
 	Terminal, 
+	Timer,
 	blit_text
 	]

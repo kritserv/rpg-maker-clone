@@ -6,6 +6,8 @@ class PygameEvent:
 		self.running = True
 		self.click = False
 		self.keydown, self.keyup = False, False
+		self.need_input = False
+		self.user_input = ""
 
 	def check_type(self, event) -> object or None:
 		keydown, \
@@ -49,6 +51,14 @@ class PygameEvent:
 				running = False
 		self.running = running
 
+	def check_unicode(self, key, event) -> None:
+		if self.need_input and key:
+			if self.keydown:
+				if key == pg.K_BACKSPACE:
+					self.user_input = self.user_input[:-1]
+				else:
+					self.user_input += event.unicode
+
 	def check_key(self, event) -> int or bool:
 		try:
 			key = event.key
@@ -60,6 +70,8 @@ class PygameEvent:
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
+			self.check_unicode(key, event)
+
 			if new_size:
 				return new_size
 			if key:

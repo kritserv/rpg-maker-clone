@@ -27,10 +27,10 @@ from src import ctx, \
 from src import DeltaTime, \
 	PygameEvent, \
 	MenuBar, Terminal, \
+	Timer, \
 	blit_text
 
 def main():
-
 	pg.display.set_icon(
 		pg.image.load(
 			"assets/imgs/icon.png"
