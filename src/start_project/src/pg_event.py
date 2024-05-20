@@ -1,13 +1,17 @@
 import pygame as pg
 
 class PygameEvent:
-	def __init__(self, game_size):
+	def __init__(self, game_size, scale_method):
 		self.game_size = game_size
 		self.running = True
 		self.click = False
 		self.keydown, self.keyup = False, False
 		self.up, self.down, self.left, self.right = False, False, False, False
 		self.interact, self.cancel = False, False
+		if scale_method == "by windows width":
+			self.scale_on_x_axis = True
+		else:
+			self.scale_on_x_axis = False
 
 	def check_type(self, event) -> object or None:
 		keydown, \
@@ -29,9 +33,14 @@ class PygameEvent:
 			click = False
 		else:
 			if event.type == pg.VIDEORESIZE:
-				ratio = event.w / self.game_size[0]
-				new_height = int(event.h / ratio)
-				new_size = pg.Surface((self.game_size[0], new_height))
+				if self.scale_on_x_axis:
+					ratio = event.w / self.game_size[0]
+					new_height = int(event.h / ratio)
+					new_size = pg.Surface((self.game_size[0], new_height))
+				else:
+					ratio = event.h / self.game_size[1]
+					new_width = int(event.w / ratio)
+					new_size = pg.Surface((new_width, self.game_size[1]))
 				return new_size
 			else:
 				return None

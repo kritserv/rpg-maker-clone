@@ -48,6 +48,10 @@ def main():
 
 	pg.display.set_caption(db["main"]["main_title"])
 
+	settings = json_loader("user_data/settings.json")
+	
+	scale_method = settings["scale_method"]
+
 	player = Player(0, 64)
 
 	rpgmap = RpgMap()
@@ -59,7 +63,7 @@ def main():
 
 	delta_time = DeltaTime()
 
-	pygame_event = PygameEvent(game_size)
+	pygame_event = PygameEvent(game_size, scale_method)
 
 	prev_time = time()
 	while pygame_event.running:
