@@ -27,7 +27,7 @@ class Player(pg.sprite.Sprite):
 		self.pos = pg.math.Vector2([x, y])
 
 		self.finish_pos = [self.pos[0], self.pos[1]]
-		self.diff_x, self.diff_y = 0, 0
+		self.distant_to_finish_x, self.distant_to_finish_y = 0, 0
 		self.finished_x_move = True
 		self.finished_y_move = True
 		self.last_dx, self.last_dy = 0, 0
@@ -74,7 +74,7 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key) -> tuple:
+	def calculate_val_from_key(self, key) -> (int, int):
 		dx = 0
 		dy = 0
 		self.key_pressed = False
@@ -120,37 +120,27 @@ class Player(pg.sprite.Sprite):
 				num -= 1
 		return num
 
-	def expect_finish_x_pos(self, one_move) -> int:
+	def expect_finish_pos(self, one_move, axis) -> int:
+		if axis == 1:
+			last_val = self.last_dy
+			pos = self.pos[1]
+		else:
+			last_val = self.last_dx
+			pos = self.pos[0]
 
-		if self.last_dx < 0:
-			check = floor(self.pos[0])
-		elif self.last_dx > 0:
-			check = ceil(self.pos[0])
+		if last_val < 0:
+			check = floor(pos)
+		elif last_val > 0:
+			check = ceil(pos)
 		else:
 			check = 0
 
 		if -one_move < check < one_move:
-			expect_x = 0
+			expect_val = 0
 		else:
-			expect_x = self.make_divisible_by(16, check)
+			expect_val = self.make_divisible_by(16, check)
 
-		return expect_x
-
-	def expect_finish_y_pos(self, one_move) -> int:
-
-		if self.last_dy < 0:
-			check = floor(self.pos[1])
-		elif self.last_dy > 0:
-			check = ceil(self.pos[1])
-		else:
-			check = 0
-
-		if -one_move < check < one_move:
-			expect_y = 0
-		else:
-			expect_y = self.make_divisible_by(16, check)
-
-		return expect_y
+		return expect_val
 
 	def move(self, dx, dy, dt) -> None:
 		self.pos[0] += dx * self.speed * dt
@@ -159,7 +149,6 @@ class Player(pg.sprite.Sprite):
 		self.rect.y = self.pos[1]
 
 	def animate(self, idle, dt) -> None:
-
 		if idle:
 			self.current_img = 0
 
@@ -181,28 +170,28 @@ class Player(pg.sprite.Sprite):
 		one_move = self.speed * dt
 
 		if not self.key_pressed:
-			self.finish_pos[0]= self.expect_finish_x_pos(one_move)
-			self.finish_pos[1] =  self.expect_finish_y_pos(one_move)
+			self.finish_pos[0]= self.expect_finish_pos(one_move, 0)
+			self.finish_pos[1] =  self.expect_finish_pos(one_move, 1)
 
 			if self.finish_pos[0]<= self.pos[0]:
-				self.diff_x = self.pos[0]- self.finish_pos[0]
+				self.distant_to_finish_x = self.pos[0]- self.finish_pos[0]
 			else:
-				self.diff_x = self.finish_pos[0]- self.pos[0]
+				self.distant_to_finish_x = self.finish_pos[0]- self.pos[0]
 
 			if self.finish_pos[1] <= self.pos[1]:
-				self.diff_y = self.pos[1] - self.finish_pos[1]
+				self.distant_to_finish_y = self.pos[1] - self.finish_pos[1]
 			else:
-				self.diff_y = self.finish_pos[1] - self.pos[1]
+				self.distant_to_finish_y = self.finish_pos[1] - self.pos[1]
 
-			if self.diff_x > one_move:
+			if self.distant_to_finish_x > one_move:
 				self.move(self.last_dx, 0, dt)
-			elif self.diff_x <= one_move:
+			elif self.distant_to_finish_x <= one_move:
 				self.pos[0]= self.finish_pos[0]
 				self.finished_x_move = True
 
-			if self.diff_y > one_move:
+			if self.distant_to_finish_y > one_move:
 				self.move(0, self.last_dy, dt)
-			elif self.diff_y <= one_move:
+			elif self.distant_to_finish_y <= one_move:
 				self.pos[1] = self.finish_pos[1]
 				self.finished_y_move = True
 
