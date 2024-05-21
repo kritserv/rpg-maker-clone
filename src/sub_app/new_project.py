@@ -30,9 +30,12 @@ button_frame = tk.Frame(root)
 button_frame.pack()
 
 create_button = tk.Button(button_frame, text="Create & Open", command=create_and_open)
-create_button.pack(side="left")
+create_button.pack()
 
-cancel_button = tk.Button(button_frame, text="Cancel", command=root.destroy)
+cancel_frame = tk.Frame(root)
+cancel_frame.pack(side=tk.BOTTOM, fill=tk.X)
+
+cancel_button = tk.Button(cancel_frame, text="Cancel", command=root.destroy)
 cancel_button.pack(side="right")
 
 root.mainloop()
