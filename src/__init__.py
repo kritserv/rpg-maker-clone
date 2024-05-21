@@ -9,6 +9,7 @@ from .opengl_stuff import ctx, \
 from .dt import DeltaTime
 from .pg_event import PygameEvent
 from .menu_bar import MenuBar
+from .menu_func import MenuFunc
 from .terminal import Terminal
 from .timer import Timer
 
@@ -25,6 +26,7 @@ __all__ = [
 	DeltaTime, 
 	PygameEvent, 
 	MenuBar, 
+	MenuFunc, 
 	Terminal, 
 	Timer,
 	blit_text

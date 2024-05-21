@@ -49,13 +49,9 @@ class SubMenuBtn:
 
 		display.blit(self.text_surface, text_pos)
 
-	def update(self, click, mouse_pos) -> int or None:
+	def update(self, click, mouse_pos) -> str or None:
 		if self.rect.collidepoint(mouse_pos) and click:
-			print(f"click {self.text}")
-			if self.text == "Exit (Ctrl + Q)":
-				return 1
-			elif self.text == "Play Test (F12)":
-				return 2
+			return self.text
 
 class ImageMenuBtn:
 	def __init__(self, image_name, pos):
@@ -73,11 +69,9 @@ class ImageMenuBtn:
 		else:
 			display.blit(self.image, (self.rect[0]+1, self.rect[1]+1))
 
-	def update(self, click, mouse_pos) -> int or None:
+	def update(self, click, mouse_pos) -> str or None:
 		if self.rect.collidepoint(mouse_pos) and click:
-			print(f"click {self.image_name}")
-			if self.image_name == "play_test":
-				return 2
+			return self.image_name
 
 
 class SubMenu:
@@ -285,7 +279,7 @@ class MenuBar:
 		for submenu in self.submenus:
 			submenu.draw(display, mouse_pos)
 
-	def update(self, click, mouse_pos) -> int or None:
+	def update(self, click, mouse_pos) -> str or int or None:
 		if click and self.click_cooldown.now()>=0.2:
 			self.click_cooldown.restart()
 

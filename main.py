@@ -26,7 +26,8 @@ from src import ctx, \
 
 from src import DeltaTime, \
 	PygameEvent, \
-	MenuBar, Terminal, \
+	MenuBar, MenuFunc, \
+	Terminal, \
 	Timer, \
 	blit_text
 
@@ -50,8 +51,10 @@ def main():
 	black = pg.Color("black")
 	white = pg.Color("white")
 
-	clock = pg.time.Clock()
 	menu_bar = MenuBar(default_font, white)
+	menu_func = MenuFunc()
+
+	clock = pg.time.Clock()
 	delta_time = DeltaTime()
 
 	pygame_event = PygameEvent(game_size)
@@ -74,12 +77,10 @@ def main():
 			pygame_event.click, 
 			mouse_pos
 			)
-		if return_value == 2:
-			terminal.run_project()
-		elif return_value == 1:
-			break
-		else:
-			pass
+		
+		return_value = menu_func.update(return_value, terminal)
+		if return_value == 0:
+			return 0
 
 		# Graphic
 
