@@ -128,7 +128,7 @@ class MenuFunc:
 	def new_project(self, terminal) -> None:
 		self.mkdir("working_state")
 		self.mkdir("projects")
-		terminal.command("python src/sub_app/new_project.py")
+		terminal.command("python src/sub_program/new_project.py")
 
 		project_name = self.get_working_project()
 
@@ -142,7 +142,7 @@ class MenuFunc:
 	def open_project(self, terminal) -> None:
 		self.mkdir("working_state")
 		self.mkdir("projects")
-		terminal.command("python src/sub_app/open_project.py")
+		terminal.command("python src/sub_program/open_project.py")
 		
 		project_name = self.get_working_project()
 

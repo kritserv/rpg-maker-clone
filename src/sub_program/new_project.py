@@ -67,7 +67,11 @@ def main():
 	exit()
 
 if __name__ == "__main__":
-	main()
+	try:
+		main()
+	except FileNotFoundError:
+		print("Error: Program need to be running from root directory.")
+		pass
 
 '''
 root = tk.Tk()
