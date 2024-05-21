@@ -56,8 +56,13 @@ class PygameEvent:
 			if self.keydown:
 				if key == pg.K_BACKSPACE:
 					self.user_input = self.user_input[:-1]
+					pg.time.set_timer(pg.USEREVENT, 75)
 				else:
 					self.user_input += event.unicode
+
+			elif self.keyup:
+				if key == pg.K_BACKSPACE:
+					pg.time.set_timer(pg.USEREVENT, 0)
 
 	def check_key(self, event) -> int or bool:
 		try:
@@ -71,6 +76,9 @@ class PygameEvent:
 			key = self.check_key(event)
 			new_size = self.check_type(event)
 			self.check_unicode(key, event)
+
+			if event.type == pg.USEREVENT:
+				self.user_input = self.user_input[:-1]
 
 			if new_size:
 				return new_size

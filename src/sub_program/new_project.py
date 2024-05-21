@@ -4,28 +4,16 @@ pg.init()
 
 from sys import exit
 
-win_size = (360, 120)
+win_size = (480, 160)
 
 screen = pg.display.set_mode(
 	(win_size)
 	)
 
-from src import PygameEvent, blit_text
+from src import PygameEvent, ProgramBtn, blit_text
 from os import path
 from pathlib import Path
 from distutils.dir_util import copy_tree
-
-def create_and_open() -> None:
-	project_name = entry.get()
-	if not project_name:
-		messagebox.showerror("Error", "Please enter a project name.")
-		return
-	if not path.isdir(f"projects/{project_name}"):
-		state = f"working_state/workonproject_{project_name}"
-		Path(state).touch()
-		root.destroy()
-	else:
-		messagebox.showerror("Error", "Project with that name already exists.")
 
 def main():
 	pg.display.set_caption("Create New Project")
@@ -33,12 +21,36 @@ def main():
 		"assets/fonts/IBMPlexSans-Regular.ttf",
 		13
 		)
+	grey = pg.Color("grey15")
 	black = pg.Color("black")
-	white = pg.Color("White")
+	white = pg.Color("white")
+	error_col = pg.Color("yellow")
 
 	clock = pg.time.Clock()
 
 	pygame_event = PygameEvent()
+
+	text_box = pg.Rect(20, 50, 440, 20)
+
+	submit_btn = ProgramBtn(
+		"Create & Open", 
+		150, 
+		default_font, 
+		white, 
+		black, 
+		(70, 111)
+		)
+
+	cancel_btn = ProgramBtn(
+		"Cancel", 
+		150, 
+		default_font, 
+		white, 
+		black, 
+		(280, 111)
+		)
+
+	error_message = ""
 
 	while pygame_event.running:
 
@@ -47,19 +59,57 @@ def main():
 		# Input
 
 		mouse_pos = pg.mouse.get_pos()
-		print(mouse_pos)
 		pygame_event.check()
+		project_name = pygame_event.user_input
+
+		enter = False
+		click_submit = submit_btn.update(pygame_event.click, mouse_pos)
+		click_cancel = cancel_btn.update(pygame_event.click, mouse_pos)
+
+		if enter or click_submit:
+			if project_name:
+				if not path.isdir(f"projects/{project_name}"):
+					state = f"working_state/workonproject_{project_name}"
+					Path(state).touch()
+					return 0
+				else:
+					error_message = "Error, Project with that name already exists."
+			else:
+				error_message = "Error, Please enter a project name."
+
+		if click_cancel:
+			return 0
 
 		# Graphic
 
-		screen.fill(black)
+		screen.fill(grey)
+		pg.draw.rect(screen, white, text_box)
 		blit_text(
 			screen,
-			"test",
+			"Enter Project Name:",
 			default_font,
 			white,
-			(0, 0)
+			(15, 20)
 			)
+
+		blit_text(
+			screen,
+			project_name,
+			default_font,
+			black,
+			(30, 50)
+			)
+
+		blit_text(
+			screen,
+			error_message,
+			default_font,
+			error_col,
+			(21, 77)
+			)
+
+		submit_btn.draw(screen, mouse_pos)
+		cancel_btn.draw(screen, mouse_pos)
 
 		pg.display.update()
 
@@ -72,29 +122,3 @@ if __name__ == "__main__":
 	except FileNotFoundError:
 		print("Error: Program need to be running from root directory.")
 		pass
-
-'''
-root = tk.Tk()
-root.minsize(360, 120)
-root.title("Create New Project")
-
-label = tk.Label(root, text="Enter Project Name:")
-label.pack()
-
-entry = tk.Entry(root)
-entry.pack()
-
-button_frame = tk.Frame(root)
-button_frame.pack()
-
-create_button = tk.Button(button_frame, text="Create & Open", command=create_and_open)
-create_button.pack()
-
-cancel_frame = tk.Frame(root)
-cancel_frame.pack(side=tk.BOTTOM, fill=tk.X)
-
-cancel_button = tk.Button(cancel_frame, text="Cancel", command=root.destroy)
-cancel_button.pack(side="right")
-
-root.mainloop()
-'''
