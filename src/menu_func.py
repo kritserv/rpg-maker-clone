@@ -1,4 +1,3 @@
-from os import startfile as openfolder
 from os import listdir, makedirs, remove
 from distutils.dir_util import copy_tree
 
@@ -107,11 +106,11 @@ class MenuFunc:
 		elif func_id == 26: #options
 			pass
 		elif func_id == 27: #test
-			pass
+			terminal.command("cd src/start_project && python main.py")
 		elif func_id == 28: #change title
 			pass
 		elif func_id == 29:
-			self.open_game_folder()
+			self.open_game_folder(terminal)
 		return None
 
 	def mkdir(self, dir_name) -> None:
@@ -151,9 +150,9 @@ class MenuFunc:
 			self.current_project_name = project_name
 			remove(f"working_state/workonproject_{project_name}")
 
-	def open_game_folder(self) -> None:
+	def open_game_folder(self, terminal) -> None:
 		path = f"projects/{self.current_project_name}"
-		openfolder(path)
+		terminal.open_folder(path)
 
 	def get_func_id(self, clicked_menu) -> int:
 		return self.func[clicked_menu]

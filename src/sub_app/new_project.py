@@ -1,6 +1,17 @@
+import pygame as pg
+
+pg.init()
+
+from sys import exit
+
+win_size = (360, 120)
+
+screen = pg.display.set_mode(
+	(win_size)
+	)
+
+from src import PygameEvent, blit_text
 from os import path
-import tkinter as tk
-from tkinter import messagebox
 from pathlib import Path
 from distutils.dir_util import copy_tree
 
@@ -16,6 +27,49 @@ def create_and_open() -> None:
 	else:
 		messagebox.showerror("Error", "Project with that name already exists.")
 
+def main():
+	pg.display.set_caption("Create New Project")
+	default_font = pg.font.Font(
+		"assets/fonts/IBMPlexSans-Regular.ttf",
+		13
+		)
+	black = pg.Color("black")
+	white = pg.Color("White")
+
+	clock = pg.time.Clock()
+
+	pygame_event = PygameEvent()
+
+	while pygame_event.running:
+
+		clock.tick(60)
+
+		# Input
+
+		mouse_pos = pg.mouse.get_pos()
+		print(mouse_pos)
+		pygame_event.check()
+
+		# Graphic
+
+		screen.fill(black)
+		blit_text(
+			screen,
+			"test",
+			default_font,
+			white,
+			(0, 0)
+			)
+
+		pg.display.update()
+
+	pg.quit()
+	exit()
+
+if __name__ == "__main__":
+	main()
+
+'''
 root = tk.Tk()
 root.minsize(360, 120)
 root.title("Create New Project")
@@ -39,3 +93,4 @@ cancel_button = tk.Button(cancel_frame, text="Cancel", command=root.destroy)
 cancel_button.pack(side="right")
 
 root.mainloop()
+'''
