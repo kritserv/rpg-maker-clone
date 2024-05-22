@@ -16,6 +16,11 @@ from pathlib import Path
 from distutils.dir_util import copy_tree
 
 def main():
+	pg.display.set_icon(
+		pg.image.load(
+			"assets/imgs/icon.png"
+			)
+		)
 	pg.display.set_caption("Create New Project")
 	default_font = pg.font.Font(
 		"assets/fonts/IBMPlexSans-Regular.ttf",
