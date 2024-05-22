@@ -109,8 +109,8 @@ class MenuFunc:
 			pass
 		elif func_id == 27:
 			self.play_test(terminal)
-		elif func_id == 28: #change title
-			pass
+		elif func_id == 28:
+			self.change_title(terminal)
 		elif func_id == 29:
 			self.open_game_folder(terminal)
 		return None
@@ -166,11 +166,14 @@ class MenuFunc:
 	def close_project(self) -> None:
 		self.current_project_name = ""
 
-	def open_game_folder(self, terminal) -> None:
-		terminal.open_folder(self.current_project_name)
-
 	def play_test(self, terminal) -> None:
 		terminal.command(f"cd projects/{self.current_project_name} && python main.py")
+
+	def change_title(self, terminal) -> None:
+		terminal.command("python src/sub_program/change_title.py")
+
+	def open_game_folder(self, terminal) -> None:
+		terminal.open_project_folder(self.current_project_name)
 
 	def get_func_id(self, clicked_menu) -> int:
 		return self.func[clicked_menu]

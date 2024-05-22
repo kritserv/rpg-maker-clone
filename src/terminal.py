@@ -1,5 +1,5 @@
 try:
-	from os import startfile as openfolder
+	from os import startfile as file_explorer
 except ImportError:
 	pass
 
@@ -14,14 +14,20 @@ class Terminal:
 	def command(self, comm) -> None:
 		call(f"{comm}", shell=True)
 
-	def open_folder(self, current_project) -> None:
+	def open_folder(self, path) -> None:
 		if self.os == "Linux":
 			try:
-				self.command(f"open projects/{current_project}")
+				self.command(f"open {path}")
 			except:
 				try:
-					self.command(f"xdg-open projects/{current_project}")
+					self.command(f"xdg-open {path}")
 				except:
-					raise OSError("I don't know what command you used to open your file manager. :)")
+					raise OSError("I don't know what command you used to open your file manager.")
+
 		elif self.os == "Windows":
-			openfolder(f"projects\\{current_project}")
+			path = path.replace("/", "\\")
+			file_explorer(path)
+
+	def open_project_folder(self, current_project) -> None:
+		path = f"projects/{current_project}"
+		self.open_folder(path)
