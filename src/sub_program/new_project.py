@@ -126,4 +126,3 @@ if __name__ == "__main__":
 		main()
 	except FileNotFoundError:
 		print("Error: Program need to be running from root directory.")
-		pass
