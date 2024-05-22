@@ -167,8 +167,7 @@ class MenuFunc:
 		self.current_project_name = ""
 
 	def open_game_folder(self, terminal) -> None:
-		path = f"projects/{self.current_project_name}"
-		terminal.open_folder(path)
+		terminal.open_folder(self.current_project_name)
 
 	def play_test(self, terminal) -> None:
 		terminal.clear()
