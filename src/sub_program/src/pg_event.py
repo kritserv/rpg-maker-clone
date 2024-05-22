@@ -5,8 +5,9 @@ class PygameEvent:
 		self.running = True
 		self.click = False
 		self.keydown, self.keyup = False, False
-		self.need_input = True
+		self.need_input = False
 		self.user_input = ""
+		self.enter = False
 
 	def check_type(self, event) -> object or None:
 		keydown, \
@@ -41,6 +42,13 @@ class PygameEvent:
 			running, \
 			click
 
+	def check_enter(self, key) -> None:
+		enter = False
+		if self.keydown:
+			if key == pg.K_RETURN:
+				enter = True
+		self.enter = enter
+
 	def check_quit_game(self, event, key) -> None:
 		running = True
 		if self.keydown:
@@ -50,14 +58,15 @@ class PygameEvent:
 				running = False
 		self.running = running
 
-	def check_unicode(self, key, event) -> None:
+	def check_unicode(self, event, key) -> None:
 		if self.need_input and key:
 			if self.keydown:
 				if key == pg.K_BACKSPACE:
 					self.user_input = self.user_input[:-1]
 					pg.time.set_timer(pg.USEREVENT, 75)
 				else:
-					self.user_input += event.unicode
+					if not self.enter:
+						self.user_input += event.unicode
 
 			elif self.keyup:
 				if key == pg.K_BACKSPACE:
@@ -74,14 +83,16 @@ class PygameEvent:
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
-			self.check_unicode(key, event)
+
+			if key:
+				self.check_enter(key)
+				self.check_quit_game(event, key)
+				self.check_unicode(event, key)
 
 			if event.type == pg.USEREVENT:
 				self.user_input = self.user_input[:-1]
 
 			if new_size:
 				return new_size
-			if key:
-				self.check_quit_game(event, key)
 
 		return 0

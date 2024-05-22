@@ -34,6 +34,7 @@ def main():
 	clock = pg.time.Clock()
 
 	pygame_event = PygameEvent()
+	pygame_event.need_input = True
 
 	text_box = pg.Rect(20, 50, 440, 20)
 
@@ -67,7 +68,7 @@ def main():
 		pygame_event.check()
 		project_name = pygame_event.user_input
 
-		enter = False
+		enter = pygame_event.enter
 		click_submit = submit_btn.update(pygame_event.click, mouse_pos)
 		click_cancel = cancel_btn.update(pygame_event.click, mouse_pos)
 
