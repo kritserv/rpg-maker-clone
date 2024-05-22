@@ -170,7 +170,6 @@ class MenuFunc:
 		terminal.open_folder(self.current_project_name)
 
 	def play_test(self, terminal) -> None:
-		terminal.clear()
 		terminal.command(f"cd projects/{self.current_project_name} && python main.py")
 
 	def get_func_id(self, clicked_menu) -> int:

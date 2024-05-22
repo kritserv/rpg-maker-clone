@@ -12,13 +12,7 @@ class Terminal:
 		self.os = system()
 
 	def command(self, comm) -> None:
-		call(comm, shell=True)
-
-	def clear(self) -> None:
-		if self.os == "Linux":
-			self.command("clear")
-		elif self.os == "Windows":
-			self.command("cls")
+		call(f"{comm}", shell=True)
 
 	def open_folder(self, current_project) -> None:
 		if self.os == "Linux":
