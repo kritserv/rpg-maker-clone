@@ -52,8 +52,8 @@ class MenuFunc:
 			self.new_project(terminal)
 		elif func_id == 1:
 			self.open_project(terminal)
-		elif func_id == 2: #close project
-			pass
+		elif func_id == 2:
+			self.close_project()
 		elif func_id == 3: #save project
 			pass
 		elif func_id == 4:
@@ -85,8 +85,8 @@ class MenuFunc:
 			self.current_layer = 2
 		elif func_id == 15:
 			self.current_layer = 3
-		elif func_id == 16:
-			terminal.command("echo event")
+		elif func_id == 16: #event
+			pass
 		elif func_id == 17:
 			self.current_tool = "pencil"
 		elif func_id == 18:
@@ -107,8 +107,8 @@ class MenuFunc:
 			pass
 		elif func_id == 26: #options
 			pass
-		elif func_id == 27: #test
-			terminal.command("cd src/start_project && python main.py")
+		elif func_id == 27:
+			self.play_test(terminal)
 		elif func_id == 28: #change title
 			pass
 		elif func_id == 29:
@@ -163,9 +163,16 @@ class MenuFunc:
 			write_line_to_file("", "working_state/work_on_project")
 			write_line_to_file(project_name, "working_state/last_open_project")
 
+	def close_project(self) -> None:
+		self.current_project_name = ""
+
 	def open_game_folder(self, terminal) -> None:
 		path = f"projects/{self.current_project_name}"
 		terminal.open_folder(path)
+
+	def play_test(self, terminal) -> None:
+		terminal.clear()
+		terminal.command(f"cd projects/{self.current_project_name} && python main.py")
 
 	def get_func_id(self, clicked_menu) -> int:
 		return self.func[clicked_menu]
