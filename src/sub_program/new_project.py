@@ -10,7 +10,7 @@ screen = pg.display.set_mode(
 	(win_size)
 	)
 
-from src import PygameEvent, ProgramBtn, blit_text
+from src import PygameEvent, ProgramBtn, blit_text, write_line_to_file
 from os import path
 from pathlib import Path
 from distutils.dir_util import copy_tree
@@ -74,8 +74,8 @@ def main():
 		if enter or click_submit:
 			if project_name:
 				if not path.isdir(f"projects/{project_name}"):
-					state = f"working_state/workonproject_{project_name}"
-					Path(state).touch()
+					state = "working_state/work_on_project"
+					write_line_to_file(project_name, state)
 					return 0
 				else:
 					error_message = "Error, Project with that name already exists."

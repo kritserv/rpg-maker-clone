@@ -1,5 +1,7 @@
-from os import listdir, makedirs, remove
+from os import listdir, makedirs
 from distutils.dir_util import copy_tree
+from pathlib import Path
+from .output_file import write_line_to_file, read_line_from_file
 
 class MenuFunc:
 	def __init__(self):
@@ -116,18 +118,28 @@ class MenuFunc:
 	def mkdir(self, dir_name) -> None:
 		makedirs(dir_name, exist_ok=True)
 
+	def make_working_dir(self) -> None:
+		self.mkdir("working_state")
+		self.mkdir("projects")
+		state = "working_state/work_on_project"
+		Path(state).touch()
+		write_line_to_file("", "working_state/work_on_project")
+		state = "working_state/last_open_project"
+		Path(state).touch()
+
 	def project_has_opened(self) -> bool:
 		return self.current_project_name != ""
 
 	def get_working_project(self) -> str or None:
 		for filename in listdir("working_state"):
-			if "workonproject" in filename:
-				project_name = filename.split("workonproject_")[1]
-				return project_name
+			if "work_on_project" in filename:
+				project_name = read_line_from_file("working_state/work_on_project")
+				if project_name:
+					return project_name
+		return None
 
 	def new_project(self, terminal) -> None:
-		self.mkdir("working_state")
-		self.mkdir("projects")
+		self.make_working_dir()
 		terminal.command("python src/sub_program/new_project.py")
 
 		project_name = self.get_working_project()
@@ -137,18 +149,19 @@ class MenuFunc:
 				"src/start_project", f"projects/{project_name}"
 				)
 			self.current_project_name = project_name
-			remove(f"working_state/workonproject_{project_name}")
+			write_line_to_file("", "working_state/work_on_project")
+			write_line_to_file(project_name, "working_state/last_open_project")
 
 	def open_project(self, terminal) -> None:
-		self.mkdir("working_state")
-		self.mkdir("projects")
+		self.make_working_dir()
 		terminal.command("python src/sub_program/open_project.py")
 		
 		project_name = self.get_working_project()
 
 		if project_name:
 			self.current_project_name = project_name
-			remove(f"working_state/workonproject_{project_name}")
+			write_line_to_file("", "working_state/work_on_project")
+			write_line_to_file(project_name, "working_state/last_open_project")
 
 	def open_game_folder(self, terminal) -> None:
 		path = f"projects/{self.current_project_name}"

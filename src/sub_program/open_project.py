@@ -16,7 +16,7 @@ screen = pg.display.set_mode(
 	(win_size)
 	)
 
-from src import PygameEvent, ProgramBtn, blit_text
+from src import PygameEvent, ProgramBtn, blit_text, write_line_to_file
 from pathlib import Path
 from distutils.dir_util import copy_tree
 
@@ -87,8 +87,8 @@ def main(projects):
 		click_cancel = cancel_btn.update(pygame_event.click, mouse_pos)
 
 		if project_name:
-			state = f"working_state/workonproject_{project_name}"
-			Path(state).touch()
+			state = "working_state/work_on_project"
+			write_line_to_file(project_name, state)
 			return 0
 
 		if click_cancel:

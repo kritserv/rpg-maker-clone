@@ -14,6 +14,7 @@ from .terminal import Terminal
 from .timer import Timer
 
 from .blit_text import blit_text
+from .output_file import write_line_to_file, read_line_from_file
 
 __all__ = [
 	ctx, 
@@ -29,5 +30,7 @@ __all__ = [
 	MenuFunc, 
 	Terminal, 
 	Timer,
-	blit_text
+	blit_text,
+	write_line_to_file,
+	read_line_from_file
 	]
