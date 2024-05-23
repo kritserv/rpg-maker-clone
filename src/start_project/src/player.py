@@ -130,9 +130,9 @@ class Player(pg.sprite.Sprite):
 				last_val = self.last_dx
 				pos = self.pos[0]
 
-			if last_val < 0:
+			if last_val > 0:
 				check = floor(pos)
-			elif last_val > 0:
+			elif last_val < 0:
 				check = ceil(pos)
 			else:
 				check = 0
