@@ -1,15 +1,15 @@
+from dataclasses import dataclass
+from platform import system
 try:
 	from os import startfile as file_explorer
 except ImportError:
 	pass
-
 from subprocess import call
-from platform import system
 from os import makedirs
 
+@dataclass(slots=True)
 class Terminal:
-	def __init__(self):
-		self.os = system()
+	os: str = system()
 
 	def command(self, comm) -> None:
 		call(f"{comm}", shell=True)

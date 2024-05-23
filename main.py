@@ -57,7 +57,9 @@ def main():
 	clock = pg.time.Clock()
 	delta_time = DeltaTime()
 
-	pygame_event = PygameEvent(game_size)
+	pygame_event = PygameEvent(
+		game_size
+		)
 
 	while pygame_event.running:
 

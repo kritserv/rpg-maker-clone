@@ -1,14 +1,16 @@
 import pygame as pg
+from dataclasses import dataclass
 
+@dataclass(slots=True)
 class PygameEvent:
-	def __init__(self, game_size):
-		self.game_size = game_size
-		self.running = True
-		self.left_click = False
-		self.right_click = False
-		self.keydown, self.keyup = False, False
-		self.need_input = False
-		self.user_input = ""
+	game_size: tuple
+	running: bool = True
+	left_click: bool = False
+	right_click: bool = False
+	keydown: bool = False
+	keyup: bool = False
+	need_input: bool = False
+	user_input: str = ""
 
 	def check_type(self, event) -> object or None:
 		keydown, \
