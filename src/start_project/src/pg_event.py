@@ -33,15 +33,9 @@ class PygameEvent:
 			click = False
 		else:
 			if event.type == pg.VIDEORESIZE:
-				if self.scale_on_x_axis:
-					ratio = event.w / self.game_size[0]
-					new_height = int(event.h / ratio)
-					new_size = pg.Surface((self.game_size[0], new_height))
-				else:
-					ratio = event.h / self.game_size[1]
-					new_width = int(event.w / ratio)
-					new_size = pg.Surface((new_width, self.game_size[1]))
-				return new_size
+				new_size = self.get_size_and_maintain_aspect_ratio(event)
+				new_display = pg.Surface(new_size)
+				return new_display
 			else:
 				return None
 		self.keydown, \
@@ -51,6 +45,16 @@ class PygameEvent:
 			keyup, \
 			running, \
 			click
+
+	def get_size_and_maintain_aspect_ratio(self, event) -> tuple:
+		if self.scale_on_x_axis:
+			ratio = event.w / self.game_size[0]
+			new_height = int(event.h / ratio)
+			return (self.game_size[0], new_height)
+		else:
+			ratio = event.h / self.game_size[1]
+			new_width = int(event.w / ratio)
+			return (new_width, self.game_size[1])
 
 	def check_arrow_key(self, event, key) -> None:
 		up, down, left, right = False, False, False, False
