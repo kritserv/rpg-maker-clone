@@ -49,8 +49,8 @@ class SubMenuBtn:
 
 		display.blit(self.text_surface, text_pos)
 
-	def update(self, click, mouse_pos) -> str or None:
-		if self.rect.collidepoint(mouse_pos) and click:
+	def update(self, left_click, mouse_pos) -> str or None:
+		if self.rect.collidepoint(mouse_pos) and left_click:
 			return self.text
 
 class ImageMenuBtn:
@@ -69,8 +69,8 @@ class ImageMenuBtn:
 		else:
 			display.blit(self.image, (self.rect[0]+1, self.rect[1]+1))
 
-	def update(self, click, mouse_pos) -> str or None:
-		if self.rect.collidepoint(mouse_pos) and click:
+	def update(self, left_click, mouse_pos) -> str or None:
+		if self.rect.collidepoint(mouse_pos) and left_click:
 			return self.image_name
 
 
@@ -110,8 +110,8 @@ class MenuBar:
 		self.btn_margin_left = 6
 		self.current_x = self.btn_margin_left
 		self.any_submenu_opened = False
-		self.click_cooldown = Timer()
-		self.click_cooldown.start()
+		self.left_click_cooldown = Timer()
+		self.left_click_cooldown.start()
 		
 		for menu_text in [
 			"File", 
@@ -279,24 +279,24 @@ class MenuBar:
 		for submenu in self.submenus:
 			submenu.draw(display, mouse_pos)
 
-	def update(self, click, mouse_pos) -> str or int or None:
-		if click and self.click_cooldown.now()>=0.2:
-			self.click_cooldown.restart()
+	def update(self, left_click, mouse_pos) -> str or int or None:
+		if left_click and self.left_click_cooldown.now()>=0.2:
+			self.left_click_cooldown.restart()
 
 			if not self.any_submenu_opened:
 				for btn in self.image_btns:
-					return_value = btn.update(click, mouse_pos)
+					return_value = btn.update(left_click, mouse_pos)
 					if return_value:
 						return return_value
 
 			for submenu in self.submenus:
 				if submenu.visible:
 					for btn in submenu.btns:
-						return_value = btn.update(click, mouse_pos)
+						return_value = btn.update(left_click, mouse_pos)
 						if return_value:
 							return return_value
 			
-		if self.any_submenu_opened and click:
+		if self.any_submenu_opened and left_click:
 			for submenu in self.submenus:
 				submenu.visible = False
 			self.any_submenu_opened = False
@@ -310,12 +310,12 @@ class MenuBar:
 							self.any_submenu_opened = True
 						else:
 							submenu.visible = False
-				elif click:
+				elif left_click:
 					for submenu in self.submenus:
 						if submenu.parent_btn == btn:
 							submenu.visible = True
 							self.any_submenu_opened = True
-		if click and not self.any_submenu_opened:
+		if left_click and not self.any_submenu_opened:
 			for submenu in self.submenus:
 				submenu.visible = False
 

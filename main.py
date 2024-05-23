@@ -70,11 +70,12 @@ def main():
 		new_size = pygame_event.check()
 		if new_size:
 			display = new_size
+		any_click = pygame_event.left_click or pygame_event.right_click
 
 		# Logic
 
 		return_value = menu_bar.update(
-			pygame_event.click, 
+			any_click, 
 			mouse_pos
 			)
 		

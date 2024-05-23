@@ -4,7 +4,8 @@ class PygameEvent:
 	def __init__(self, game_size):
 		self.game_size = game_size
 		self.running = True
-		self.click = False
+		self.left_click = False
+		self.right_click = False
 		self.keydown, self.keyup = False, False
 		self.need_input = False
 		self.user_input = ""
@@ -13,9 +14,11 @@ class PygameEvent:
 		keydown, \
 		keyup, \
 		running , \
-		click = False, \
+		left_click, \
+		right_click = False, \
 			False, \
 			True, \
+			False, \
 			False
 		if event.type == pg.KEYDOWN:
 			keydown = True
@@ -24,9 +27,12 @@ class PygameEvent:
 		elif event.type == pg.QUIT:
 			running = False
 		elif event.type == pg.MOUSEBUTTONDOWN:
-			click = True
+			if event.button == 1:
+				left_click = True
+			elif event.button == 3:
+				right_click = True
 		elif event.type == pg.MOUSEBUTTONUP:
-			click = False
+			left_click, right_click = False, False
 		else:
 			if event.type == pg.VIDEORESIZE:
 				new_size = pg.Surface((event.w, event.h))
@@ -37,10 +43,12 @@ class PygameEvent:
 		self.keydown, \
 		self.keyup, \
 		self.running, \
-		self.click = keydown, \
+		self.left_click, \
+		self.right_click = keydown, \
 			keyup, \
 			running, \
-			click
+			left_click, \
+			right_click
 
 	def check_quit_game(self, event, key) -> None:
 		running = True
