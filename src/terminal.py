@@ -16,13 +16,7 @@ class Terminal:
 
 	def open_folder(self, path) -> None:
 		if self.os == "Linux":
-			try:
-				self.command(f"open {path}")
-			except:
-				try:
-					self.command(f"xdg-open {path}")
-				except:
-					raise OSError("I don't know what command you used to open your file manager.")
+			self.command(f"xdg-open {path}")
 
 		elif self.os == "Windows":
 			path = path.replace("/", "\\")
