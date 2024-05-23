@@ -1,18 +1,35 @@
 import pygame as pg
+from dataclasses import dataclass, field
 from .blit_text import create_text_surface
 from .timer import Timer
 
+@dataclass(slots=True, kw_only=True)
 class MenuBtn:
-	def __init__(self, text, font, white, pos):
-		self.width = 36
-		self.text = text
+	width: int = 36
+	text: str
+	white: object
+	pos: tuple
+	font: object
+	hover_bg_color: object = field(
+		default_factory=lambda: pg.Color("cyan4")
+		)
+	text_surface: object = field(
+		default_factory=object
+		)
+	rect: object = field(
+		default_factory=object
+		)
 
-		self.hover_bg_color = pg.Color("cyan4")
-
-		self.text_surface = create_text_surface(
-			self.text, font, white
+	def create_text(self):
+		self.text_surface: object = create_text_surface(
+			self.text, self.font, self.white
 			)
-		self.rect = pg.Rect(pos[0], pos[1], self.width, self.text_surface.get_height()+4)
+		self.rect: object = pg.Rect(
+			self.pos[0], 
+			self.pos[1], 
+			self.width, 
+			self.text_surface.get_height()+4
+			)
 
 	def draw(self, display, mouse_pos) -> None:
 		if self.rect.collidepoint(mouse_pos):
@@ -25,18 +42,34 @@ class MenuBtn:
 
 		display.blit(self.text_surface, text_pos)
 
+@dataclass(slots=True, kw_only=True)
 class SubMenuBtn:
-	def __init__(self, text, font, white, pos):
-		self.width = 220
-		self.text = text
-		self.margin_left = 6
+	width: int = 220
+	text: str
+	margin_left: int = 6
+	white: object
+	pos: tuple
+	font: object
+	hover_bg_color: object = field(
+		default_factory=lambda: pg.Color("cyan4")
+		)
+	text_surface: object = field(
+		default_factory=object
+		)
+	rect: object = field(
+		default_factory=object
+		)
 
-		self.hover_bg_color = pg.Color("cyan4")
-
+	def create_text(self):
 		self.text_surface = create_text_surface(
-			self.text, font, white
+			self.text, self.font, self.white
 			)
-		self.rect = pg.Rect(pos[0], pos[1], self.width, self.text_surface.get_height()+4)
+		self.rect = pg.Rect(
+			self.pos[0], 
+			self.pos[1], 
+			self.width, 
+			self.text_surface.get_height()+4
+			)
 
 	def draw(self, display, mouse_pos) -> None:
 		if self.rect.collidepoint(mouse_pos):
@@ -53,12 +86,27 @@ class SubMenuBtn:
 		if self.rect.collidepoint(mouse_pos) and left_click:
 			return self.text
 
+@dataclass(slots=True, kw_only=True)
 class ImageMenuBtn:
-	def __init__(self, image_name, pos):
-		self.image_name = image_name
-		image_path = f"assets/imgs/{image_name}.png"
+	img_name: str
+	pos: tuple
+	image_path: str = field(
+		default_factory=str
+		)
+	image: object = field(
+		default_factory=object
+		)
+	rect: object = field(
+		default_factory=object
+		)
+	image_hover: object = field(
+		default_factory=object
+		)
+
+	def create_img(self):
+		image_path = f"assets/imgs/{self.img_name}.png"
 		self.image = pg.image.load(image_path).convert_alpha()
-		self.rect = self.image.get_rect(topleft=pos)
+		self.rect = self.image.get_rect(topleft=self.pos)
 		self.image_hover = pg.Surface((self.rect.width + 2, self.rect.height + 2))
 		self.image_hover.fill(pg.Color("cyan4"))
 		self.image_hover.blit(self.image, (1, 1))
@@ -71,24 +119,33 @@ class ImageMenuBtn:
 
 	def update(self, left_click, mouse_pos) -> str or None:
 		if self.rect.collidepoint(mouse_pos) and left_click:
-			return self.image_name
+			return self.img_name
 
-
+@dataclass(slots=True, kw_only=True)
 class SubMenu:
-	def __init__(self, parent_btn, options, font, white):
-		self.parent_btn = parent_btn
-		self.btns = []
-		self.visible = False
+	parent_btn: object
+	options: list
+	font: object
+	white: object
+	btns: list = field(
+		default_factory=list
+		)
+	visible: bool = False
+	bg: object = field(
+		default_factory=object
+		)
 
+	def create_menu(self):
 		bg_height = 1
-		for i, option in enumerate(options):
+		for i, option in enumerate(self.options):
 			bg_height += 21
 			pos_x, pos_y = self.parent_btn.rect.topleft
 			btn = SubMenuBtn(
-				option,
-				font,
-				white,
-				(pos_x, pos_y + (i+1)*self.parent_btn.rect.height))
+				text=option,
+				font=self.font,
+				white=self.white,
+				pos=(pos_x, pos_y + (i+1)*self.parent_btn.rect.height))
+			btn.create_text()
 			self.btns.append(btn)
 
 		self.bg = pg.Surface((220, bg_height))
@@ -100,18 +157,31 @@ class SubMenu:
 			for btn in self.btns:
 				btn.draw(display, mouse_pos)
 
+@dataclass(slots=True, kw_only=True)
 class MenuBar:
-	def __init__(self, default_font, white):
-		max_display_width = pg.display.get_desktop_sizes()[0][0]
-		self.bg = pg.Surface((max_display_width, 64))
+	max_display_width: int = pg.display.get_desktop_sizes()[0][0]
+	font: object
+	white: object
+	bg: object = field(
+		default_factory=object
+		)
+	btns: list = field(
+		default_factory=list
+		)
+	image_btns: list = field(
+		default_factory=list
+		)
+	btn_margin_left: int = 6
+	current_x: int = 6
+	any_submenu_opened: bool = False
+	left_click_cooldown: object = Timer()
+	submenus: list = field(
+		default_factory=list
+		)
+
+	def create_menu(self):
+		self.bg = pg.Surface((self.max_display_width, 64))
 		self.bg.fill(pg.Color("grey20"))
-		self.btns = []
-		self.image_btns = []
-		self.btn_margin_left = 6
-		self.current_x = self.btn_margin_left
-		self.any_submenu_opened = False
-		self.left_click_cooldown = Timer()
-		self.left_click_cooldown.start()
 		
 		for menu_text in [
 			"File", 
@@ -124,11 +194,12 @@ class MenuBar:
 			"Game"
 			]:
 			btn = MenuBtn(
-				menu_text, 
-				default_font, 
-				white, 
-				(self.current_x, 5)
+				text=menu_text, 
+				font=self.font, 
+				white=self.white, 
+				pos=(self.current_x, 5)
 				)
+			btn.create_text()
 			self.btns.append(btn)
 			self.current_x += btn.rect.width + self.btn_margin_left
 
@@ -159,9 +230,10 @@ class MenuBar:
 			"play_test"
 			]:
 			btn = ImageMenuBtn(
-				img,
-				(self.current_x, 35)
+				img_name=img,
+				pos=(self.current_x, 35)
 			)
+			btn.create_img()
 			self.image_btns.append(btn)
 			self.current_x += 20 + self.btn_margin_left
 			if img == "save_project" or \
@@ -171,92 +243,99 @@ class MenuBar:
 					self.current_x += 5
 
 		file_submenu = SubMenu(
-			self.btns[0], 
-			[
+			parent_btn=self.btns[0], 
+			options=[
 				"New project (Ctrl + N)", 
 				"Open project (Ctrl + O)", 
 				"Close project", 
 				"Save Project (Ctrl + S)", 
 				"Exit (Ctrl + Q)"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		file_submenu.create_menu()
 		edit_submenu = SubMenu(
-			self.btns[1], 
-			[
+			parent_btn=self.btns[1], 
+			options=[
 				"Undo (Ctrl + Z)", 
 				"Cut (Ctrl + X)", 
 				"Copy (Ctrl + C)", 
 				"Paste (Ctrl + V)", 
 				"Delete (Del)"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		edit_submenu.create_menu()
 		view_submenu = SubMenu(
-			self.btns[2], 
-			[
+			parent_btn=self.btns[2], 
+			options=[
 				"Current and Below (F2)", 
 				"All Layers (F3)", 
 				"Dim Other Layers (F4)"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		view_submenu.create_menu()
 		mode_submenu = SubMenu(
-			self.btns[3], 
-			[
+			parent_btn=self.btns[3], 
+			options=[
 				"Layer 1 (F5)", 
 				"Layer 2 (F6)", 
 				"Layer 3 (F7)", 
 				"Events (F8)"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		mode_submenu.create_menu()
 		draw_submenu = SubMenu(
-			self.btns[4], 
-			[
+			parent_btn=self.btns[4], 
+			options=[
 				"Pencil", 
 				"Rectangle", 
 				"Ellipse", 
 				"Flood Fill", 
 				"Select"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		draw_submenu.create_menu()
 		scale_submenu = SubMenu(
-			self.btns[5], 
-			[
+			parent_btn=self.btns[5], 
+			options=[
 				"1:1", 
 				"1:2", 
 				"1:4"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		scale_submenu.create_menu()
 		tools_submenu = SubMenu(
-			self.btns[6], 
-			[
+			parent_btn=self.btns[6], 
+			options=[
 				"Database (F9)", 
 				"Options"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
+		tools_submenu.create_menu()
 		game_submenu = SubMenu(
-			self.btns[7], 
-			[
+			parent_btn=self.btns[7], 
+			options=[
 				"Play Test (F12)", 
 				"Change Title", 
 				"Open Game Folder"
 			], 
-			default_font, 
-			white
+			font=self.font, 
+			white=self.white
 			)
-
+		game_submenu.create_menu()
 		self.submenus = [
 			file_submenu, 
 			edit_submenu, 
@@ -267,6 +346,7 @@ class MenuBar:
 			tools_submenu,
 			game_submenu
 			]
+		self.left_click_cooldown.start()
 
 	def draw(self, display, mouse_pos) -> None:
 		display.blit(self.bg, (0, 0))

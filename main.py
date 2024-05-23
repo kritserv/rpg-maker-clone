@@ -51,7 +51,11 @@ def main():
 	black = pg.Color("black")
 	white = pg.Color("white")
 
-	menu_bar = MenuBar(default_font, white)
+	menu_bar = MenuBar(
+		font=default_font, 
+		white=white
+		)
+	menu_bar.create_menu()
 	menu_func = MenuFunc()
 
 	clock = pg.time.Clock()

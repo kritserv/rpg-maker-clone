@@ -7,7 +7,7 @@ except ImportError:
 from subprocess import call
 from os import makedirs
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Terminal:
 	os: str = system()
 

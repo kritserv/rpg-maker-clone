@@ -1,12 +1,14 @@
+from dataclasses import dataclass, field
 from os import listdir, makedirs
 from distutils.dir_util import copy_tree
 from pathlib import Path
 from .output_file import write_line_to_file, read_line_from_file
 
+@dataclass(slots=True)
 class MenuFunc:
-	def __init__(self):
-		self.current_project_name = ""
-		self.func = {
+	current_project_name: str = ""
+	func: dict[str, int] = field(
+		default_factory=lambda: ({
 			"New project (Ctrl + N)": 0, "new_project": 0,
 			"Open project (Ctrl + O)": 1, "open_project": 1,
 			"Close project": 2,
@@ -37,15 +39,18 @@ class MenuFunc:
 			"Play Test (F12)": 27, "play_test": 27,
 			"Change Title": 28,
 			"Open Game Folder": 29
-		}
-		self.current_tool = "pencil"
-		self.current_mode = {
-			"current_and_below": False,
-			"all_layer": True,
-			"dim_others_layer": True,
-		}
-		self.current_layer = 1
-		self.zoom_level = 1.00
+		})
+		)
+	current_tool: str = "pencil"
+	current_mode: dict[str, bool] = field(
+		default_factory=lambda: ({
+		"current_and_below": False,
+		"all_layer": True,
+		"dim_others_layer": True,
+		})
+		)
+	current_layer: int = 1
+	zoom_level: float = 1.00
 
 	def exec_func(self, func_id, terminal) -> int or None:
 		if func_id == 0:
