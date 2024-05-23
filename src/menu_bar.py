@@ -149,7 +149,7 @@ class MenuBar:
 			"events", 
 			"pencil", 
 			"rectangle", 
-			"eclipse", 
+			"ellipse", 
 			"flood_fill", 
 			"select", 
 			"1to1", 
@@ -220,7 +220,7 @@ class MenuBar:
 			[
 				"Pencil", 
 				"Rectangle", 
-				"Eclipse", 
+				"Ellipse", 
 				"Flood Fill", 
 				"Select"
 			], 

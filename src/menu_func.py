@@ -26,7 +26,7 @@ class MenuFunc:
 			"Events (F8)": 16, "events": 16,
 			"Pencil": 17, "pencil": 17,
 			"Rectangle": 18, "rectangle": 18,
-			"Eclipse": 19, "eclipse": 19,
+			"Ellipse": 19, "ellipse": 19,
 			"Flood Fill": 20, "flood_fill": 20,
 			"Select": 21, "select": 21,
 			"1:1": 22, "1to1": 22,
