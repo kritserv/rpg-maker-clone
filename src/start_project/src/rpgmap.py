@@ -7,8 +7,9 @@ class Tile:
 		self.img = pg.image.load(img_path)
 		self.rect = self.img.get_rect(topleft=pos)
 
-class RpgMap:
+class RpgMap(pg.sprite.Sprite):
 	def __init__(self):
+		pg.sprite.Sprite.__init__(self)
 		self.tile_size = 16
 		self.map_data = {}
 		self.curr_map = "map001"

@@ -1,8 +1,9 @@
 from time import time
+from dataclasses import dataclass
 
+@dataclass(slots=True)
 class DeltaTime:
-	def __init__(self):
-		self.prev = time()
+	prev: float = time()
 
 	def get(self) -> float:
 		now = time()

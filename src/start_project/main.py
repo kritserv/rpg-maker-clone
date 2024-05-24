@@ -63,7 +63,13 @@ def main():
 
 	delta_time = DeltaTime()
 
-	pygame_event = PygameEvent(game_size, scale_method)
+	scale_on_x_axis = False
+	if scale_method == "by windows width":
+		scale_on_x_axis = True
+	pygame_event = PygameEvent(
+		game_size=game_size, 
+		scale_on_x_axis=scale_on_x_axis
+		)
 
 	prev_time = time()
 	while pygame_event.running:

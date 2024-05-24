@@ -1,17 +1,20 @@
 import pygame as pg
+from dataclasses import dataclass
 
+@dataclass(slots=True, kw_only=True)
 class PygameEvent:
-	def __init__(self, game_size, scale_method):
-		self.game_size = game_size
-		self.running = True
-		self.click = False
-		self.keydown, self.keyup = False, False
-		self.up, self.down, self.left, self.right = False, False, False, False
-		self.interact, self.cancel = False, False
-		if scale_method == "by windows width":
-			self.scale_on_x_axis = True
-		else:
-			self.scale_on_x_axis = False
+	game_size: tuple
+	running: bool = True
+	click: bool = False
+	keydown: bool = False
+	keyup: bool = False
+	up: bool = False
+	down: bool = False
+	left: bool = False
+	right: bool = False
+	interact: bool = False
+	cancel: bool = False
+	scale_on_x_axis: bool
 
 	def check_type(self, event) -> object or None:
 		keydown, \
