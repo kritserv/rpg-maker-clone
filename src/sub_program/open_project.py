@@ -3,7 +3,6 @@ import pygame as pg
 pg.font.init()
 
 from sys import exit
-
 from os import listdir
 
 projects = listdir("projects/")
@@ -17,7 +16,6 @@ screen = pg.display.set_mode(
 	)
 
 from src import PygameEvent, ProgramBtn, blit_text, write_line_to_file
-from pathlib import Path
 from distutils.dir_util import copy_tree
 
 def main(projects):

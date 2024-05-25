@@ -7,12 +7,21 @@ except ImportError:
 from subprocess import call
 from os import makedirs
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, kw_only=True)
 class Terminal:
 	os: str = system()
+	venv_dir_exist: bool
 
-	def command(self, comm) -> None:
-		call(f"{comm}", shell=True)
+	def command(self, comm, need_venv=False) -> None:
+		if need_venv and self.venv_dir_exist:
+			if self.os == "Linux":
+				comm = "source venv/bin/activate &&" + comm
+			elif self.os == "Windows":
+				comm = "venv\\Scripts\\activate.bat &&" + comm
+		try:
+			call(f"{comm}", shell=True)
+		except Exception as e:
+			print(e.message)
 
 	def open_folder(self, path) -> None:
 		if self.os == "Linux":

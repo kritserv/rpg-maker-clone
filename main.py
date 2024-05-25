@@ -16,6 +16,7 @@ screen = pg.display.set_mode(
 		pg.DOUBLEBUF
 		)
 
+from os import listdir
 from src import ctx, \
 	quad_buffer, \
 	vert_shader, \
@@ -39,7 +40,9 @@ def main():
 		)
 	pg.display.set_caption("RPPYG Maker")
 
-	terminal = Terminal()
+	terminal = Terminal(
+		venv_dir_exist="venv" in listdir()
+		)
 
 	display = pg.Surface(
 			(game_size))
