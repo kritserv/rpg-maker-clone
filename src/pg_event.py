@@ -66,7 +66,7 @@ class PygameEvent:
 			if self.keydown:
 				if key == pg.K_BACKSPACE:
 					self.user_input = self.user_input[:-1]
-					pg.time.set_timer(pg.USEREVENT, 75)
+					pg.time.set_timer(pg.USEREVENT, 110)
 				else:
 					self.user_input += event.unicode
 
