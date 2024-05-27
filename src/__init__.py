@@ -10,6 +10,7 @@ from .dt import DeltaTime
 from .pg_event import PygameEvent
 from .menu_bar import MenuBar
 from .menu_func import MenuFunc
+from .sidebar_menu import SideBarMenu
 from .terminal import Terminal
 from .timer import Timer
 
@@ -28,6 +29,7 @@ __all__ = [
 	PygameEvent, 
 	MenuBar, 
 	MenuFunc, 
+	SideBarMenu,
 	Terminal, 
 	Timer,
 	blit_text,

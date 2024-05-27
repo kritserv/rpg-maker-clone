@@ -28,6 +28,7 @@ from src import ctx, \
 from src import DeltaTime, \
 	PygameEvent, \
 	MenuBar, MenuFunc, \
+	SideBarMenu, \
 	Terminal, \
 	Timer, \
 	blit_text
@@ -61,6 +62,15 @@ def main():
 	menu_bar.create_menu()
 	menu_func = MenuFunc()
 
+	sidebar_menu = SideBarMenu(
+		rect = pg.Rect(
+			0, 
+			64, 
+			240, 
+			pg.display.get_desktop_sizes()[0][1]-64
+			)
+		)
+
 	clock = pg.time.Clock()
 	delta_time = DeltaTime()
 
@@ -88,14 +98,22 @@ def main():
 			mouse_pos
 			)
 		
-		return_value = menu_func.update(return_value, terminal)
+		return_value = menu_func.update(
+			return_value, 
+			terminal
+			)
 		if return_value == 0:
 			return 0
+
+		sidebar_menu.update(
+			menu_func.current_project_name
+			)
 
 		# Graphic
 
 		display.fill(black)
 
+		sidebar_menu.draw(display)
 		menu_bar.draw(display, mouse_pos)
 
 		curr_fps = "fps:"+str(clock.get_fps()//0.1/10)
