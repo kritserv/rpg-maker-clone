@@ -89,6 +89,10 @@ class Player(pg.sprite.Sprite):
 					self.direction = "right"
 					dx = 1
 
+				if key[pg.K_LEFT] and key[pg.K_RIGHT]:
+					self.direction = "bottom"
+					dx = 0
+
 				if dx != 0:
 					self.last_dx = dx
 					self.key_pressed = True
@@ -103,6 +107,10 @@ class Player(pg.sprite.Sprite):
 				elif key[pg.K_DOWN]:
 					self.direction = "bottom"
 					dy = 1
+
+				if key[pg.K_UP] and key[pg.K_DOWN]:
+					self.direction = "bottom"
+					dy = 0
 
 				if dy != 0:
 					self.last_dy = dy
