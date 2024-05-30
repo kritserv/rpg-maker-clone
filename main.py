@@ -17,15 +17,9 @@ screen = pg.display.set_mode(
 		)
 
 from os import listdir
-from src import ctx, \
-	quad_buffer, \
-	vert_shader, \
-	frag_shader, \
-	program, \
-	render_object, \
-	surf_to_texture
 
-from src import DeltaTime, \
+from src import OpenGLStuff, \
+	DeltaTime, \
 	PygameEvent, \
 	MenuBar, MenuFunc, \
 	SideBarMenu, \
@@ -40,6 +34,8 @@ def main():
 			)
 		)
 	pg.display.set_caption("RPPYG Maker")
+
+	opengl = OpenGLStuff()
 
 	terminal = Terminal(
 		venv_dir_exist="venv" in listdir()
@@ -126,16 +122,7 @@ def main():
 			draw_fps_pos
 			)
 
-		frame_tex = surf_to_texture(display)
-		frame_tex.use(0)
-		program["tex"] = 0
-		render_object.render(
-			mode=moderngl.TRIANGLE_STRIP
-			)
-
-		pg.display.flip()
-
-		frame_tex.release()
+		opengl.draw(display)
 
 	pg.quit()
 	exit()
