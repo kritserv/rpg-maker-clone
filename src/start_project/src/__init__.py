@@ -1,10 +1,4 @@
-from .opengl_stuff import ctx, \
-	quad_buffer, \
-	vert_shader, \
-	frag_shader, \
-	program, \
-	render_object, \
-	surf_to_texture
+from .opengl_stuff import OpenGLStuff
 
 from .load_json import json_loader
 
@@ -17,13 +11,7 @@ from .pg_event import PygameEvent
 from .blit_text import blit_text
 
 __all__ = [
-	ctx, 
-	quad_buffer, 
-	vert_shader, 
-	frag_shader, 
-	program, 
-	render_object, 
-	surf_to_texture,
+	OpenGLStuff, 
 	json_loader, 
 	Player,
 	RpgMap,

@@ -19,15 +19,8 @@ screen = pg.display.set_mode(
 	pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
 	)
 
-from src import ctx, \
-	quad_buffer, \
-	vert_shader, \
-	frag_shader, \
-	program, \
-	render_object, \
-	surf_to_texture
-
-from src import json_loader, \
+from src import OpenGLStuff, \
+	json_loader, \
 	Player, \
 	RpgMap, \
 	DeltaTime, \
@@ -43,6 +36,8 @@ pg.display.set_icon(
 def main():
 	display = pg.Surface(
 		(game_size))
+
+	opengl = OpenGLStuff()
 
 	db = json_loader("game_data/db.json")
 
@@ -95,16 +90,7 @@ def main():
 
 		display.blit(player.img, (player.pos))
 		
-		frame_tex = surf_to_texture(display)
-		frame_tex.use(0)
-		program["tex"] = 0
-		render_object.render(
-			mode=moderngl.TRIANGLE_STRIP
-			)
-
-		pg.display.flip()
-
-		frame_tex.release()
+		opengl.draw(display)
 
 	pg.quit()
 	exit()

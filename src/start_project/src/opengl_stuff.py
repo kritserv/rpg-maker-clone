@@ -1,61 +1,75 @@
+import pygame as pg
 import moderngl
 from array import array
 
-ctx = moderngl.create_context()
+class OpenGLStuff:
+	def __init__(self):
+		self.ctx = moderngl.create_context()
+		self.quad_buffer = self.ctx.buffer(data=array("f", [
+			-1.0, 1.0, 0.0, 0.0,
+			1.0, 1.0, 1.0, 0.0,
+			-1.0, -1.0, 0.0, 1.0,
+			1.0, -1.0, 1.0, 1.0
+			]))
 
-quad_buffer = ctx.buffer(data=array("f", [
-	-1.0, 1.0, 0.0, 0.0,
-	1.0, 1.0, 1.0, 0.0,
-	-1.0, -1.0, 0.0, 1.0,
-	1.0, -1.0, 1.0, 1.0
-	]))
+		vert_shader = '''
+		#version 330 core
 
-vert_shader = '''
-#version 330 core
+		in vec2 vert;
+		in vec2 textcoord;
+		out vec2 uvs;
 
-in vec2 vert;
-in vec2 textcoord;
-out vec2 uvs;
+		void main() {
+			uvs = textcoord;
+			gl_Position = vec4(vert, 0.0, 1.0);
+		}
+		'''
 
-void main() {
-	uvs = textcoord;
-	gl_Position = vec4(vert, 0.0, 1.0);
-}
-'''
+		frag_shader = '''
+		#version 330 core
 
-frag_shader = '''
-#version 330 core
+		uniform sampler2D tex;
 
-uniform sampler2D tex;
+		in vec2 uvs;
+		out vec4 f_color;
 
-in vec2 uvs;
-out vec4 f_color;
+		void main() {
+			f_color = vec4(texture(tex, uvs).rgb, 1.0);
+		}
+		'''
 
-void main() {
-	f_color = vec4(texture(tex, uvs).rgb, 1.0);
-}
-'''
-
-program = ctx.program(
-	vertex_shader=vert_shader,	 
-	fragment_shader=frag_shader
-	)
-
-render_object = ctx.vertex_array(
-	program, 
-	[
-		(
-			quad_buffer,
-			 "2f 2f", 
-			 "vert", 
-			 "textcoord"
+		self.program = self.ctx.program(
+			vertex_shader=vert_shader,	 
+			fragment_shader=frag_shader
 			)
-	]
-	)
 
-def surf_to_texture(surf) -> object:
-	tex = ctx.texture(surf.get_size(), 4)
-	tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
-	tex.swizzle = "BGRA"
-	tex.write(surf.get_view("1"))
-	return tex
+		self.render_object = self.ctx.vertex_array(
+			self.program, 
+			[
+				(
+					self.quad_buffer,
+					 "2f 2f", 
+					 "vert", 
+					 "textcoord"
+					)
+			]
+			)
+
+	def surf_to_texture(self, surf) -> object:
+		tex = self.ctx.texture(surf.get_size(), 4)
+		tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+		tex.swizzle = "BGRA"
+		tex.write(surf.get_view("1"))
+		return tex
+
+	def draw(self, display) -> None:
+		frame_tex = self.surf_to_texture(display)
+		frame_tex.use(0)
+		self.program["tex"] = 0
+		self.render_object.render(
+			mode=moderngl.TRIANGLE_STRIP
+			)
+
+		pg.display.flip()
+
+		frame_tex.release()
