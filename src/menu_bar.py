@@ -174,7 +174,9 @@ class MenuBar:
 	btn_margin_left: int = 6
 	current_x: int = 6
 	any_submenu_opened: bool = False
-	left_click_cooldown: object = Timer()
+	left_click_cooldown: object = field(
+		default_factory=lambda: Timer()
+		)
 	submenus: list = field(
 		default_factory=list
 		)
