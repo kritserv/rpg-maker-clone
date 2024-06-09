@@ -2,8 +2,9 @@ from .load_json import json_loader
 from csv import reader
 import pygame as pg
 
-class Tile:
+class Tile(pg.sprite.Sprite):
 	def __init__(self, img_path, pos):
+		pg.sprite.Sprite.__init__(self)
 		self.img = pg.image.load(img_path)
 		self.rect = self.img.get_rect(topleft=pos)
 

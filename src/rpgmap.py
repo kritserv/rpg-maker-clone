@@ -2,10 +2,10 @@ from .load_json import json_loader
 from csv import reader
 import pygame as pg
 
-class Tile:
+class Tile(pg.sprite.Sprite):
 	def __init__(self, img_path, pos, zoom):
+		pg.sprite.Sprite.__init__(self)
 		self.img = pg.image.load(img_path)
-		self.zoom = zoom
 		self.img = pg.transform.scale(
 			self.img, 
 			(self.img.get_width() * zoom, 
@@ -39,7 +39,6 @@ class RpgMap(pg.sprite.Sprite):
 			with open(path) as f:
 				csv_load = reader(f, delimiter=",")
 				csv_data = [row for row in csv_load]
-				f.close()
 
 			for y, row in enumerate(csv_data):
 				for x, tile_id in enumerate(row):
