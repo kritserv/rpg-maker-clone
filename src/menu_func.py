@@ -3,15 +3,16 @@ from os import listdir, makedirs
 from distutils.dir_util import copy_tree
 from pathlib import Path
 from .output_file import write_line_to_file, read_line_from_file
+from .load_json import json_loader
 
 @dataclass(slots=True)
 class MenuFunc:
 	current_project_name: str = ""
 	func: dict[str, str] = field(
 		default_factory=lambda: ({
-			"New project (Ctrl + N)": "self.new_project(terminal)", "new_project": "self.new_project(terminal)",
-			"Open project (Ctrl + O)": "self.open_project(terminal)", "open_project": "self.open_project(terminal)",
-			"Close project": "self.close_project()",
+			"New project (Ctrl + N)": "self.new_project(terminal, rpgmap)", "new_project": "self.new_project(terminal, rpgmap)",
+			"Open project (Ctrl + O)": "self.open_project(terminal, rpgmap)", "open_project": "self.open_project(terminal, rpgmap)",
+			"Close project": "self.close_project(rpgmap)",
 			"Save Project (Ctrl + S)": "pass", "save_project": "pass",
 			"Undo (Ctrl + Z)": "pass", "undo": "pass",
 			"Cut (Ctrl + X)": "pass", "cut": "pass",
@@ -74,7 +75,14 @@ class MenuFunc:
 					return project_name
 		return None
 
-	def new_project(self, terminal) -> None:
+	def set_project_to_working_state(self, project_name, rpgmap):
+		self.current_project_name = project_name
+		write_line_to_file("", "working_state/work_on_project")
+		write_line_to_file(project_name, "working_state/last_open_project")
+		db = json_loader(f"projects/{project_name}/game_data/db.json")
+		rpgmap.load_map_data(db["maps"], project_name)
+
+	def new_project(self, terminal, rpgmap) -> None:
 		self.make_working_dir()
 		terminal.command("python src/sub_program/new_project.py")
 
@@ -84,23 +92,20 @@ class MenuFunc:
 			copy_tree(
 				"src/start_project", f"projects/{project_name}"
 				)
-			self.current_project_name = project_name
-			write_line_to_file("", "working_state/work_on_project")
-			write_line_to_file(project_name, "working_state/last_open_project")
+			self.set_project_to_working_state(project_name, rpgmap)
 
-	def open_project(self, terminal) -> None:
+	def open_project(self, terminal, rpgmap) -> None:
 		self.make_working_dir()
 		terminal.command("python src/sub_program/open_project.py")
 		
 		project_name = self.get_working_project()
 
 		if project_name:
-			self.current_project_name = project_name
-			write_line_to_file("", "working_state/work_on_project")
-			write_line_to_file(project_name, "working_state/last_open_project")
+			self.set_project_to_working_state(project_name, rpgmap)
 
-	def close_project(self) -> None:
+	def close_project(self, rpgmap) -> None:
 		self.current_project_name = ""
+		rpgmap.map_data = {}
 
 	def change_current_mode(self, changes) -> None:
 		for mode_name, change in changes:
@@ -121,15 +126,15 @@ class MenuFunc:
 	def get_func(self, clicked_menu) -> int:
 		return self.func[clicked_menu]
 
-	def update(self, clicked_menu, terminal) -> int or None:
+	def update(self, clicked_menu, terminal, rpgmap) -> int or None:
 		return_value = None
 		if clicked_menu:
 			if clicked_menu == "Exit (Ctrl + Q)":
 				return 0
 			func = self.get_func(clicked_menu)
 			need_project = func not in set((
-				"self.new_project(terminal)", 
-				"self.open_project(terminal)"
+				"self.new_project(terminal, rpgmap)", 
+				"self.open_project(terminal, rpgmap)"
 				))
 			if need_project:
 				if self.project_has_opened():

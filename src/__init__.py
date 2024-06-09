@@ -5,6 +5,7 @@ from .menu_bar import MenuBar
 from .menu_func import MenuFunc
 from .sidebar_menu import SideBarMenu
 from .terminal import Terminal
+from .rpgmap import RpgMap
 from .timer import Timer
 
 from .blit_text import blit_text
@@ -18,6 +19,7 @@ __all__ = [
 	MenuFunc, 
 	SideBarMenu,
 	Terminal, 
+	RpgMap, 
 	Timer,
 	blit_text,
 	write_line_to_file,

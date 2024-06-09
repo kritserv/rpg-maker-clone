@@ -24,6 +24,7 @@ from src import OpenGLStuff, \
 	MenuBar, MenuFunc, \
 	SideBarMenu, \
 	Terminal, \
+	RpgMap, \
 	Timer, \
 	blit_text
 
@@ -50,6 +51,8 @@ def main():
 		)
 	black = pg.Color("black")
 	white = pg.Color("white")
+
+	rpgmap = RpgMap()
 
 	menu_bar = MenuBar(
 		font=default_font, 
@@ -96,7 +99,8 @@ def main():
 		
 		return_value = menu_func.update(
 			return_value, 
-			terminal
+			terminal, 
+			rpgmap
 			)
 		if return_value == 0:
 			return 0
@@ -108,6 +112,9 @@ def main():
 		# Graphic
 
 		display.fill(black)
+
+		if rpgmap.map_data:
+			rpgmap.draw(display)
 
 		sidebar_menu.draw(display)
 		menu_bar.draw(display, mouse_pos)

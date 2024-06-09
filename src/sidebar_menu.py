@@ -13,3 +13,5 @@ class SideBarMenu:
 	def update(self, current_project):
 		if current_project:
 			self.visible = True
+		else:
+			self.visible = False
