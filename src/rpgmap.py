@@ -38,12 +38,11 @@ class RpgMap(pg.sprite.Sprite):
 
 			with open(path) as f:
 				csv_load = reader(f, delimiter=",")
-				csv_data = [row for row in csv_load]
 
-			for y, row in enumerate(csv_data):
-				for x, tile_id in enumerate(row):
-					img_path = f"projects/{project_name}/assets/img/tile/" + tilesets[tileset][tile_id]
-					current_tiles.append(Tile(img_path, (x*self.tile_size, y*self.tile_size), self.zoom))
+				for y, row in enumerate(csv_load):
+					for x, tile_id in enumerate(row):
+						img_path = f"projects/{project_name}/assets/img/tile/" + tilesets[tileset][tile_id]
+						current_tiles.append(Tile(img_path, (x*self.tile_size, y*self.tile_size), self.zoom))
 
 			self.map_data[name] = current_tiles
 

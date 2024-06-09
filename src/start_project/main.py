@@ -9,7 +9,7 @@ pg.init()
 import moderngl
 from sys import exit
 
-game_size = (240, 135)
+game_size = (240, 137)
 
 native_res_multiplier = 3
 screen = pg.display.set_mode(
