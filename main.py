@@ -65,7 +65,7 @@ def main():
 		rect = pg.Rect(
 			0, 
 			64, 
-			240, 
+			280, 
 			pg.display.get_desktop_sizes()[0][1]-64
 			)
 		)

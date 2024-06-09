@@ -13,14 +13,14 @@ class Tile:
 				)
 			)
 		self.rect = self.img.get_rect(topleft=pos)
-		menu_offset = (240, 64)
+		menu_offset = (280, 64)
 		self.rect.x += menu_offset[0]
 		self.rect.y += menu_offset[1]
 
 class RpgMap(pg.sprite.Sprite):
 	def __init__(self):
 		pg.sprite.Sprite.__init__(self)
-		self.zoom = 2
+		self.zoom = 2.25
 		self.tile_size = 16 * self.zoom
 		self.map_data = {}
 		self.curr_map = "map001"
