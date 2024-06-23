@@ -76,11 +76,14 @@ class MenuFunc:
 		return None
 
 	def set_project_to_working_state(self, project_name, rpgmap):
-		self.current_project_name = project_name
-		write_line_to_file("", "working_state/work_on_project")
-		write_line_to_file(project_name, "working_state/last_open_project")
-		db = json_loader(f"projects/{project_name}/game_data/db.json")
-		rpgmap.load_map_data(db["maps"], project_name)
+		try:
+			self.current_project_name = project_name
+			write_line_to_file("", "working_state/work_on_project")
+			write_line_to_file(project_name, "working_state/last_open_project")
+			db = json_loader(f"projects/{project_name}/game_data/db.json")
+			rpgmap.load_map_data(db["maps"], project_name)
+		except:
+			pass
 
 	def new_project(self, terminal, rpgmap) -> None:
 		self.make_working_dir()
