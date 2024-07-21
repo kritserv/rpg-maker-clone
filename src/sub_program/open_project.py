@@ -68,7 +68,7 @@ def main(projects):
 		error_message = "Error, No projects found in the projects folder."
 
 	while pygame_event.running:
-		
+
 		clock.tick(60)
 
 		# Input

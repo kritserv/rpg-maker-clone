@@ -87,7 +87,7 @@ class MenuFunc:
 
 	def new_project(self, terminal, rpgmap) -> None:
 		self.make_working_dir()
-		terminal.command("python src/sub_program/new_project.py")
+		terminal.command("python3 src/sub_program/new_project.py")
 
 		project_name = self.get_working_project()
 
@@ -99,8 +99,8 @@ class MenuFunc:
 
 	def open_project(self, terminal, rpgmap) -> None:
 		self.make_working_dir()
-		terminal.command("python src/sub_program/open_project.py")
-		
+		terminal.command("python3 src/sub_program/open_project.py")
+
 		project_name = self.get_working_project()
 
 		if project_name:
@@ -118,10 +118,10 @@ class MenuFunc:
 				self.current_mode[mode_name] = change
 
 	def play_test(self, terminal) -> None:
-		terminal.command(f"cd projects/{self.current_project_name} && python main.py")
+		terminal.command(f"cd projects/{self.current_project_name} && python3 main.py")
 
 	def change_title(self, terminal) -> None:
-		terminal.command("python src/sub_program/change_title.py")
+		terminal.command("python3 src/sub_program/change_title.py")
 
 	def open_game_folder(self, terminal) -> None:
 		terminal.open_project_folder(self.current_project_name)
@@ -136,7 +136,7 @@ class MenuFunc:
 				return 0
 			func = self.get_func(clicked_menu)
 			need_project = func not in set((
-				"self.new_project(terminal, rpgmap)", 
+				"self.new_project(terminal, rpgmap)",
 				"self.open_project(terminal, rpgmap)"
 				))
 			if need_project:

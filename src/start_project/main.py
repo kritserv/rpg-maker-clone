@@ -1,4 +1,3 @@
-import numpy as np
 import pygame as pg
 from time import time
 
@@ -14,8 +13,8 @@ game_size = (240, 137)
 native_res_multiplier = 3
 screen = pg.display.set_mode(
 	(
-		game_size[0]*native_res_multiplier, 
-		game_size[1]*native_res_multiplier), 
+		game_size[0]*native_res_multiplier,
+		game_size[1]*native_res_multiplier),
 	pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
 	)
 
@@ -44,7 +43,7 @@ def main():
 	pg.display.set_caption(db["main"]["main_title"])
 
 	settings = json_loader("user_data/settings.json")
-	
+
 	scale_method = settings["scale_method"]
 
 	player = Player(0, 64)
@@ -62,7 +61,7 @@ def main():
 	if scale_method == "by windows width":
 		scale_on_x_axis = True
 	pygame_event = PygameEvent(
-		game_size=game_size, 
+		game_size=game_size,
 		scale_on_x_axis=scale_on_x_axis
 		)
 
@@ -89,7 +88,7 @@ def main():
 		rpgmap.draw(display)
 
 		display.blit(player.img, (player.pos))
-		
+
 		opengl.draw(display)
 
 	pg.quit()
