@@ -16,7 +16,7 @@ screen = pg.display.set_mode(
 	)
 
 from src import PygameEvent, ProgramBtn, blit_text, write_line_to_file
-from distutils.dir_util import copy_tree
+from shutil import copytree
 
 def main(projects):
 	pg.display.set_icon(
