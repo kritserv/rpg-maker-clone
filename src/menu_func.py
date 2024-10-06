@@ -99,7 +99,7 @@ class MenuFunc:
 
 	def open_project(self, terminal, rpgmap) -> None:
 		self.make_working_dir()
-		terminal.command("python3 src/sub_program/open_project.py")
+		terminal.command("python3 src/sub_program/open_project.py &")
 
 		project_name = self.get_working_project()
 
@@ -118,10 +118,10 @@ class MenuFunc:
 				self.current_mode[mode_name] = change
 
 	def play_test(self, terminal) -> None:
-		terminal.command(f"cd projects/{self.current_project_name} && python3 main.py")
+		terminal.command(f"cd projects/{self.current_project_name} && python3 main.py &")
 
 	def change_title(self, terminal) -> None:
-		terminal.command("python3 src/sub_program/change_title.py")
+		terminal.command("python3 src/sub_program/change_title.py &")
 
 	def open_game_folder(self, terminal) -> None:
 		terminal.open_project_folder(self.current_project_name)
