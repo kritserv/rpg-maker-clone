@@ -1,40 +1,44 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>RPPYG Maker</title>
-        <link
-            rel="stylesheet"
-            href="{{ url_for('static', filename='main.css') }}"
-        />
-    </head>
-    <body>
-        <nav>
-            <ul>
-                <li>
-                    <a href="#">File</a>
-                    <ul>
-                        <li><a href="#">New Project</a></li>
-                        <li><a href="#">Open Project</a></li>
-                        <li><a href="#">Open Folder</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">Export</a>
-                    <ul>
-                        <li><a href="#">Desktop</a></li>
-                        <li><a href="#">Android</a></li>
-                        <li><a href="#">Browser</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Save</a></li>
-                <li><a href="start-game" target="_blank">Play Test</a></li>
-            </ul>
-        </nav>
+{% extends "base.html" %}
 
-        <div class="container">
-            <h1>123</h1>
+{% block title %}RPPYG Maker{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">File</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('new_project') }}">New Project</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('open_project') }}">Open Project</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('open_folder') }}">Open Folder</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Save</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Export</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Desktop</a></li>
+                        <li><a class="dropdown-item" href="#">Android</a></li>
+                        <li><a class="dropdown-item" href="#">Browser</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('start_game') }}">Play Test</a>
+                </li>
+            </ul>
         </div>
-    </body>
-</html>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <h1>RPPYG Maker</h1>
+{% endblock %}
