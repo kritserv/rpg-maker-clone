@@ -19,8 +19,8 @@ CONFIG_FILE = 'config.json'
 
 if not os.path.exists(CONFIG_FILE):
     initial_config = {
-        "current_project": None,  
-        "other_settings": {}  
+        "current_project": None,
+        "other_settings": {}
     }
     json_saver(initial_config, CONFIG_FILE)
 
@@ -34,7 +34,7 @@ def new_project():
     if request.method == 'POST':
         project_name = request.form['name']
         if project_name:
-            src = 'start_project'  
+            src = 'start_project'
             dest = os.path.join('your_projects', project_name)
 
             shutil.copytree(src, dest)
@@ -59,7 +59,7 @@ def open_project():
 
     if request.method == 'POST':
         selected_project = request.form['project_folder']
-        
+
         if selected_project:
             project_folder = os.path.join(projects_dir, selected_project)
 
@@ -83,9 +83,11 @@ def open_folder():
     if current_project:
         folder_path = current_project['project_folder']
         if platform == "win32":
-            os.startfile(folder_path)  
+            os.startfile(folder_path)
         elif platform == "linux" or platform == "linux2":
-            os.system(f'xdg-open "{folder_path}"')  
+            open_folder_with = 'thunar' #xdg-open
+
+            os.system(f'{open_folder_with} "{folder_path}"')
 
     return redirect(url_for('index'))
 
