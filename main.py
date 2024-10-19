@@ -91,6 +91,23 @@ def open_folder():
 
     return redirect(url_for('index'))
 
+# moderngl lib is not supported on browser, TODO edit code before export
+@app.route('/export-to-browser')
+def export_to_browser():
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+    except FileNotFoundError:
+        return redirect(url_for('index'))
+
+    if current_project:
+        folder_path = current_project['project_folder']
+        command = 'pygbag .'
+        subprocess.Popen(command, cwd=folder_path, shell=True)
+        return redirect(url_for('index'))
+        
+    return redirect(url_for('index'))
+
 
 def run_pygame():
     try:

@@ -1,5 +1,6 @@
 import pygame as pg
 from time import time
+# import asyncio
 
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
@@ -32,6 +33,7 @@ pg.display.set_icon(
 		).convert_alpha()
 	)
 
+# async def main():
 def main():
 	display = pg.Surface(
 		(game_size))
@@ -90,9 +92,11 @@ def main():
 		display.blit(player.img, (player.pos))
 
 		opengl.draw(display)
+		# await asyncio.sleep(0)
 
 	pg.quit()
 	exit()
 
 if __name__ == "__main__":
+	# asyncio.run(main())
 	main()
