@@ -90,8 +90,15 @@ def open_folder():
             os.system(f'{open_folder_with} "{folder_path}"')
 
     return redirect(url_for('index'))
+    
+def change_web_line(main_file_path, boolean):
+    with open(main_file_path, "r") as file:
+        lines = file.readlines()
+    lines[0] = f"web = {boolean}\n"
+    with open(main_file_path, "w") as file:
+        file.writelines(lines)
 
-# moderngl lib is not supported on browser, TODO edit code before export
+
 @app.route('/export-to-browser')
 def export_to_browser():
     try:
@@ -102,8 +109,18 @@ def export_to_browser():
 
     if current_project:
         folder_path = current_project['project_folder']
-        command = 'pygbag .'
+        
+        main_file_path = os.path.join(folder_path, "main.py")
+        opengl_file_path = os.path.join(folder_path, "src/opengl_stuff.py")
+        change_web_line(main_file_path, True)
+        change_web_line(opengl_file_path, True)
+            
+        command = 'pygbag --archive .'
         subprocess.Popen(command, cwd=folder_path, shell=True)
+        
+        change_web_line(main_file_path, False)
+        change_web_line(opengl_file_path, False)
+            
         return redirect(url_for('index'))
         
     return redirect(url_for('index'))

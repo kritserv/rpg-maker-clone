@@ -1,102 +1,86 @@
+web = True
+
 import pygame as pg
 from time import time
-# import asyncio
+
+import asyncio
+if not web:
+    import moderngl
+    from src import OpenGLStuff
 
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
-import moderngl
 from sys import exit
 
 game_size = (240, 137)
 
 native_res_multiplier = 3
 screen = pg.display.set_mode(
-	(
-		game_size[0]*native_res_multiplier,
-		game_size[1]*native_res_multiplier),
-	pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
-	)
+    (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier),
+    pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF if not web else 0)
+)
 
-from src import OpenGLStuff, \
-	json_loader, \
-	Player, \
-	RpgMap, \
-	DeltaTime, \
-	PygameEvent, \
-	blit_text
+from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, blit_text
 
-pg.display.set_icon(
-	pg.image.load(
-		"assets/icon.png"
-		).convert_alpha()
-	)
+pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
 
-# async def main():
-def main():
-	display = pg.Surface(
-		(game_size))
+async def main():
+    display = pg.Surface((game_size))
 
-	opengl = OpenGLStuff()
+    if not web:
+        opengl = OpenGLStuff()
 
-	db = json_loader("game_data/db.json")
+    db = json_loader("game_data/db.json")
+    pg.display.set_caption(db["main"]["main_title"])
 
-	pg.display.set_caption(db["main"]["main_title"])
+    settings = json_loader("user_data/settings.json")
+    scale_method = settings["scale_method"]
 
-	settings = json_loader("user_data/settings.json")
+    player = Player(0, 64)
+    rpgmap = RpgMap()
+    rpgmap.load_map_data(db["maps"])
 
-	scale_method = settings["scale_method"]
+    clock = pg.time.Clock()
+    grey = pg.Color("grey20")
 
-	player = Player(0, 64)
+    delta_time = DeltaTime()
+    scale_on_x_axis = scale_method == "by windows width"
+    pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
-	rpgmap = RpgMap()
-	rpgmap.load_map_data(db["maps"])
+    while pygame_event.running:
+        dt = delta_time.get()
+        clock.tick()
 
-	clock = pg.time.Clock()
+        # Input
+        new_size = pygame_event.check()
+        if new_size:
+            display = new_size
+        key = pg.key.get_pressed()
 
-	grey = pg.Color("grey20")
+        # Logic
+        player.update(key, dt)
 
-	delta_time = DeltaTime()
+        # Graphic
+        display.fill(grey)
+        rpgmap.draw(display)
+        display.blit(player.img, player.pos)
 
-	scale_on_x_axis = False
-	if scale_method == "by windows width":
-		scale_on_x_axis = True
-	pygame_event = PygameEvent(
-		game_size=game_size,
-		scale_on_x_axis=scale_on_x_axis
-		)
+        # Use OpenGL if not web
+        if not web:
+            opengl.draw(display)
+        else:
+            pg.transform.scale(display, screen.get_size(), screen)
+            pg.display.flip()
 
-	prev_time = time()
-	while pygame_event.running:
+        await asyncio.sleep(0)
 
-		dt = delta_time.get()
-		clock.tick()
-
-		# Input
-
-		new_size = pygame_event.check()
-		if new_size:
-			display = new_size
-		key = pg.key.get_pressed()
-
-		# Logic
-
-		player.update(key, dt)
-
-		# Graphic
-
-		display.fill(grey)
-		rpgmap.draw(display)
-
-		display.blit(player.img, (player.pos))
-
-		opengl.draw(display)
-		# await asyncio.sleep(0)
-
-	pg.quit()
-	exit()
+    pg.quit()
+    exit()
 
 if __name__ == "__main__":
-	# asyncio.run(main())
-	main()
+    if web:
+        asyncio.run(main())
+    else:
+        main()
