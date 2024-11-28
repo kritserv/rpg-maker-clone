@@ -4,6 +4,8 @@ import os
 import shutil
 from json import load, dump
 import subprocess
+import base64
+import csv
 
 def json_loader(path) -> dict:
     with open(path) as f:
@@ -25,9 +27,40 @@ if not os.path.exists(CONFIG_FILE):
     json_saver(initial_config, CONFIG_FILE)
 
 
+def encode_image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    config = json_loader(CONFIG_FILE)
+    project_folder = config["current_project"]["project_folder"]
+    # Paths
+    tile_map_path = os.path.join(project_folder, "game_data/data/maps/map001.csv")
+    tile_map_setting_path = os.path.join(project_folder, "game_data/data/maps/tilesets.json")
+
+    # Load tile mappings
+    tile_mappings = json_loader(tile_map_setting_path)
+
+    # Prepare base64 image map
+    base64_images = {}
+    for tile_id, image_name in tile_mappings["forests"].items():
+        image_path = os.path.join(project_folder, f"assets/img/tile/{image_name}")
+        base64_images[tile_id] = encode_image_to_base64(image_path)
+
+    # Read the CSV file and construct the table
+    table = []
+    with open(tile_map_path, "r") as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            table.append([base64_images.get(cell, "") for cell in row])
+
+    # Populate context
+    context = {
+        "project_folder": project_folder,
+        "table": table,
+    }
+    return render_template('index.html', context=context)
 
 @app.route('/new-project', methods=['GET', 'POST'])
 def new_project():
@@ -90,7 +123,7 @@ def open_folder():
             os.system(f'{open_folder_with} "{folder_path}"')
 
     return redirect(url_for('index'))
-    
+
 def change_web_line(main_file_path, boolean):
     with open(main_file_path, "r") as file:
         lines = file.readlines()
@@ -109,20 +142,20 @@ def export_to_browser():
 
     if current_project:
         folder_path = current_project['project_folder']
-        
+
         main_file_path = os.path.join(folder_path, "main.py")
         opengl_file_path = os.path.join(folder_path, "src/opengl_stuff.py")
         change_web_line(main_file_path, True)
         change_web_line(opengl_file_path, True)
-            
+
         command = 'pygbag --archive .'
         subprocess.Popen(command, cwd=folder_path, shell=True)
-        
+
         change_web_line(main_file_path, False)
         change_web_line(opengl_file_path, False)
-            
+
         return redirect(url_for('index'))
-        
+
     return redirect(url_for('index'))
 
 
