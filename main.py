@@ -35,25 +35,26 @@ def encode_image_to_base64(image_path):
 def index():
     config = json_loader(CONFIG_FILE)
     project_folder = config["current_project"]["project_folder"]
-    # Paths
-    tile_map_path = os.path.join(project_folder, "game_data/data/maps/map001.csv")
-    tile_map_setting_path = os.path.join(project_folder, "game_data/data/maps/tilesets.json")
-
-    # Load tile mappings
-    tile_mappings = json_loader(tile_map_setting_path)
-
-    # Prepare base64 image map
-    base64_images = {}
-    for tile_id, image_name in tile_mappings["forests"].items():
-        image_path = os.path.join(project_folder, f"assets/img/tile/{image_name}")
-        base64_images[tile_id] = encode_image_to_base64(image_path)
-
-    # Read the CSV file and construct the table
     table = []
-    with open(tile_map_path, "r") as csv_file:
-        csv_reader = csv.reader(csv_file)
-        for row in csv_reader:
-            table.append([base64_images.get(cell, "") for cell in row])
+    if project_folder:
+        # Paths
+        tile_map_path = os.path.join(project_folder, "game_data/data/maps/map001.csv")
+        tile_map_setting_path = os.path.join(project_folder, "game_data/data/maps/tilesets.json")
+
+        # Load tile mappings
+        tile_mappings = json_loader(tile_map_setting_path)
+
+        # Prepare base64 image map
+        base64_images = {}
+        for tile_id, image_name in tile_mappings["forests"].items():
+            image_path = os.path.join(project_folder, f"assets/img/tile/{image_name}")
+            base64_images[tile_id] = encode_image_to_base64(image_path)
+
+        # Read the CSV file and construct the table
+        with open(tile_map_path, "r") as csv_file:
+            csv_reader = csv.reader(csv_file)
+            for row in csv_reader:
+                table.append([base64_images.get(cell, "") for cell in row])
 
     # Populate context
     context = {
@@ -105,15 +106,26 @@ def open_project():
     return render_template('file/open_project.html', project_folders=project_folders)
 
 
+@app.route('/close-project')
+def close_project():
+    projects_dir = 'your_projects'
+
+    config = json_loader(CONFIG_FILE)
+    config["current_project"] = {"project_folder": False}
+    json_saver(config, CONFIG_FILE)
+
+    return redirect(url_for('index'))
+
 @app.route('/open-folder')
 def open_folder():
     try:
         config = json_loader(CONFIG_FILE)
         current_project = config.get("current_project")
+        project_folder = config["current_project"]["project_folder"]
     except FileNotFoundError:
         return redirect(url_for('index'))
 
-    if current_project:
+    if current_project and project_folder:
         folder_path = current_project['project_folder']
         if platform == "win32":
             os.startfile(folder_path)
@@ -163,10 +175,11 @@ def run_pygame():
     try:
         config = json_loader(CONFIG_FILE)
         current_project = config.get("current_project")
+        project_folder = config["current_project"]["project_folder"]
     except FileNotFoundError:
         return None
 
-    if current_project:
+    if current_project and project_folder:
         folder_path = current_project['project_folder']
         if os.path.exists(folder_path):
 
