@@ -1,5 +1,3 @@
-from .opengl_stuff import OpenGLStuff
-
 from .load_json import json_loader
 
 from .player import Player
@@ -11,7 +9,6 @@ from .pg_event import PygameEvent
 from .blit_text import blit_text
 
 __all__ = [
-	OpenGLStuff, 
 	json_loader, 
 	Player,
 	RpgMap,

@@ -158,15 +158,12 @@ def export_to_browser():
         folder_path = current_project['project_folder']
 
         main_file_path = os.path.join(folder_path, "main.py")
-        opengl_file_path = os.path.join(folder_path, "src/opengl_stuff.py")
         change_web_line(main_file_path, True)
-        change_web_line(opengl_file_path, True)
 
         command = 'pygbag --archive .'
         subprocess.Popen(command, cwd=folder_path, shell=True)
 
         change_web_line(main_file_path, False)
-        change_web_line(opengl_file_path, False)
 
         return redirect(url_for('index'))
 

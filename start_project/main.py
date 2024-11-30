@@ -1,12 +1,92 @@
-web = True
+web = False
 
 import pygame as pg
 from time import time
 
 import asyncio
-if not web:
+if web:
+    OpenGLStuff = None
+else:
+    """
+    OpenGL Stuff
+    I don't know what any of these code do, I copy it from dafluffypotato.
+    """
+    import pygame as pg
     import moderngl
-    from src import OpenGLStuff
+    from array import array
+
+    class OpenGLStuff:
+        def __init__(self):
+            self.ctx = moderngl.create_context()
+            self.quad_buffer = self.ctx.buffer(data=array("f", [
+                -1.0, 1.0, 0.0, 0.0,
+                1.0, 1.0, 1.0, 0.0,
+                -1.0, -1.0, 0.0, 1.0,
+                1.0, -1.0, 1.0, 1.0
+                ]))
+
+            vert_shader = '''
+            #version 330 core
+
+            in vec2 vert;
+            in vec2 textcoord;
+            out vec2 uvs;
+
+            void main() {
+                uvs = textcoord;
+                gl_Position = vec4(vert, 0.0, 1.0);
+            }
+            '''
+
+            frag_shader = '''
+            #version 330 core
+
+            uniform sampler2D tex;
+
+            in vec2 uvs;
+            out vec4 f_color;
+
+            void main() {
+                f_color = vec4(texture(tex, uvs).rgb, 1.0);
+            }
+            '''
+
+            self.program = self.ctx.program(
+                vertex_shader=vert_shader,   
+                fragment_shader=frag_shader
+                )
+
+            self.render_object = self.ctx.vertex_array(
+                self.program, 
+                [
+                    (
+                        self.quad_buffer,
+                         "2f 2f", 
+                         "vert", 
+                         "textcoord"
+                        )
+                ]
+                )
+
+        def surf_to_texture(self, surf) -> object:
+            tex = self.ctx.texture(surf.get_size(), 4)
+            tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+            tex.swizzle = "BGRA"
+            tex.write(surf.get_view("1"))
+            return tex
+
+        def draw(self, display) -> None:
+            frame_tex = self.surf_to_texture(display)
+            frame_tex.use(0)
+            self.program["tex"] = 0
+            self.render_object.render(
+                mode=moderngl.TRIANGLE_STRIP
+                )
+
+            pg.display.flip()
+
+            frame_tex.release()
+
 
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
@@ -49,38 +129,57 @@ async def main():
     scale_on_x_axis = scale_method == "by windows width"
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
-    while pygame_event.running:
-        dt = delta_time.get()
-        clock.tick()
+    if not web:
+        while pygame_event.running:
+            dt = delta_time.get()
+            clock.tick()
 
-        # Input
-        new_size = pygame_event.check()
-        if new_size:
-            display = new_size
-        key = pg.key.get_pressed()
+            # Input
+            new_size = pygame_event.check()
+            if new_size:
+                display = new_size
+            key = pg.key.get_pressed()
 
-        # Logic
-        player.update(key, dt)
+            # Logic
+            player.update(key, dt)
 
-        # Graphic
-        display.fill(grey)
-        rpgmap.draw(display)
-        display.blit(player.img, player.pos)
+            # Graphic
+            display.fill(grey)
+            rpgmap.draw(display)
+            display.blit(player.img, player.pos)
 
-        # Use OpenGL if not web
-        if not web:
+            # Use OpenGL if not web
             opengl.draw(display)
-        else:
+
+            await asyncio.sleep(0)
+
+    else:
+        while pygame_event.running:
+            dt = delta_time.get()
+            clock.tick()
+
+            # Input
+            new_size = pygame_event.check()
+            if new_size:
+                display = new_size
+            key = pg.key.get_pressed()
+
+            # Logic
+            player.update(key, dt)
+
+            # Graphic
+            display.fill(grey)
+            rpgmap.draw(display)
+            display.blit(player.img, player.pos)
+
+            # Not use OpenGL if not web
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
 
-        await asyncio.sleep(0)
+            await asyncio.sleep(0)
 
     pg.quit()
     exit()
 
 if __name__ == "__main__":
-    if web:
-        asyncio.run(main())
-    else:
-        main()
+    asyncio.run(main())
