@@ -34,7 +34,9 @@ def encode_image_to_base64(image_path):
 @app.route('/')
 def index():
     config = json_loader(CONFIG_FILE)
-    project_folder = config["current_project"]["project_folder"]
+    project_folder = False
+    if config["current_project"]:
+        project_folder = config["current_project"]["project_folder"]
     table = []
     if project_folder:
         # Paths
@@ -175,7 +177,9 @@ def run_pygame():
     try:
         config = json_loader(CONFIG_FILE)
         current_project = config.get("current_project")
-        project_folder = config["current_project"]["project_folder"]
+        project_folder = False
+        if config["current_project"]:
+            project_folder = config["current_project"]["project_folder"]
     except FileNotFoundError:
         return None
 
