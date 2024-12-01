@@ -1,6 +1,5 @@
 web = False
 android = False
-# web and android shoudn't be True at the same time.
 
 import asyncio
 import pygame as pg
@@ -13,7 +12,7 @@ pg.init()
 
 if not web:
     """
-    OpenGL Stuff; for better FPS in high resolution.
+    OpenGL Stuff; for better FPS in desktop high resolution.
     I don't know what any of these code do, I copy it from dafluffypotato.
     """
     import moderngl
@@ -92,10 +91,12 @@ if not web:
             frame_tex.release()
 
 game_size = (240, 137)
-
 native_res_multiplier = 3
+game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
+
+
 screen = pg.display.set_mode(
-    (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier),
+    (game_size_native),
     pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF if not web else 0)
 )
 
@@ -105,25 +106,20 @@ Use this if prefer maximize window instead of the default one.
 # from pygame._sdl2 import Window
 # Window.from_display_module().maximize()
 
+from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, Timer, blit_text
 
 def toggle_full_screen():
     pg.display.toggle_fullscreen()
 
 if android:
-    screen = pg.display.set_mode(game_size, 
-        pg.SCALED | pg.OPENGL | pg.DOUBLEBUF)
+    screen = pg.display.set_mode(game_size,
+        pg.SCALED)
     toggle_full_screen()
-    
-
-from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, Timer, blit_text
 
 pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
 
 async def main():
     display = pg.Surface((game_size))
-
-    if not web:
-        opengl = OpenGLStuff()
 
     db = json_loader("game_data/db.json")
     pg.display.set_caption(db["main"]["main_title"])
@@ -140,12 +136,13 @@ async def main():
 
     delta_time = DeltaTime()
     scale_on_x_axis = scale_method == "by windows width"
+    # print(game_size_native)
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
-    fullscreen_toggle_timer = Timer()
-    fullscreen_toggle_timer.start()
-
-    if not web:
+    if not web and not android:
+        opengl = OpenGLStuff()
+        fullscreen_toggle_timer = Timer()
+        fullscreen_toggle_timer.start()
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
@@ -169,13 +166,64 @@ async def main():
             display.fill(grey)
             rpgmap.draw(display)
             display.blit(player.img, player.pos)
+            display.blit(player.img, player.pos)
 
-            # Use OpenGL if not web
+            # Use OpenGL for desktop
             opengl.draw(display)
 
             await asyncio.sleep(0)
+    elif android:
+        rect1 = (pg.Rect(15, 100, 10, 10), "UP")
+        rect2 = (pg.Rect(5, 110, 10, 10), "LEFT")
+        rect3 = (pg.Rect(25, 110, 10, 10), "RIGHT")
+        rect4 = (pg.Rect(15, 120, 10, 10), "DOWN")
+        all_rect = [rect1, rect2, rect3, rect4]
+        RED = (255, 0 , 0)
+        BLUE = (0, 0, 255)
+        while pygame_event.running:
+            dt = delta_time.get()
+            clock.tick()
 
-    else:
+            # Input
+            new_size = pygame_event.check()
+            if new_size:
+                display = new_size
+            key = pg.key.get_pressed()
+            mouse = pg.mouse.get_pos()
+
+            mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False}
+            if pygame_event.click:
+                for rect, direction in all_rect:
+                    if rect.collidepoint(mouse):
+                        if direction == "UP":
+                            mobile_key["K_UP"] = True
+                        if direction == "LEFT":
+                            mobile_key["K_LEFT"] = True
+                        if direction == "RIGHT":
+                            mobile_key["K_RIGHT"] = True
+                        if direction == "DOWN":
+                            mobile_key["K_DOWN"] = True
+
+            # Logic
+            player.update(key, dt, mobile_key)
+
+            # Graphic
+            display.fill(grey)
+            rpgmap.draw(display)
+            display.blit(player.img, player.pos)
+
+            for rect, direction in all_rect:
+                if rect.collidepoint(mouse):
+                    pg.draw.rect(display, RED, rect)
+                else:
+                    pg.draw.rect(display, BLUE, rect)
+
+            # Can't use OpenGL for android (Mobile Controller will not work.)
+            pg.transform.scale(display, screen.get_size(), screen)
+            pg.display.flip()
+
+            await asyncio.sleep(0)
+    elif web:
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
@@ -194,7 +242,7 @@ async def main():
             rpgmap.draw(display)
             display.blit(player.img, player.pos)
 
-            # Not use OpenGL if not web
+            # Can't use OpenGL if web
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
 

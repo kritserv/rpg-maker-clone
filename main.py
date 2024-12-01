@@ -170,6 +170,25 @@ def export_to_browser():
     return redirect(url_for('index'))
 
 
+@app.route('/export-to-android')
+def export_to_android():
+    if platform == "linux" or platform == "linux2":
+        pass
+    else:
+        return render_template('error.html', message='Export to android only work for Linux.')
+
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+    except FileNotFoundError:
+        return redirect(url_for('index'))
+
+    if current_project:
+        return redirect(url_for('index'))
+
+    return redirect(url_for('index'))
+
+
 def run_pygame():
     try:
         config = json_loader(CONFIG_FILE)

@@ -74,22 +74,34 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key) -> (int, int):
+	def calculate_val_from_key(self, key, mobile_key) -> (int, int):
 		dx = 0
 		dy = 0
 		self.key_pressed = False
+
+		if mobile_key:
+			up = mobile_key["K_UP"]
+			left = mobile_key["K_LEFT"]
+			right = mobile_key["K_RIGHT"]
+			down = mobile_key["K_DOWN"]
+		else:
+			up = key[pg.K_UP]
+			left = key[pg.K_LEFT]
+			right = key[pg.K_RIGHT]
+			down = key[pg.K_DOWN]
+
 		
-		if key[pg.K_LEFT] or key[pg.K_RIGHT]:
+		if left or right:
 			if self.finished_y_move:
-				if key[pg.K_LEFT]:
+				if left:
 					self.direction = "left"
 					dx = -1
 
-				elif key[pg.K_RIGHT]:
+				elif right:
 					self.direction = "right"
 					dx = 1
 
-				if key[pg.K_LEFT] and key[pg.K_RIGHT]:
+				if left and right:
 					self.direction = "bottom"
 					dx = 0
 
@@ -98,17 +110,17 @@ class Player(pg.sprite.Sprite):
 					self.key_pressed = True
 					self.finished_x_move = False
 
-		elif key[pg.K_UP] or key[pg.K_DOWN]:
+		elif up or down:
 			if self.finished_x_move:
-				if key[pg.K_UP]:
+				if up:
 					self.direction = "top"
 					dy = -1
 
-				elif key[pg.K_DOWN]:
+				elif down:
 					self.direction = "bottom"
 					dy = 1
 
-				if key[pg.K_UP] and key[pg.K_DOWN]:
+				if up and down:
 					self.direction = "bottom"
 					dy = 0
 
@@ -227,8 +239,8 @@ class Player(pg.sprite.Sprite):
 			self.finished_y_move = True
 
 
-	def update(self, key, dt) -> None:
-		dx, dy = self.calculate_val_from_key(key)
+	def update(self, key, dt, mobile_key=False) -> None:
+		dx, dy = self.calculate_val_from_key(key, mobile_key)
 
 		one_move = self.speed * dt
 
