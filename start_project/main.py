@@ -1,17 +1,21 @@
 web = False
-
-import pygame as pg
-from time import time
+android = False
+# web and android shoudn't be True at the same time.
 
 import asyncio
-if web:
-    OpenGLStuff = None
-else:
+import pygame as pg
+from sys import exit
+
+pg.mixer.init()
+pg.mixer.pre_init(44100, -16, 2, 512)
+pg.init()
+
+
+if not web:
     """
-    OpenGL Stuff
+    OpenGL Stuff; for better FPS in high resolution.
     I don't know what any of these code do, I copy it from dafluffypotato.
     """
-    import pygame as pg
     import moderngl
     from array import array
 
@@ -87,13 +91,6 @@ else:
 
             frame_tex.release()
 
-
-pg.mixer.init()
-pg.mixer.pre_init(44100, -16, 2, 512)
-pg.init()
-
-from sys import exit
-
 game_size = (240, 137)
 
 native_res_multiplier = 3
@@ -102,7 +99,23 @@ screen = pg.display.set_mode(
     pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF if not web else 0)
 )
 
-from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, blit_text
+"""
+Use this if prefer maximize window instead of the default one.
+"""
+# from pygame._sdl2 import Window
+# Window.from_display_module().maximize()
+
+
+def toggle_full_screen():
+    pg.display.toggle_fullscreen()
+
+if android:
+    screen = pg.display.set_mode(game_size, 
+        pg.SCALED | pg.OPENGL | pg.DOUBLEBUF)
+    toggle_full_screen()
+    
+
+from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, Timer, blit_text
 
 pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
 
@@ -129,6 +142,9 @@ async def main():
     scale_on_x_axis = scale_method == "by windows width"
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
+    fullscreen_toggle_timer = Timer()
+    fullscreen_toggle_timer.start()
+
     if not web:
         while pygame_event.running:
             dt = delta_time.get()
@@ -139,6 +155,12 @@ async def main():
             if new_size:
                 display = new_size
             key = pg.key.get_pressed()
+            if key[pg.K_f] or key[pg.K_F11]:
+                if fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
+                    toggle_full_screen()
+                    fullscreen_toggle_timer.restart()
+            if fullscreen_toggle_timer.get_elapsed_time() >= 0.5:
+                fullscreen_toggle_timer.pause()
 
             # Logic
             player.update(key, dt)
