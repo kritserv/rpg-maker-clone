@@ -10,7 +10,7 @@ pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
 
-if not web:
+if not web or not android:
     """
     OpenGL Stuff; for better FPS in desktop high resolution.
     I don't know what any of these code do, I copy it from dafluffypotato.

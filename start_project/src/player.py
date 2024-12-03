@@ -1,5 +1,6 @@
 import pygame as pg
 from math import floor, ceil
+import os
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, x, y):
@@ -35,19 +36,19 @@ class Player(pg.sprite.Sprite):
 
 	def load_sprites(self) -> None:
 		load_spritesheet = pg.image.load(
-			"assets/img/sprite/player.png"
+			os.path.abspath('.')+'/'+"assets/img/sprite/player.png"
 			)
 		sprite_width = 16
 		sprite_height = 24
 		directions = [
-			"bottom", 
-			"top", 
-			"left", 
+			"bottom",
+			"top",
+			"left",
 			"right"
 			]
 		frames = [
-			"stand_still",  
-			"left_leg_forward",  
+			"stand_still",
+			"left_leg_forward",
 			"right_leg_forward"
 			]
 		for row, direction in enumerate(directions):
@@ -57,12 +58,12 @@ class Player(pg.sprite.Sprite):
 					)
 				img.fill((255, 0, 255))
 				img.blit(
-					load_spritesheet, 
-					(0, 0), 
+					load_spritesheet,
+					(0, 0),
 					(
-						i*sprite_width, 
-						row*sprite_height, 
-						sprite_width, 
+						i*sprite_width,
+						row*sprite_height,
+						sprite_width,
 						sprite_height
 					)
 				)
@@ -90,7 +91,7 @@ class Player(pg.sprite.Sprite):
 			right = key[pg.K_RIGHT]
 			down = key[pg.K_DOWN]
 
-		
+
 		if left or right:
 			if self.finished_y_move:
 				if left:
@@ -128,7 +129,7 @@ class Player(pg.sprite.Sprite):
 					self.last_dy = dy
 					self.key_pressed = True
 					self.finished_y_move = False
-		
+
 		return dx, dy
 
 	def make_divisible_by(self, tile_size, num) -> int:
@@ -257,8 +258,8 @@ class Player(pg.sprite.Sprite):
 
 		if not self.key_pressed:
 			self.move_to_finish_pos(
-				dt, 
-				one_move, 
+				dt,
+				one_move,
 				ease_out
 				)
 
