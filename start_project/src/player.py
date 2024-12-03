@@ -33,10 +33,13 @@ class Player(pg.sprite.Sprite):
 		self.finished_y_move = True
 		self.last_dx, self.last_dy = 0, 0
 		self.key_pressed = False
+		
+		self.full_path = os.path.abspath('.')+'/'
 
 	def load_sprites(self) -> None:
+		self.full_path = os.path.abspath('.')+'/'
 		load_spritesheet = pg.image.load(
-			os.path.abspath('.')+'/'+"assets/img/sprite/player.png"
+			self.full_path +"assets/img/sprite/player.png"
 			)
 		sprite_width = 16
 		sprite_height = 24

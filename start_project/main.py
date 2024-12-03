@@ -9,6 +9,9 @@ pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
+import os
+full_path = os.path.abspath('.')+'/'
+
 
 if not web or not android:
     """
@@ -116,15 +119,15 @@ if android:
         pg.SCALED)
     toggle_full_screen()
 
-pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
+pg.display.set_icon(pg.image.load(full_path + "assets/icon.png").convert_alpha())
 
 async def main():
     display = pg.Surface((game_size))
 
-    db = json_loader("game_data/db.json")
+    db = json_loader(full_path + "game_data/db.json")
     pg.display.set_caption(db["main"]["main_title"])
 
-    settings = json_loader("user_data/settings.json")
+    settings = json_loader(full_path + "user_data/settings.json")
     scale_method = settings["scale_method"]
 
     player = Player(0, 64)
