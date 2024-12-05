@@ -8,12 +8,13 @@ from sys import exit
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
+pg.font.init()
 
 import os
 full_path = os.path.abspath('.')+'/'
 
 
-if not web or not android:
+if not web and not android:
     """
     OpenGL Stuff; for better FPS in desktop high resolution.
     I don't know what any of these code do, I copy it from dafluffypotato.
@@ -58,17 +59,17 @@ if not web or not android:
             '''
 
             self.program = self.ctx.program(
-                vertex_shader=vert_shader,   
+                vertex_shader=vert_shader,
                 fragment_shader=frag_shader
                 )
 
             self.render_object = self.ctx.vertex_array(
-                self.program, 
+                self.program,
                 [
                     (
                         self.quad_buffer,
-                         "2f 2f", 
-                         "vert", 
+                         "2f 2f",
+                         "vert",
                          "textcoord"
                         )
                 ]
@@ -139,7 +140,6 @@ async def main():
 
     delta_time = DeltaTime()
     scale_on_x_axis = scale_method == "by windows width"
-    # print(game_size_native)
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
     if not web and not android:
@@ -176,21 +176,27 @@ async def main():
 
             await asyncio.sleep(0)
     elif android:
-        rect1 = (pg.Rect(15, 100, 10, 10), "UP")
-        rect2 = (pg.Rect(5, 110, 10, 10), "LEFT")
-        rect3 = (pg.Rect(25, 110, 10, 10), "RIGHT")
-        rect4 = (pg.Rect(15, 120, 10, 10), "DOWN")
-        all_rect = [rect1, rect2, rect3, rect4]
-        RED = (255, 0 , 0)
-        BLUE = (0, 0, 255)
+        rect1 = (pg.Rect(40, 30, 30, 30), "UP")
+        rect2 = (pg.Rect(5, 65, 30, 30), "LEFT")
+        rect3 = (pg.Rect(75, 65, 30, 30), "RIGHT")
+        rect4 = (pg.Rect(40, 100, 30, 30), "DOWN")
+        rect5 = (pg.Rect(game_size[0]-90, 77, 30, 30), "A")
+        rect6 = (pg.Rect(game_size[0]-50, 77, 30, 30), "B")
+        all_rect = [rect1, rect2, rect3, rect4, rect5, rect6]
+        RED = pg.Color(255, 0 , 0)
+        BLUE = pg.Color(0, 0, 255)
+        BLACK = pg.Color(0, 0, 0)
+        use_font = pg.font.SysFont(None, 22)
+        fps = 0
+        fps_update_timer = Timer()
+        fps_update_timer.start()
+        trigger_once = True
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
 
             # Input
-            new_size = pygame_event.check()
-            if new_size:
-                display = new_size
+            pygame_event.check()
             key = pg.key.get_pressed()
             mouse = pg.mouse.get_pos()
 
@@ -216,12 +222,16 @@ async def main():
             display.blit(player.img, player.pos)
 
             for rect, direction in all_rect:
-                if rect.collidepoint(mouse):
-                    pg.draw.rect(display, RED, rect)
+                if rect.collidepoint(mouse) and pygame_event.click:
+                    pg.draw.rect(display, RED, rect, border_radius=5)
                 else:
-                    pg.draw.rect(display, BLUE, rect)
+                    pg.draw.rect(display, BLUE, rect, border_radius=5)
 
-            # Can't use OpenGL for android (Mobile Controller will not work.)
+            if fps_update_timer.get_elapsed_time() >= 0.5:
+                fps = round(clock.get_fps(),2)
+                fps_update_timer.restart()
+            blit_text(display, f'FPS:{fps}', use_font, BLACK, (10,10))
+
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
 
@@ -245,7 +255,6 @@ async def main():
             rpgmap.draw(display)
             display.blit(player.img, player.pos)
 
-            # Can't use OpenGL if web
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
 
