@@ -180,41 +180,50 @@ async def main():
         rect2 = (pg.Rect(5, 65, 30, 30), "LEFT")
         rect3 = (pg.Rect(75, 65, 30, 30), "RIGHT")
         rect4 = (pg.Rect(40, 100, 30, 30), "DOWN")
-        rect5 = (pg.Rect(game_size[0]-90, 77, 30, 30), "A")
-        rect6 = (pg.Rect(game_size[0]-50, 77, 30, 30), "B")
+        rect5 = (pg.Rect(game_size[0] - 90, 77, 30, 30), "A")
+        rect6 = (pg.Rect(game_size[0] - 50, 77, 30, 30), "B")
         all_rect = [rect1, rect2, rect3, rect4, rect5, rect6]
-        RED = pg.Color(255, 0 , 0)
+        RED = pg.Color(255, 0, 0)
         BLUE = pg.Color(0, 0, 255)
         BLACK = pg.Color(0, 0, 0)
         use_font = pg.font.SysFont(None, 22)
         fps = 0
         fps_update_timer = Timer()
         fps_update_timer.start()
-        trigger_once = True
+        active_touches = {}  # Store touch points and their corresponding actions
+
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
 
-            # Input
-            pygame_event.check()
-            key = pg.key.get_pressed()
-            mouse = pg.mouse.get_pos()
+            # Input\
+            for event in pg.event.get():
+                if event.type == pg.FINGERDOWN or event.type == pg.FINGERMOTION:
+                    touch_pos = (event.x * game_size[0], event.y * game_size[1])
+                    for rect, direction in all_rect:
+                        if rect.collidepoint(touch_pos):
+                            active_touches[event.finger_id] = direction
+                elif event.type == pg.FINGERUP:
+                    if event.finger_id in active_touches:
+                        del active_touches[event.finger_id]
 
-            mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False}
-            if pygame_event.click:
-                for rect, direction in all_rect:
-                    if rect.collidepoint(mouse):
-                        if direction == "UP":
-                            mobile_key["K_UP"] = True
-                        if direction == "LEFT":
-                            mobile_key["K_LEFT"] = True
-                        if direction == "RIGHT":
-                            mobile_key["K_RIGHT"] = True
-                        if direction == "DOWN":
-                            mobile_key["K_DOWN"] = True
+            mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False, "K_A": False, "K_B": False}
+            for direction in active_touches.values():
+                if direction == "UP":
+                    mobile_key["K_UP"] = True
+                if direction == "LEFT":
+                    mobile_key["K_LEFT"] = True
+                if direction == "RIGHT":
+                    mobile_key["K_RIGHT"] = True
+                if direction == "DOWN":
+                    mobile_key["K_DOWN"] = True
+                if direction == "A":
+                    mobile_key["K_A"] = True
+                if direction == "B":
+                    mobile_key["K_B"] = True
 
             # Logic
-            player.update(key, dt, mobile_key)
+            player.update(None, dt, mobile_key)
 
             # Graphic
             display.fill(grey)
@@ -222,15 +231,15 @@ async def main():
             display.blit(player.img, player.pos)
 
             for rect, direction in all_rect:
-                if rect.collidepoint(mouse) and pygame_event.click:
+                if direction in active_touches.values():
                     pg.draw.rect(display, RED, rect, border_radius=5)
                 else:
                     pg.draw.rect(display, BLUE, rect, border_radius=5)
 
             if fps_update_timer.get_elapsed_time() >= 0.5:
-                fps = round(clock.get_fps(),2)
+                fps = round(clock.get_fps(), 2)
                 fps_update_timer.restart()
-            blit_text(display, f'FPS:{fps}', use_font, BLACK, (10,10))
+            blit_text(display, f'FPS:{fps}', use_font, BLACK, (10, 10))
 
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
