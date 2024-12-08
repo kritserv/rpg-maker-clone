@@ -3,8 +3,10 @@ from math import floor, ceil
 import os
 
 class Player(pg.sprite.Sprite):
-	def __init__(self, x, y):
+	def __init__(self, xy, full_path):
+		x, y = xy
 		pg.sprite.Sprite.__init__(self)
+		self.full_path = full_path
 
 		self.speed = 80
 
@@ -33,13 +35,10 @@ class Player(pg.sprite.Sprite):
 		self.finished_y_move = True
 		self.last_dx, self.last_dy = 0, 0
 		self.key_pressed = False
-		
-		self.full_path = os.path.abspath('.')+'/'
 
 	def load_sprites(self) -> None:
-		self.full_path = os.path.abspath('.')+'/'
 		load_spritesheet = pg.image.load(
-			self.full_path +"assets/img/sprite/player.png"
+			f"{self.full_path}assets/img/sprite/player.png"
 			)
 		sprite_width = 16
 		sprite_height = 24
@@ -88,11 +87,10 @@ class Player(pg.sprite.Sprite):
 			left = mobile_key["K_LEFT"]
 			right = mobile_key["K_RIGHT"]
 			down = mobile_key["K_DOWN"]
-		else:
-			up = key[pg.K_UP]
-			left = key[pg.K_LEFT]
-			right = key[pg.K_RIGHT]
-			down = key[pg.K_DOWN]
+		up = key[pg.K_UP]
+		left = key[pg.K_LEFT]
+		right = key[pg.K_RIGHT]
+		down = key[pg.K_DOWN]
 
 
 		if left or right:

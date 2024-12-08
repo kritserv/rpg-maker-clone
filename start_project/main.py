@@ -1,5 +1,6 @@
 web = False
 android = False
+pc = True
 
 import asyncio
 import pygame as pg
@@ -11,98 +12,14 @@ pg.init()
 pg.font.init()
 
 import os
-full_path = os.path.abspath('.')+'/'
+full_path = f"{os.path.abspath('.')}/"
 
-
-if not web and not android:
-    """
-    OpenGL Stuff; for better FPS in desktop high resolution.
-    I don't know what any of these code do, I copy it from dafluffypotato.
-    """
-    import moderngl
-    from array import array
-
-    class OpenGLStuff:
-        def __init__(self):
-            self.ctx = moderngl.create_context()
-            self.quad_buffer = self.ctx.buffer(data=array("f", [
-                -1.0, 1.0, 0.0, 0.0,
-                1.0, 1.0, 1.0, 0.0,
-                -1.0, -1.0, 0.0, 1.0,
-                1.0, -1.0, 1.0, 1.0
-                ]))
-
-            vert_shader = '''
-            #version 330 core
-
-            in vec2 vert;
-            in vec2 textcoord;
-            out vec2 uvs;
-
-            void main() {
-                uvs = textcoord;
-                gl_Position = vec4(vert, 0.0, 1.0);
-            }
-            '''
-
-            frag_shader = '''
-            #version 330 core
-
-            uniform sampler2D tex;
-
-            in vec2 uvs;
-            out vec4 f_color;
-
-            void main() {
-                f_color = vec4(texture(tex, uvs).rgb, 1.0);
-            }
-            '''
-
-            self.program = self.ctx.program(
-                vertex_shader=vert_shader,
-                fragment_shader=frag_shader
-                )
-
-            self.render_object = self.ctx.vertex_array(
-                self.program,
-                [
-                    (
-                        self.quad_buffer,
-                         "2f 2f",
-                         "vert",
-                         "textcoord"
-                        )
-                ]
-                )
-
-        def surf_to_texture(self, surf) -> object:
-            tex = self.ctx.texture(surf.get_size(), 4)
-            tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
-            tex.swizzle = "BGRA"
-            tex.write(surf.get_view("1"))
-            return tex
-
-        def draw(self, display) -> None:
-            frame_tex = self.surf_to_texture(display)
-            frame_tex.use(0)
-            self.program["tex"] = 0
-            self.render_object.render(
-                mode=moderngl.TRIANGLE_STRIP
-                )
-
-            pg.display.flip()
-
-            frame_tex.release()
-
-game_size = (240, 137)
+game_size = (280, 137)
 native_res_multiplier = 3
 game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
 
-
-screen = pg.display.set_mode(
-    (game_size_native),
-    pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF if not web else 0)
-)
+def toggle_full_screen():
+    pg.display.toggle_fullscreen()
 
 """
 Use this if prefer maximize window instead of the default one.
@@ -112,37 +29,118 @@ Use this if prefer maximize window instead of the default one.
 
 from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, Timer, blit_text
 
-def toggle_full_screen():
-    pg.display.toggle_fullscreen()
-
-if android:
-    screen = pg.display.set_mode(game_size,
-        pg.SCALED)
-    toggle_full_screen()
-
-pg.display.set_icon(pg.image.load(full_path + "assets/icon.png").convert_alpha())
-
 async def main():
     display = pg.Surface((game_size))
 
-    db = json_loader(full_path + "game_data/db.json")
+    db = json_loader(f"{full_path}game_data/db.json")
     pg.display.set_caption(db["main"]["main_title"])
 
-    settings = json_loader(full_path + "user_data/settings.json")
+    settings = json_loader(f"{full_path}user_data/settings.json")
     scale_method = settings["scale_method"]
-
-    player = Player(0, 64)
-    rpgmap = RpgMap()
-    rpgmap.load_map_data(db["maps"])
-
-    clock = pg.time.Clock()
-    grey = pg.Color("grey20")
 
     delta_time = DeltaTime()
     scale_on_x_axis = scale_method == "by windows width"
+
+    player_pos = (0, 64)
+
+    clock = pg.time.Clock()
+
+    GREY = pg.Color("grey20")
+    RED = pg.Color(255, 0, 0)
+    BLUE = pg.Color(0, 0, 255)
+    BLACK = pg.Color(0, 0, 0)
+
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
-    if not web and not android:
+    if pc:
+        """
+        OpenGL Stuff; for better FPS
+        I don't know what any of these code do, I copy it from dafluffypotato.
+        """
+        import moderngl
+        from array import array
+
+        class OpenGLStuff:
+            def __init__(self):
+                self.ctx = moderngl.create_context()
+                self.quad_buffer = self.ctx.buffer(data=array("f", [
+                    -1.0, 1.0, 0.0, 0.0,
+                    1.0, 1.0, 1.0, 0.0,
+                    -1.0, -1.0, 0.0, 1.0,
+                    1.0, -1.0, 1.0, 1.0
+                    ]))
+
+                vert_shader = '''
+                #version 330 core
+
+                in vec2 vert;
+                in vec2 textcoord;
+                out vec2 uvs;
+
+                void main() {
+                    uvs = textcoord;
+                    gl_Position = vec4(vert, 0.0, 1.0);
+                }
+                '''
+
+                frag_shader = '''
+                #version 330 core
+
+                uniform sampler2D tex;
+
+                in vec2 uvs;
+                out vec4 f_color;
+
+                void main() {
+                    f_color = vec4(texture(tex, uvs).rgb, 1.0);
+                }
+                '''
+
+                self.program = self.ctx.program(
+                    vertex_shader=vert_shader,
+                    fragment_shader=frag_shader
+                    )
+
+                self.render_object = self.ctx.vertex_array(
+                    self.program,
+                    [
+                        (
+                            self.quad_buffer,
+                             "2f 2f",
+                             "vert",
+                             "textcoord"
+                            )
+                    ]
+                    )
+
+            def surf_to_texture(self, surf) -> object:
+                tex = self.ctx.texture(surf.get_size(), 4)
+                tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+                tex.swizzle = "BGRA"
+                tex.write(surf.get_view("1"))
+                return tex
+
+            def draw(self, display) -> None:
+                frame_tex = self.surf_to_texture(display)
+                frame_tex.use(0)
+                self.program["tex"] = 0
+                self.render_object.render(
+                    mode=moderngl.TRIANGLE_STRIP
+                    )
+
+                pg.display.flip()
+
+                frame_tex.release()
+
+        screen = pg.display.set_mode(
+            (game_size_native),
+            pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF)
+        )
+        pg.display.set_icon(pg.image.load(f"{full_path}assets/icon.png").convert_alpha())
+        player = Player(player_pos, full_path)
+        rpgmap = RpgMap(full_path)
+        rpgmap.load_map_data(db["maps"])
+
         opengl = OpenGLStuff()
         fullscreen_toggle_timer = Timer()
         fullscreen_toggle_timer.start()
@@ -166,7 +164,7 @@ async def main():
             player.update(key, dt)
 
             # Graphic
-            display.fill(grey)
+            display.fill(GREY)
             rpgmap.draw(display)
             display.blit(player.img, player.pos)
             display.blit(player.img, player.pos)
@@ -176,6 +174,13 @@ async def main():
 
             await asyncio.sleep(0)
     elif android:
+        screen = pg.display.set_mode(game_size,
+            pg.SCALED)
+        toggle_full_screen()
+        player = Player(player_pos, full_path)
+        rpgmap = RpgMap(full_path)
+        rpgmap.load_map_data(db["maps"])
+
         rect1 = (pg.Rect(40, 30, 30, 30), "UP")
         rect2 = (pg.Rect(5, 65, 30, 30), "LEFT")
         rect3 = (pg.Rect(75, 65, 30, 30), "RIGHT")
@@ -183,9 +188,6 @@ async def main():
         rect5 = (pg.Rect(game_size[0] - 90, 77, 30, 30), "A")
         rect6 = (pg.Rect(game_size[0] - 50, 77, 30, 30), "B")
         all_rect = [rect1, rect2, rect3, rect4, rect5, rect6]
-        RED = pg.Color(255, 0, 0)
-        BLUE = pg.Color(0, 0, 255)
-        BLACK = pg.Color(0, 0, 0)
         use_font = pg.font.SysFont(None, 22)
         fps = 0
         fps_update_timer = Timer()
@@ -196,7 +198,7 @@ async def main():
             dt = delta_time.get()
             clock.tick()
 
-            # Input\
+            # Input
             for event in pg.event.get():
                 if event.type == pg.FINGERDOWN or event.type == pg.FINGERMOTION:
                     touch_pos = (event.x * game_size[0], event.y * game_size[1])
@@ -223,10 +225,10 @@ async def main():
                     mobile_key["K_B"] = True
 
             # Logic
-            player.update(None, dt, mobile_key)
+            player.update(key=None, dt=dt, mobile_key=mobile_key)
 
             # Graphic
-            display.fill(grey)
+            display.fill(GREY)
             rpgmap.draw(display)
             display.blit(player.img, player.pos)
 
@@ -245,7 +247,14 @@ async def main():
             pg.display.flip()
 
             await asyncio.sleep(0)
-    elif web:
+    else:
+        screen = pg.display.set_mode(
+            (game_size_native),
+            pg.RESIZABLE)
+        player = Player(player_pos, full_path)
+        rpgmap = RpgMap(full_path)
+        rpgmap.load_map_data(db["maps"])
+
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
@@ -260,7 +269,7 @@ async def main():
             player.update(key, dt)
 
             # Graphic
-            display.fill(grey)
+            display.fill(GREY)
             rpgmap.draw(display)
             display.blit(player.img, player.pos)
 

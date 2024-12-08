@@ -2,3 +2,7 @@ pygame-ce
 moderngl
 flask
 pygbag
+buildozer
+cython
+javac
+cmake

@@ -10,20 +10,20 @@ class Tile(pg.sprite.Sprite):
 		self.rect = self.img.get_rect(topleft=pos)
 
 class RpgMap(pg.sprite.Sprite):
-	def __init__(self):
+	def __init__(self, full_path):
 		pg.sprite.Sprite.__init__(self)
 		self.tile_size = 16
 		self.map_data = {}
 		self.curr_map = "map001"
-		self.full_path = os.path.abspath('.')+'/'
+		self.full_path = full_path
 
 	def load_map_data(self, map_json) -> None:
 
-		tilesets = json_loader(self.full_path + "game_data/data/maps/tilesets.json")
+		tilesets = json_loader(f"{self.full_path}game_data/data/maps/tilesets.json")
 
 		for elem in map_json:
 			name = elem["name"]
-			path = self.full_path + "game_data/data/maps/"+elem["path"]
+			path = f"{self.full_path}game_data/data/maps/{elem['path']}"
 			tileset = elem["tileset"]
 
 			current_tiles = []
@@ -33,7 +33,7 @@ class RpgMap(pg.sprite.Sprite):
 
 				for y, row in enumerate(csv_load):
 					for x, tile_id in enumerate(row):
-						img_path = self.full_path + "assets/img/tile/" + tilesets[tileset][tile_id]
+						img_path = f"{self.full_path}assets/img/tile/{tilesets[tileset][tile_id]}"
 						current_tiles.append(Tile(img_path, (x*self.tile_size, y*self.tile_size)))
 
 			self.map_data[name] = current_tiles

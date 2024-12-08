@@ -1,0 +1,111 @@
+{% extends "base.html" %} {% block title %}RPPYG Maker Android{% endblock %} {%
+block navbar %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}"
+                        >Go Back</a
+                    >
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %} {% block content %}
+<h1>Android Build Instructions</h1>
+<div class="mb-3">
+    <p>
+        <strong
+            >1. Open game folder
+            <a href="{{ url_for('open_folder') }}" target="_blank"
+                >Click Me</a
+            ></strong
+        >
+    </p>
+    <p>
+        <strong>2. Edit <code>main.py</code>:</strong>
+    </p>
+    <ul>
+        <li><code>web = False</code></li>
+        <li><code>android = True</code></li>
+        <li><code>pc = False</code></li>
+    </ul>
+    <p>
+        <strong
+            >3. Install Buildozer
+            <a
+                href="https://buildozer.readthedocs.io/en/latest/installation.html"
+                >readthedocs</a
+            ></strong
+        >
+    </p>
+    <ul>
+        <li><code>sudo apt update -y</code></li>
+        <li>
+            <code
+                >sudo apt install -y git zip unzip openjdk-17-jdk python3-pip
+                autoconf libtool pkg-config zlib1g-dev libncurses5-dev
+                libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev</code
+            >
+        </li>
+    </ul>
+
+    <p><strong>4. Initialize Buildozer:</strong></p>
+    <ul>
+        <li>Run <code>buildozer init</code>.</li>
+        <li>Edit <code>buildozer.spec</code> as follows:</li>
+    </ul>
+
+    <p>
+        <strong
+            >5. Modify the following parameters in
+            <code>buildozer.spec</code>:</strong
+        >
+    </p>
+    <ul>
+        <li><code>source.include_exts = </code></li>
+        <li>
+            <code
+                >requirements = python3==3.10.12, kivy==2.3.0,
+                hostpython3==3.10.12, pygame, pyjnius, jnius, sdl2, sdl2_image,
+                sdl2_mixer, sdl2_ttf, png, jpeg, pillow</code
+            >
+        </li>
+        <li>
+            <code
+                >presplash.filename = %(source.dir)s/android_presplash.png</code
+            >
+        </li>
+        <li><code>icon.filename = %(source.dir)s/android_icon.png</code></li>
+        <li><code>orientation = landscape</code></li>
+        <li><code>fullscreen = 1</code></li>
+        <li><code>android.presplash_color = black</code></li>
+    </ul>
+
+    <p><strong>6. Build and Run:</strong></p>
+    <ul>
+        <li>Run <code>buildozer android debug deploy run logcat</code>.</li>
+        <li>
+            The first time you build with Buildozer, accept any required
+            licenses.
+        </li>
+        <li>
+            The process may take some time initially, but subsequent builds will
+            be faster.
+        </li>
+    </ul>
+</div>
+{% endblock %}

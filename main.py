@@ -184,7 +184,7 @@ def export_to_android():
         return redirect(url_for('index'))
 
     if current_project:
-        return redirect(url_for('index'))
+        return render_template('export/android.html')
 
     return redirect(url_for('index'))
 
