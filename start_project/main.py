@@ -14,7 +14,7 @@ pg.font.init()
 import os
 full_path = f"{os.path.abspath('.')}/"
 
-game_size = (280, 137)
+game_size = (240, 137)
 native_res_multiplier = 3
 game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
 
