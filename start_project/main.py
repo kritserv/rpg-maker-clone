@@ -14,9 +14,16 @@ pg.font.init()
 import os
 full_path = f"{os.path.abspath('.')}/"
 
-game_size = (240, 137)
+game_size = [240, 137]
 native_res_multiplier = 3
 game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
+
+if android:
+    phone_width, phone_height = pg.display.get_desktop_sizes()[0]
+    # scale game_width to match phone_width
+    phone_ratio = phone_width / phone_height
+    while game_size[0] / game_size[1] < phone_ratio:
+        game_size[0] += 1
 
 def toggle_full_screen():
     pg.display.toggle_fullscreen()
@@ -174,6 +181,7 @@ async def main():
 
             await asyncio.sleep(0)
     elif android:
+
         screen = pg.display.set_mode(game_size,
             pg.SCALED)
         toggle_full_screen()
