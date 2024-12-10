@@ -1,13 +1,16 @@
 {
-	"main": {
-		"main_title": "Game Title"
-	},
+  "main": {
+    "main_title": "Game Title"
+  },
 
-	"maps": [
-		{
-			"name":"map001",
-			"path":"map001.csv", 
-			"tileset": "forests"
-		}
-	]
+  "maps": [
+    {
+      "name": "map001",
+      "path": "map001.csv",
+      "tileset": "forests"
+    }
+  ],
+
+  "start_map": "map001",
+  "player_start_position": [0, 64]
 }

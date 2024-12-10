@@ -10,11 +10,11 @@ class Tile(pg.sprite.Sprite):
 		self.rect = self.img.get_rect(topleft=pos)
 
 class RpgMap(pg.sprite.Sprite):
-	def __init__(self, full_path):
+	def __init__(self, full_path, start_map):
 		pg.sprite.Sprite.__init__(self)
 		self.tile_size = 16
 		self.map_data = {}
-		self.curr_map = "map001"
+		self.curr_map = start_map
 		self.full_path = full_path
 
 	def load_map_data(self, map_json) -> None:

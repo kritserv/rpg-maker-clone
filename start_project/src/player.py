@@ -3,7 +3,7 @@ from math import floor, ceil
 import os
 
 class Player(pg.sprite.Sprite):
-	def __init__(self, xy, full_path):
+	def __init__(self, full_path, xy):
 		x, y = xy
 		pg.sprite.Sprite.__init__(self)
 		self.full_path = full_path

@@ -36,26 +36,33 @@ Use this if prefer maximize window instead of the default one.
 
 from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, Timer, blit_text
 
+def load_game(player_start_pos, start_map, db):
+    player = Player(full_path, player_start_pos)
+    rpgmap = RpgMap(full_path, start_map)
+    rpgmap.load_map_data(db["maps"])
+    return player, rpgmap
+
 async def main():
+    delta_time = DeltaTime()
     display = pg.Surface((game_size))
 
+    # load data
     db = json_loader(f"{full_path}game_data/db.json")
     pg.display.set_caption(db["main"]["main_title"])
+    start_map = db["start_map"]
+    player_start_pos = db["player_start_position"]
 
+    # load settings
     settings = json_loader(f"{full_path}user_data/settings.json")
     scale_method = settings["scale_method"]
-
-    delta_time = DeltaTime()
     scale_on_x_axis = scale_method == "by windows width"
-
-    player_pos = (0, 64)
 
     clock = pg.time.Clock()
 
     GREY = pg.Color("grey20")
-    RED = pg.Color(255, 0, 0)
-    BLUE = pg.Color(0, 0, 255)
-    BLACK = pg.Color(0, 0, 0)
+    RED = pg.Color("red")
+    BLUE = pg.Color("blue")
+    BLACK = pg.Color("black")
 
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
@@ -143,10 +150,8 @@ async def main():
             (game_size_native),
             pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF)
         )
-        pg.display.set_icon(pg.image.load(f"{full_path}assets/icon.png").convert_alpha())
-        player = Player(player_pos, full_path)
-        rpgmap = RpgMap(full_path)
-        rpgmap.load_map_data(db["maps"])
+        pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
+        player, rpgmap = load_game(player_start_pos, start_map, db)
 
         opengl = OpenGLStuff()
         fullscreen_toggle_timer = Timer()
@@ -185,9 +190,7 @@ async def main():
         screen = pg.display.set_mode(game_size,
             pg.SCALED)
         toggle_full_screen()
-        player = Player(player_pos, full_path)
-        rpgmap = RpgMap(full_path)
-        rpgmap.load_map_data(db["maps"])
+        player, rpgmap = load_game(player_start_pos, start_map, db)
 
         rect1 = (pg.Rect(40, 30, 30, 30), "UP")
         rect2 = (pg.Rect(5, 65, 30, 30), "LEFT")
@@ -259,9 +262,7 @@ async def main():
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
-        player = Player(player_pos, full_path)
-        rpgmap = RpgMap(full_path)
-        rpgmap.load_map_data(db["maps"])
+        player, rpgmap = load_game(player_start_pos, start_map, db)
 
         while pygame_event.running:
             dt = delta_time.get()
