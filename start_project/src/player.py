@@ -87,10 +87,11 @@ class Player(pg.sprite.Sprite):
 			left = mobile_key["K_LEFT"]
 			right = mobile_key["K_RIGHT"]
 			down = mobile_key["K_DOWN"]
-		up = key[pg.K_UP]
-		left = key[pg.K_LEFT]
-		right = key[pg.K_RIGHT]
-		down = key[pg.K_DOWN]
+		else:
+			up = key[pg.K_UP]
+			left = key[pg.K_LEFT]
+			right = key[pg.K_RIGHT]
+			down = key[pg.K_DOWN]
 
 
 		if left or right:

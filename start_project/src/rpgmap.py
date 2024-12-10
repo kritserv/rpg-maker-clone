@@ -38,6 +38,18 @@ class RpgMap(pg.sprite.Sprite):
 
 			self.map_data[name] = current_tiles
 
-	def draw(self, display) -> None:
+	def draw(self, display, camera):
 		for tile in self.map_data[self.curr_map]:
-			display.blit(tile.img, tile.rect)
+			# Calculate adjusted positions
+			adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0]//2
+			adjusted_y = tile.rect.y - camera.offset_y
+			# Draw the tile at the adjusted position
+			display.blit(tile.img, (adjusted_x, adjusted_y))
+
+	def draw_scaled_screen(self, display, camera, game_size):
+		for tile in self.map_data[self.curr_map]:
+			# Calculate adjusted positions
+			adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0]//2 - game_size[0]
+			adjusted_y = tile.rect.y - camera.offset_y - game_size[1]
+			# Draw the tile at the adjusted position
+			display.blit(tile.img, (adjusted_x, adjusted_y))

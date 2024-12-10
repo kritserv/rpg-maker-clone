@@ -1,6 +1,6 @@
 web = False
-android = False
-pc = True
+android = True
+pc = False
 
 import asyncio
 import pygame as pg
@@ -14,7 +14,7 @@ pg.font.init()
 import os
 full_path = f"{os.path.abspath('.')}/"
 
-game_size = [240, 137]
+game_size = [256, 137]
 native_res_multiplier = 3
 game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
 
@@ -34,13 +34,15 @@ Use this if prefer maximize window instead of the default one.
 # from pygame._sdl2 import Window
 # Window.from_display_module().maximize()
 
-from src import json_loader, Player, RpgMap, DeltaTime, PygameEvent, Timer, blit_text
+from src import json_loader, Player, RpgMap, Camera, DeltaTime, PygameEvent, Timer, blit_text
 
-def load_game(player_start_pos, start_map, db):
+def load_game(player_start_pos, start_map, db, screen):
     player = Player(full_path, player_start_pos)
     rpgmap = RpgMap(full_path, start_map)
     rpgmap.load_map_data(db["maps"])
-    return player, rpgmap
+    camera_width, camera_height = screen.get_size()
+    camera = Camera(camera_width, camera_height, game_size[0])
+    return player, rpgmap, camera
 
 async def main():
     delta_time = DeltaTime()
@@ -151,7 +153,7 @@ async def main():
             pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF)
         )
         pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
-        player, rpgmap = load_game(player_start_pos, start_map, db)
+        player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
 
         opengl = OpenGLStuff()
         fullscreen_toggle_timer = Timer()
@@ -174,12 +176,12 @@ async def main():
 
             # Logic
             player.update(key, dt)
+            camera.update(player)
 
             # Graphic
             display.fill(GREY)
-            rpgmap.draw(display)
-            display.blit(player.img, player.pos)
-            display.blit(player.img, player.pos)
+            rpgmap.draw(display, camera)
+            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])#player.pos)
 
             # Use OpenGL for desktop
             opengl.draw(display)
@@ -187,10 +189,10 @@ async def main():
             await asyncio.sleep(0)
     elif android:
 
-        screen = pg.display.set_mode(game_size,
+        screen = pg.display.set_mode((game_size),
             pg.SCALED)
         toggle_full_screen()
-        player, rpgmap = load_game(player_start_pos, start_map, db)
+        player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
 
         rect1 = (pg.Rect(40, 30, 30, 30), "UP")
         rect2 = (pg.Rect(5, 65, 30, 30), "LEFT")
@@ -219,6 +221,8 @@ async def main():
                 elif event.type == pg.FINGERUP:
                     if event.finger_id in active_touches:
                         del active_touches[event.finger_id]
+                elif event.type == pg.QUIT:
+                    pygame_event.running = False
 
             mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False, "K_A": False, "K_B": False}
             for direction in active_touches.values():
@@ -237,11 +241,12 @@ async def main():
 
             # Logic
             player.update(key=None, dt=dt, mobile_key=mobile_key)
+            camera.update(player)
 
             # Graphic
             display.fill(GREY)
-            rpgmap.draw(display)
-            display.blit(player.img, player.pos)
+            rpgmap.draw_scaled_screen(display, camera, game_size)
+            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
             for rect, direction in all_rect:
                 if direction in active_touches.values():
@@ -262,7 +267,7 @@ async def main():
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
-        player, rpgmap = load_game(player_start_pos, start_map, db)
+        player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
 
         while pygame_event.running:
             dt = delta_time.get()
@@ -276,11 +281,12 @@ async def main():
 
             # Logic
             player.update(key, dt)
+            camera.update(player)
 
             # Graphic
             display.fill(GREY)
-            rpgmap.draw(display)
-            display.blit(player.img, player.pos)
+            rpgmap.draw(display, camera)
+            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
