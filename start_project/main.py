@@ -1,6 +1,6 @@
 web = False
-android = True
-pc = False
+android = False
+pc = True
 
 import asyncio
 import pygame as pg

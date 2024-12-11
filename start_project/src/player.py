@@ -1,6 +1,7 @@
 import pygame as pg
 from math import floor, ceil
 import os
+from .timer import Timer
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, full_path, xy):
@@ -35,6 +36,9 @@ class Player(pg.sprite.Sprite):
 		self.finished_y_move = True
 		self.last_dx, self.last_dy = 0, 0
 		self.key_pressed = False
+
+		self.turn_around_timer = Timer()
+		self.turn_around_timer.start()
 
 	def load_sprites(self) -> None:
 		load_spritesheet = pg.image.load(
@@ -87,22 +91,47 @@ class Player(pg.sprite.Sprite):
 			left = mobile_key["K_LEFT"]
 			right = mobile_key["K_RIGHT"]
 			down = mobile_key["K_DOWN"]
+			cancel = mobile_key["K_B"]
 		else:
 			up = key[pg.K_UP]
 			left = key[pg.K_LEFT]
 			right = key[pg.K_RIGHT]
 			down = key[pg.K_DOWN]
+			cancel = key[pg.K_x]
 
+		if cancel:
+			self.speed = 80
+			self.animation_time = 0.09
+		else:
+			self.speed = 50
+			self.animation_time = 0.19
+
+		if self.turn_around_timer.get_elapsed_time() > 1.15:
+			self.turn_around_timer.pause()
 
 		if left or right:
 			if self.finished_y_move:
 				if left:
-					self.direction = "left"
-					dx = -1
+					if cancel:
+						dx = -1
+						self.direction = "left"
+					else:
+						if self.direction == "left" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							dx = -1
+						else:
+							self.direction = "left"
+							self.turn_around_timer.elapsed_time = 0.9
 
 				elif right:
-					self.direction = "right"
-					dx = 1
+					if cancel:
+						dx = 1
+						self.direction = "right"
+					else:
+						if self.direction == "right" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							dx = 1
+						else:
+							self.direction = "right"
+							self.turn_around_timer.elapsed_time = 0.9
 
 				if left and right:
 					self.direction = "bottom"
@@ -116,12 +145,26 @@ class Player(pg.sprite.Sprite):
 		elif up or down:
 			if self.finished_x_move:
 				if up:
-					self.direction = "top"
-					dy = -1
+					if cancel:
+						dy = -1
+						self.direction = "top"
+					else:
+						if self.direction == "top" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							dy = -1
+						else:
+							self.direction = "top"
+							self.turn_around_timer.elapsed_time = 0.9
 
 				elif down:
-					self.direction = "bottom"
-					dy = 1
+					if cancel:
+						dy = 1
+						self.direction = "bottom"
+					else:
+						if self.direction == "bottom" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							dy = 1
+						else:
+							self.direction = "bottom"
+							self.turn_around_timer.elapsed_time = 0.9
 
 				if up and down:
 					self.direction = "bottom"
@@ -131,6 +174,8 @@ class Player(pg.sprite.Sprite):
 					self.last_dy = dy
 					self.key_pressed = True
 					self.finished_y_move = False
+		else:
+			self.turn_around_timer.restart()
 
 		return dx, dy
 
