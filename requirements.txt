@@ -6,3 +6,4 @@ buildozer
 cython
 javac
 cmake
+pillow

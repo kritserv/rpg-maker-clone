@@ -6,6 +6,8 @@ from json import load, dump
 import subprocess
 import base64
 import csv
+from PIL import Image
+import io
 
 def json_loader(path) -> dict:
     with open(path) as f:
@@ -31,13 +33,28 @@ def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
+def crop_sprite_from_sheet(image_path, sprite_width, sprite_height):
+    """
+    Crop the top-left sprite from the spritesheet.
+    """
+    with Image.open(image_path) as img:
+        # Crop the top-left sprite (0, 0) to (sprite_width, sprite_height)
+        cropped_sprite = img.crop((0, 0, sprite_width, sprite_height))
+        # Convert the cropped image to base64
+        buffered = io.BytesIO()
+        cropped_sprite.save(buffered, format="PNG")
+        return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
 @app.route('/')
 def index():
     config = json_loader(CONFIG_FILE)
     project_folder = False
+    table = []
+    player_position = None
+
     if config["current_project"]:
         project_folder = config["current_project"]["project_folder"]
-    table = []
+
     if project_folder:
         # Paths
         tile_map_path = os.path.join(project_folder, "game_data/data/maps/map001.csv")
@@ -52,11 +69,26 @@ def index():
             image_path = os.path.join(project_folder, f"assets/img/tile/{image_name}")
             base64_images[tile_id] = encode_image_to_base64(image_path)
 
+        player_image_path = os.path.join(project_folder, f"assets/img/sprite/player.png")
+        base64_images['player'] = crop_sprite_from_sheet(player_image_path, 16, 24)  # Encode player image
+
+        game_data_path = os.path.join(project_folder, "game_data/db.json")
+        game_data = json_loader(game_data_path)
+        player_start_position = game_data["player_start_position"]
+        player_position = tuple(player_start_position)  # Convert to tuple for easy comparison
+
         # Read the CSV file and construct the table
         with open(tile_map_path, "r") as csv_file:
             csv_reader = csv.reader(csv_file)
-            for row in csv_reader:
-                table.append([base64_images.get(cell, "") for cell in row])
+            for row_index, row in enumerate(csv_reader):
+                table_row = []
+                for col_index, cell in enumerate(row):
+                    if (row_index, col_index) == player_position:
+                        # Insert player sprite at player's position
+                        table_row.append(base64_images['player'])
+                    else:
+                        table_row.append(base64_images.get(cell, ""))
+                table.append(table_row)
 
     # Populate context
     context = {
