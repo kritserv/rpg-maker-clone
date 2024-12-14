@@ -161,6 +161,7 @@ async def main():
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
+            # print(round(clock.get_fps(), 2))
 
             # Input
             new_size = pygame_event.check()
