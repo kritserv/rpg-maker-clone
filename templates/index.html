@@ -56,9 +56,7 @@ navbar %}
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Save</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="#">Save</a></li>
                 <li class="nav-item dropdown">
                     <a
                         class="nav-link dropdown-toggle"
@@ -86,43 +84,6 @@ navbar %}
                         </li>
                     </ul>
                 </li>
-
-                <li class="nav-item dropdown">
-                    <a
-                        class="nav-link dropdown-toggle"
-                        href="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        >3rd party Tools</a
-                    >
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="https://beepbox.co"
-                                target="_blank"
-                                >Beepbox</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="https://sfxr.me"
-                                target="_blank"
-                                >Sfxr</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="https://www.piskelapp.com/p/create/sprite"
-                                target="_blank"
-                                >Piskel</a
-                            >
-                        </li>
-                    </ul>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('start_game') }}"
                         >Play Test</a
@@ -134,21 +95,52 @@ navbar %}
 </nav>
 {% endblock %} {% block content %}
 <h1>RPPYG Maker</h1>
+
 {% if context.table %}
-<table border="None" cellspacing="0" cellpadding="0">
-    {% for row in context.table %}
-    <tr>
-        {% for cell in row %}
-        <td style="width: 32px; height: 32px; text-align: center">
-            {% if cell %}
-            <img
-                src="data:image/png;base64,{{ cell }}"
-                style="width: 100%; height: 100%"
-            />
-            {% endif %}
-        </td>
-        {% endfor %}
-    </tr>
+<!-- Layer Selection -->
+<div id="layer-controls">
+    {% for layer_index, _ in context.table %}
+    <label>
+        <input
+            type="checkbox"
+            class="layer-toggle"
+            data-layer="{{ layer_index }}"
+            checked
+        />
+        Layer {{ layer_index + 1 }}
+    </label>
     {% endfor %}
-</table>
-{% endif %} {% endblock %}
+</div>
+
+<!-- Map Rendering -->
+<div id="map-container">
+    {% for layer_index, layer in context.table %}
+    <table
+        class="map-layer"
+        data-layer="{{ layer_index }}"
+        border="None"
+        cellspacing="0"
+        cellpadding="0"
+        style="position: absolute; display: block"
+    >
+        {% for row in layer %}
+        <tr>
+            {% for cell in row %}
+            <td style="width: 64px; height: 64px; text-align: center">
+                {% if cell %}
+                <img
+                    src="data:image/png;base64,{{ cell }}"
+                    style="width: 100%; height: 100%"
+                />
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</div>
+{% endif %}
+
+<script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
+{% endblock %}

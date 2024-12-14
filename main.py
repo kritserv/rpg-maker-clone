@@ -48,54 +48,71 @@ def crop_sprite_from_sheet(image_path, sprite_width, sprite_height):
 @app.route('/')
 def index():
     config = json_loader(CONFIG_FILE)
-    project_folder = False
+    project_folder = config.get("current_project", {}).get("project_folder")
     table = []
-    player_position = None
-
-    if config["current_project"]:
-        project_folder = config["current_project"]["project_folder"]
 
     if project_folder:
-        # Paths
-        tile_map_path = os.path.join(project_folder, "game_data/data/maps/map001.csv")
+        tile_map_path = "game_data/data/maps/map001"
+        tile_map_layer_paths = [
+            os.path.join(project_folder, f"{tile_map_path}layer1.csv"),
+            os.path.join(project_folder, f"{tile_map_path}layer2.csv"),
+        ]
         tile_map_setting_path = os.path.join(project_folder, "game_data/data/maps/tilesets.json")
-
-        # Load tile mappings
-        tile_mappings = json_loader(tile_map_setting_path)
-
-        # Prepare base64 image map
-        base64_images = {}
-        for tile_id, image_name in tile_mappings["forests"].items():
-            image_path = os.path.join(project_folder, f"assets/img/tile/{image_name}")
-            base64_images[tile_id] = encode_image_to_base64(image_path)
-
-        player_image_path = os.path.join(project_folder, f"assets/img/sprite/player.png")
-        base64_images['player'] = crop_sprite_from_sheet(player_image_path, 16, 24)  # Encode player image
-
         game_data_path = os.path.join(project_folder, "game_data/db.json")
+        player_image_path = os.path.join(project_folder, "assets/img/sprite/player.png")
+
+        # Load data
+        tile_mappings = json_loader(tile_map_setting_path)
         game_data = json_loader(game_data_path)
-        player_start_position = game_data["player_start_position"]
-        player_position = tuple(player_start_position)  # Convert to tuple for easy comparison
+        player_position = game_data.get("player_start_position", (0, 0))
+        player_position = tuple([player_position[1]/16, player_position[0]/16])
 
-        # Read the CSV file and construct the table
-        with open(tile_map_path, "r") as csv_file:
-            csv_reader = csv.reader(csv_file)
-            for row_index, row in enumerate(csv_reader):
-                table_row = []
-                for col_index, cell in enumerate(row):
-                    if (row_index, col_index) == player_position:
-                        # Insert player sprite at player's position
-                        table_row.append(base64_images['player'])
-                    else:
-                        table_row.append(base64_images.get(cell, ""))
-                table.append(table_row)
+        # Prepare base64 images
+        base64_images = {
+            tile_id: encode_image_to_base64(os.path.join(project_folder, f"assets/img/tile/{image_name}"))
+            for tile_id, image_name in tile_mappings.get("forests", {}).items()
+        }
+        base64_images['player'] = crop_sprite_from_sheet(player_image_path, 16, 24)
 
-    # Populate context
+        # Read CSV layers into tables
+        table = [render_csv_layer(path, base64_images) for path in tile_map_layer_paths]
+
+        # Add player position layer
+        player_layer = render_player_layer(tile_map_layer_paths[1], player_position, base64_images['player'])
+        table.append(player_layer)
+
+    # Add enumerated layers to context
+    table_with_indices = [(index, layer) for index, layer in enumerate(table)]
     context = {
         "project_folder": project_folder,
-        "table": table,
+        "table": table_with_indices,
     }
     return render_template('index.html', context=context)
+
+
+def render_csv_layer(csv_path, base64_images):
+    """Render a CSV layer into a table of base64 images."""
+    table = []
+    if os.path.exists(csv_path):
+        with open(csv_path, "r") as csv_file:
+            csv_reader = csv.reader(csv_file)
+            for row in csv_reader:
+                table.append([base64_images.get(cell, "") for cell in row])
+    return table
+
+
+def render_player_layer(csv_path, player_position, player_image):
+    """Render a layer showing the player's position."""
+    table = []
+    if os.path.exists(csv_path):
+        with open(csv_path, "r") as csv_file:
+            csv_reader = csv.reader(csv_file)
+            for row_index, row in enumerate(csv_reader):
+                table.append([
+                    player_image if (row_index, col_index) == player_position else ""
+                    for col_index, _ in enumerate(row)
+                ])
+    return table
 
 @app.route('/new-project', methods=['GET', 'POST'])
 def new_project():
@@ -165,7 +182,6 @@ def open_folder():
             os.startfile(folder_path)
         elif platform == "linux" or platform == "linux2":
             open_folder_with = 'thunar' #xdg-open
-
             os.system(f'{open_folder_with} "{folder_path}"')
 
     return redirect(url_for('index'))
@@ -234,11 +250,9 @@ def run_pygame():
     if current_project and project_folder:
         folder_path = current_project['project_folder']
         if os.path.exists(folder_path):
-
+            command = f'python3 main.py'
             if platform == "win32":
                 command = f'python main.py'
-            elif platform == "linux" or platform == "linux2":
-                command = f'python3 main.py'
 
             subprocess.Popen(command, cwd=folder_path, shell=True)
 

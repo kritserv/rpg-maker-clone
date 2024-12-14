@@ -97,7 +97,7 @@ class Player(pg.sprite.Sprite):
 			left = key[pg.K_LEFT]
 			right = key[pg.K_RIGHT]
 			down = key[pg.K_DOWN]
-			cancel = key[pg.K_x]
+			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x]
 
 		if cancel:
 			self.speed = 80

@@ -1,5 +1,6 @@
 {
-	"forests": {
-		"1": "grass1.png"
-	}
+  "forests": {
+    "1": "grass1.png",
+    "2": "flower1.png"
+  }
 }

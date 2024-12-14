@@ -6,11 +6,10 @@
   "maps": [
     {
       "name": "map001",
-      "path": "map001.csv",
       "tileset": "forests"
     }
   ],
 
   "start_map": "map001",
-  "player_start_position": [0, 0]
+  "player_start_position": [0, 64]
 }
