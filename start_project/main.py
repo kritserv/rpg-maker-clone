@@ -38,7 +38,7 @@ from src import json_loader, Player, RpgMap, Camera, DeltaTime, PygameEvent, Tim
 
 def load_game(player_start_pos, start_map, db, screen):
     player = Player(full_path, player_start_pos)
-    rpgmap = RpgMap(full_path, start_map)
+    rpgmap = RpgMap(full_path, start_map, game_size)
     rpgmap.load_map_data(db["maps"])
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, game_size[0])
@@ -181,7 +181,7 @@ async def main():
 
             # Graphic
             display.fill(GREY)
-            rpgmap.draw(display, camera)
+            rpgmap.draw(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])#player.pos)
 
             # Use OpenGL for desktop
@@ -246,7 +246,7 @@ async def main():
 
             # Graphic
             display.fill(GREY)
-            rpgmap.draw_scaled_screen(display, camera, game_size)
+            rpgmap.draw_scaled_screen(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
             for rect, direction in all_rect:
@@ -286,7 +286,7 @@ async def main():
 
             # Graphic
             display.fill(GREY)
-            rpgmap.draw(display, camera)
+            rpgmap.draw(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
             pg.transform.scale(display, screen.get_size(), screen)

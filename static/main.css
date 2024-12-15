@@ -1,4 +1,29 @@
 body {
     margin: 0;
     padding: 0;
+    image-rendering: optimizeSpeed;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+td {
+    width: 32px;
+    height: 32px;
+    text-align: center;
+}
+
+img:hover {
+    border: 1px solid white;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+}
+.map-layer {
+    position: absolute;
+    display: block;
 }

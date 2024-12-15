@@ -13,12 +13,16 @@ class Tile(pg.sprite.Sprite):
 
 class RpgMap(pg.sprite.Sprite):
     """Handles loading and rendering of RPG map layers."""
-    def __init__(self, full_path, start_map):
+    def __init__(self, full_path, start_map, game_size):
         super().__init__()
         self.tile_size = 16  # Standard tile size
         self.map_data = {}   # Stores map layers for each map
         self.curr_map = start_map
         self.full_path = full_path
+
+        self.game_size = game_size
+        self.view_height = game_size[1]//2+self.tile_size
+        self.view_width = game_size[0]//2+self.tile_size
 
     def load_map_data(self, map_json) -> None:
         """
@@ -58,28 +62,37 @@ class RpgMap(pg.sprite.Sprite):
                         layer_tiles.append(Tile(img_path, (x * self.tile_size, y * self.tile_size)))
         return layer_tiles
 
-    def draw(self, display, camera, layers=None):
+    def draw(self, display, camera, player_rect, layers=None):
         """
         Draw specified layers of the current map onto the display.
         If no layers are specified, all layers will be drawn.
         """
         layers_to_draw = layers or self.map_data[self.curr_map].keys()
-
+        bottom_edge = player_rect.y - self.view_height
+        top_edge = player_rect.y + self.view_height
+        left_edge = player_rect.x + self.view_width
+        right_edge = player_rect.x - self.view_width
         for layer_name in layers_to_draw:
             for tile in self.map_data[self.curr_map].get(layer_name, []):
-                adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2
-                adjusted_y = tile.rect.y - camera.offset_y
-                display.blit(tile.img, (adjusted_x, adjusted_y))
+                if bottom_edge < tile.rect.y < top_edge and right_edge < tile.rect.x < left_edge:
+                    adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2
+                    adjusted_y = tile.rect.y - camera.offset_y
+                    display.blit(tile.img, (adjusted_x, adjusted_y))
 
-    def draw_scaled_screen(self, display, camera, game_size, layers=None):
+    def draw_scaled_screen(self, display, camera, player_rect, layers=None):
         """
         Draw specified layers of the current map onto a scaled display.
         If no layers are specified, all layers will be drawn.
         """
         layers_to_draw = layers or self.map_data[self.curr_map].keys()
+        bottom_edge = player_rect.y - self.view_height
+        top_edge = player_rect.y + self.view_height
+        left_edge = player_rect.x + self.view_width
+        right_edge = player_rect.x - self.view_width
 
         for layer_name in layers_to_draw:
             for tile in self.map_data[self.curr_map].get(layer_name, []):
-                adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2 - game_size[0]
-                adjusted_y = tile.rect.y - camera.offset_y - game_size[1]
-                display.blit(tile.img, (adjusted_x, adjusted_y))
+                if bottom_edge < tile.rect.y < top_edge and right_edge < tile.rect.x < left_edge:
+                    adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2 - self.game_size[0]
+                    adjusted_y = tile.rect.y - camera.offset_y - self.game_size[1]
+                    display.blit(tile.img, (adjusted_x, adjusted_y))
