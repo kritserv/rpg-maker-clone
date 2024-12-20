@@ -297,7 +297,7 @@ class Player(pg.sprite.Sprite):
 		if self.key_pressed:
 			self.move(dx, dy, dt)
 
-		is_idle = self.finish_pos == self.pos
+		is_idle = self.finished_x_move and self.finished_y_move
 
 		ease_out = False
 		if dt > 0.018:
