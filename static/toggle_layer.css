@@ -2,6 +2,10 @@
     margin-bottom: 20px;
 }
 
+.layer-toggle:hover {
+    cursor: pointer;
+}
+
 .map-layer {
     position: absolute;
 }

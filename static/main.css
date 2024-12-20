@@ -27,3 +27,12 @@ img {
     position: absolute;
     display: block;
 }
+
+.object {
+    height: 48px;
+    margin-top: -48px;
+}
+
+.object:hover {
+    cursor: pointer;
+}
