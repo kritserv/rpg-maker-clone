@@ -10,12 +10,17 @@ class Player(pg.sprite.Sprite):
 		self.full_path = full_path
 
 		self.speed = 80
+		self.is_running = False
 
 		self.imgs = {
 			"bottom": [],
 			"top": [],
 			"left": [],
-			"right": []
+			"right": [],
+			"running_bottom": [],
+			"running_top": [],
+			"running_left": [],
+			"running_right": [],
 			}
 		self.load_sprites()
 
@@ -47,10 +52,14 @@ class Player(pg.sprite.Sprite):
 		sprite_width = 16
 		sprite_height = 24
 		directions = [
-			"bottom",
+		    "bottom",
 			"top",
 			"left",
-			"right"
+			"right",
+			"running_bottom",
+			"running_top",
+			"running_left",
+			"running_right"
 			]
 		frames = [
 			"stand_still",
@@ -102,9 +111,11 @@ class Player(pg.sprite.Sprite):
 		if cancel:
 			self.speed = 80
 			self.animation_time = 0.09
+			self.is_running = True
 		else:
 			self.speed = 50
 			self.animation_time = 0.19
+			self.is_running = False
 
 		if self.turn_around_timer.get_elapsed_time() > 1.15:
 			self.turn_around_timer.pause()
@@ -241,6 +252,8 @@ class Player(pg.sprite.Sprite):
 				self.current_frame -= self.animation_time
 				self.current_img = (self.current_img + 1) % len(self.imgs[self.direction])
 		self.img = self.imgs[self.direction][self.current_img]
+		if self.is_running:
+		      self.img = self.imgs['running_'+self.direction][self.current_img]
 
 	def move_to_finish_pos(self, dt, one_move, ease_out) -> None:
 		distant_to_finish_x ,\
