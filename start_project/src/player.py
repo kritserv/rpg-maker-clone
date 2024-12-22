@@ -110,10 +110,10 @@ class Player(pg.sprite.Sprite):
 
 		if cancel:
 			self.speed = 80
-			self.animation_time = 0.09
+			self.animation_time = 0.13
 			self.is_running = True
 		else:
-			self.speed = 50
+			self.speed = 40
 			self.animation_time = 0.19
 			self.is_running = False
 
