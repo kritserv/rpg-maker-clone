@@ -4,6 +4,8 @@ from .player import Player
 from .rpgmap import RpgMap
 from .camera import Camera
 
+from .input import Input
+
 from .dt import DeltaTime
 from .pg_event import PygameEvent
 from .timer import Timer

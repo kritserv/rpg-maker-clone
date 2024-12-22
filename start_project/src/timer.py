@@ -2,8 +2,8 @@ import time
 
 class Timer:
 	def __init__(self):
-		self.start_time = 0
-		self.elapsed_time = 0
+		self.start_time = 0.0
+		self.elapsed_time = 0.0
 		self.is_paused = True
 
 	def start_or_resume(self):
@@ -23,8 +23,8 @@ class Timer:
 			self.is_paused = True
 
 	def reset(self):
-		self.start_time = 0
-		self.elapsed_time = 0
+		self.start_time = 0.0
+		self.elapsed_time = 0.0
 		self.is_paused = True
 
 	def restart(self):

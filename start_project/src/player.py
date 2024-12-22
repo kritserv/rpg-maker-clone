@@ -109,11 +109,11 @@ class Player(pg.sprite.Sprite):
 			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x]
 
 		if cancel:
-			self.speed = 80
-			self.animation_time = 0.13
+			self.speed = 90
+			self.animation_time = 0.1
 			self.is_running = True
 		else:
-			self.speed = 40
+			self.speed = 50
 			self.animation_time = 0.19
 			self.is_running = False
 
@@ -300,7 +300,7 @@ class Player(pg.sprite.Sprite):
 			self.finished_y_move = True
 
 
-	def update(self, key, dt, mobile_key=False) -> None:
+	def update(self, key, dt, mobile_key={}) -> None:
 		dx, dy = self.calculate_val_from_key(key, mobile_key)
 
 		one_move = self.speed * dt

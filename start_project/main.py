@@ -25,16 +25,13 @@ if android:
     while game_size[0] / game_size[1] < phone_ratio:
         game_size[0] += 1
 
-def toggle_full_screen():
-    pg.display.toggle_fullscreen()
-
 """
 Use this if prefer maximize window instead of the default one.
 """
 # from pygame._sdl2 import Window
 # Window.from_display_module().maximize()
 
-from src import json_loader, Player, RpgMap, Camera, DeltaTime, PygameEvent, Timer, blit_text
+from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text
 
 def load_game(player_start_pos, start_map, db, screen):
     player = Player(full_path, player_start_pos)
@@ -156,24 +153,14 @@ async def main():
         player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
 
         opengl = OpenGLStuff()
-        fullscreen_toggle_timer = Timer()
-        fullscreen_toggle_timer.start()
+        input = Input('pc')
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
             # print(round(clock.get_fps(), 2))
 
             # Input
-            new_size = pygame_event.check()
-            if new_size:
-                display = new_size
-            key = pg.key.get_pressed()
-            if key[pg.K_f] or key[pg.K_F11]:
-                if fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
-                    toggle_full_screen()
-                    fullscreen_toggle_timer.restart()
-            if fullscreen_toggle_timer.get_elapsed_time() >= 0.5:
-                fullscreen_toggle_timer.pause()
+            new_size, key, display = input.update_for_pc(pygame_event, display)
 
             # Logic
             player.update(key, dt)
@@ -182,7 +169,7 @@ async def main():
             # Graphic
             display.fill(GREY)
             rpgmap.draw(display, camera, player.rect)
-            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])#player.pos)
+            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
             # Use OpenGL for desktop
             opengl.draw(display)
@@ -192,53 +179,22 @@ async def main():
 
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
-        toggle_full_screen()
+        pg.display.toggle_fullscreen()
         player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
 
-        rect1 = (pg.Rect(40, 30, 30, 30), "UP")
-        rect2 = (pg.Rect(5, 65, 30, 30), "LEFT")
-        rect3 = (pg.Rect(75, 65, 30, 30), "RIGHT")
-        rect4 = (pg.Rect(40, 100, 30, 30), "DOWN")
-        rect5 = (pg.Rect(game_size[0] - 90, 77, 30, 30), "A")
-        rect6 = (pg.Rect(game_size[0] - 50, 77, 30, 30), "B")
-        all_rect = [rect1, rect2, rect3, rect4, rect5, rect6]
         use_font = pg.font.SysFont(None, 22)
         fps = 0
         fps_update_timer = Timer()
         fps_update_timer.start()
-        active_touches = {}  # Store touch points and their corresponding actions
+
+        input = Input('android', game_size)
 
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
 
             # Input
-            for event in pg.event.get():
-                if event.type == pg.FINGERDOWN or event.type == pg.FINGERMOTION:
-                    touch_pos = (event.x * game_size[0], event.y * game_size[1])
-                    for rect, direction in all_rect:
-                        if rect.collidepoint(touch_pos):
-                            active_touches[event.finger_id] = direction
-                elif event.type == pg.FINGERUP:
-                    if event.finger_id in active_touches:
-                        del active_touches[event.finger_id]
-                elif event.type == pg.QUIT:
-                    pygame_event.running = False
-
-            mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False, "K_A": False, "K_B": False}
-            for direction in active_touches.values():
-                if direction == "UP":
-                    mobile_key["K_UP"] = True
-                if direction == "LEFT":
-                    mobile_key["K_LEFT"] = True
-                if direction == "RIGHT":
-                    mobile_key["K_RIGHT"] = True
-                if direction == "DOWN":
-                    mobile_key["K_DOWN"] = True
-                if direction == "A":
-                    mobile_key["K_A"] = True
-                if direction == "B":
-                    mobile_key["K_B"] = True
+            mobile_key = input.update_for_android(pygame_event)
 
             # Logic
             player.update(key=None, dt=dt, mobile_key=mobile_key)
@@ -248,12 +204,7 @@ async def main():
             display.fill(GREY)
             rpgmap.draw_scaled_screen(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
-
-            for rect, direction in all_rect:
-                if direction in active_touches.values():
-                    pg.draw.rect(display, RED, rect, border_radius=5)
-                else:
-                    pg.draw.rect(display, BLUE, rect, border_radius=5)
+            input.draw_for_android(display, RED, BLUE)
 
             if fps_update_timer.get_elapsed_time() >= 0.5:
                 fps = round(clock.get_fps(), 2)
@@ -270,15 +221,13 @@ async def main():
             pg.RESIZABLE)
         player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
 
+        input = Input('web')
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
 
             # Input
-            new_size = pygame_event.check()
-            if new_size:
-                display = new_size
-            key = pg.key.get_pressed()
+            key = input.update_for_web(pygame_event)
 
             # Logic
             player.update(key, dt)

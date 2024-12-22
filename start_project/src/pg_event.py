@@ -4,36 +4,19 @@ from dataclasses import dataclass
 @dataclass(slots=True, kw_only=True)
 class PygameEvent:
 	game_size: tuple
-	running: bool = True
-	click: bool = False
 	keydown: bool = False
 	keyup: bool = False
-	up: bool = False
-	down: bool = False
-	left: bool = False
-	right: bool = False
-	interact: bool = False
-	cancel: bool = False
 	scale_on_x_axis: bool
+	running: bool = True
 
-	def check_type(self, event) -> object or None:
-		keydown, \
-		keyup, \
-		running, \
-		click =	False, \
-			True, \
-			True, \
-			False
+	def check_type(self, event):
+		keydown, keyup, running = False, True, True
 		if event.type == pg.KEYDOWN:
 			keydown = True
 		elif event.type == pg.KEYUP:
 			keyup = True
 		elif event.type == pg.QUIT:
 			running = False
-		elif event.type == pg.MOUSEBUTTONDOWN:
-			click = True
-		elif event.type == pg.MOUSEBUTTONUP:
-			click = False
 		else:
 			if event.type == pg.VIDEORESIZE:
 				new_size = self.get_size_and_maintain_aspect_ratio(event)
@@ -43,11 +26,9 @@ class PygameEvent:
 				return None
 		self.keydown, \
 		self.keyup, \
-		self.running, \
-		self.click = keydown, \
+		self.running = keydown, \
 			keyup, \
-			running, \
-			click
+			running
 
 	def get_size_and_maintain_aspect_ratio(self, event) -> tuple:
 		if self.scale_on_x_axis:
@@ -59,42 +40,6 @@ class PygameEvent:
 			new_width = int(event.w / ratio)
 			return (new_width, self.game_size[1])
 
-	def check_arrow_key(self, event, key) -> None:
-		up, down, left, right = False, False, False, False
-		if self.keydown:
-			if key == pg.K_UP:
-				up = True
-			elif key == pg.K_DOWN:
-				down = True
-			elif key == pg.K_LEFT:
-				left = True
-			elif key == pg.K_RIGHT:
-				right = True
-		elif self.keyup:
-			if key == pg.K_UP or key == pg.K_DOWN or key == pg.K_LEFT or key == pg.K_RIGHT:
-				up, down, left, right = False, False, False, False
-		self.up, self.down, self.left, self.right = up, down, left, right
-
-	def check_interact(self, event, key) -> None:
-		interact = False
-		if self.keydown:
-			if key == pg.K_RETURN:
-				interact = True
-		elif self.keyup:
-			if key == pg.K_z or key == pg.K_SPACE:
-				interact = True
-		self.interact = interact
-
-	def check_cancel(self, event, key) -> None:
-		cancel = False
-		if self.keydown:
-			if key == pg.K_ESCAPE:
-				cancel = True
-		elif self.keyup:
-			if key == pg.K_x or key == pg.K_KP0:
-				cancel = True
-		self.cancel = cancel
-
 	def check_quit_game(self, event, key) -> None:
 		running = True
 		if self.keydown:
@@ -104,14 +49,14 @@ class PygameEvent:
 				running = False
 		self.running = running
 
-	def check_key(self, event) -> int or bool:
+	def check_key(self, event) -> bool:
 		try:
 			key = event.key
 			return key
 		except AttributeError:
 			return False
 
-	def check(self) -> object or int:
+	def check(self):
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
@@ -120,7 +65,4 @@ class PygameEvent:
 				break
 			if key:
 				self.check_quit_game(event, key)
-				self.check_arrow_key(event, key)
-				self.check_interact(event, key)
-				self.check_cancel(event, key)
 		return 0
