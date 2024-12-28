@@ -8,8 +8,8 @@ from sys import exit
 
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
-pg.init()
 pg.font.init()
+pg.init()
 
 import os
 full_path = f"{os.path.abspath('.')}/"
@@ -25,13 +25,7 @@ if android:
     while game_size[0] / game_size[1] < phone_ratio:
         game_size[0] += 1
 
-"""
-Use this if prefer maximize window instead of the default one.
-"""
-# from pygame._sdl2 import Window
-# Window.from_display_module().maximize()
-
-from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text
+from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI
 
 def load_game(player_start_pos, start_map, db, screen):
     player = Player(full_path, player_start_pos)
@@ -39,7 +33,8 @@ def load_game(player_start_pos, start_map, db, screen):
     rpgmap.load_map_data(db["maps"])
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, game_size[0])
-    return player, rpgmap, camera
+    top_ui = TopUI(full_path)
+    return player, rpgmap, camera, top_ui
 
 async def main():
     delta_time = DeltaTime()
@@ -63,12 +58,15 @@ async def main():
     BLUE = pg.Color("blue")
     BLACK = pg.Color("black")
 
+    font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
+    fps_font = pg.font.Font(font_path, 16)
+
     pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
 
     if pc:
         """
-        OpenGL Stuff; for better FPS
-        I don't know what any of these code do, I copy it from dafluffypotato.
+        OpenGL Stuff; for better FPS and for steam achievement
+        I don't know what any of these code do, I just copy it from dafluffypotato.
         """
         import moderngl
         from array import array
@@ -149,15 +147,21 @@ async def main():
             (game_size_native),
             pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF)
         )
+
+        """
+        Use this if prefer game to open in maximize window instead of the default one.
+        """
+        # from pygame._sdl2 import Window
+        # Window.from_display_module().maximize()
+
         pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
-        player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
 
         opengl = OpenGLStuff()
         input = Input('pc')
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
-            # print(round(clock.get_fps(), 2))
 
             # Input
             new_size, key, display = input.update_for_pc(pygame_event, display)
@@ -170,6 +174,8 @@ async def main():
             display.fill(GREY)
             rpgmap.draw(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
+            top_ui.draw_fps(display, clock)
+
 
             # Use OpenGL for desktop
             opengl.draw(display)
@@ -180,12 +186,7 @@ async def main():
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
         pg.display.toggle_fullscreen()
-        player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
-
-        use_font = pg.font.SysFont(None, 22)
-        fps = 0
-        fps_update_timer = Timer()
-        fps_update_timer.start()
+        player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
 
         input = Input('android', game_size)
 
@@ -205,11 +206,7 @@ async def main():
             rpgmap.draw_scaled_screen(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
             input.draw_for_android(display, RED, BLUE)
-
-            if fps_update_timer.get_elapsed_time() >= 0.5:
-                fps = round(clock.get_fps(), 2)
-                fps_update_timer.restart()
-            blit_text(display, f'FPS:{fps}', use_font, BLACK, (10, 10))
+            top_ui.draw_fps(display, clock)
 
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()
@@ -219,7 +216,7 @@ async def main():
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
-        player, rpgmap, camera = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
 
         input = Input('web')
         while pygame_event.running:
@@ -237,6 +234,7 @@ async def main():
             display.fill(GREY)
             rpgmap.draw(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
+            top_ui.draw_fps(display, clock)
 
             pg.transform.scale(display, screen.get_size(), screen)
             pg.display.flip()

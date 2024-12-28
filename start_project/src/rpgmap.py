@@ -22,7 +22,7 @@ class RpgMap(pg.sprite.Sprite):
 
         self.game_size = game_size
         self.view_height = game_size[1]//2+self.tile_size
-        self.view_width = game_size[0]//2+self.tile_size
+        self.view_width = game_size[0]//2+self.tile_size*2
 
     def load_map_data(self, map_json) -> None:
         """
@@ -60,6 +60,7 @@ class RpgMap(pg.sprite.Sprite):
                     if tile_id.strip():  # Ignore empty tiles
                         img_path = f"{self.full_path}assets/img/tile/{tileset[tile_id]}"
                         layer_tiles.append(Tile(img_path, (x * self.tile_size, y * self.tile_size)))
+        layer_tiles = tuple(layer_tiles)
         return layer_tiles
 
     def draw(self, display, camera, player_rect, layers=None):

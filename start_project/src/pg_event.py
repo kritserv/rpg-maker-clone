@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(slots=True, kw_only=True)
 class PygameEvent:
-	game_size: tuple
+	game_size: list
 	keydown: bool = False
 	keyup: bool = False
 	scale_on_x_axis: bool

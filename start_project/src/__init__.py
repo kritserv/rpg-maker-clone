@@ -12,6 +12,8 @@ from .timer import Timer
 
 from .blit_text import blit_text
 
+from .top_ui import TopUI
+
 __all__ = [
 	json_loader,
 	Player,
@@ -20,5 +22,6 @@ __all__ = [
 	DeltaTime,
 	PygameEvent,
 	Timer,
-	blit_text
+	blit_text,
+	TopUI,
 	]
