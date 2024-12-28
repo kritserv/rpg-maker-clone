@@ -22,7 +22,7 @@ class RpgMap(pg.sprite.Sprite):
 
         self.game_size = game_size
         self.view_height = game_size[1]//2+self.tile_size
-        self.view_width = game_size[0]//2+self.tile_size*2
+        self.view_width = game_size[0]//2+self.tile_size
 
     def load_map_data(self, map_json) -> None:
         """
@@ -62,6 +62,15 @@ class RpgMap(pg.sprite.Sprite):
                         layer_tiles.append(Tile(img_path, (x * self.tile_size, y * self.tile_size)))
         layer_tiles = tuple(layer_tiles)
         return layer_tiles
+        
+    def resize_view(self, new_size):
+        """
+        Update View size when resize windows
+        """
+        if new_size != 0:
+            self.game_size = new_size.get_size()
+            self.view_height = self.game_size[1]//2+self.tile_size
+            self.view_width = self.game_size[0]//2+self.tile_size
 
     def draw(self, display, camera, player_rect, layers=None):
         """

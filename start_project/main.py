@@ -159,12 +159,15 @@ async def main():
 
         opengl = OpenGLStuff()
         input = Input('pc')
+        
+        debug_message = ''
         while pygame_event.running:
             dt = delta_time.get()
             clock.tick()
 
             # Input
             new_size, key, display = input.update_for_pc(pygame_event, display)
+            rpgmap.resize_view(new_size)
 
             # Logic
             player.update(key, dt)
@@ -175,6 +178,9 @@ async def main():
             rpgmap.draw(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
             top_ui.draw_fps(display, clock)
+            
+            # Debug
+            blit_text(display, f"{debug_message}", fps_font, BLACK, (5, 50))
 
 
             # Use OpenGL for desktop
