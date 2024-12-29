@@ -9,9 +9,16 @@ body {
     -ms-interpolation-mode: nearest-neighbor;
 }
 
+.map-container table {
+    margin-left: 100px;
+    border: None;
+}
+
 td {
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     text-align: center;
 }
 

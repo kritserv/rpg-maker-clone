@@ -7,6 +7,10 @@
     {
       "name": "map001",
       "tileset": "forests"
+    },
+    {
+      "name": "map002",
+      "tileset": "forests"
     }
   ],
 

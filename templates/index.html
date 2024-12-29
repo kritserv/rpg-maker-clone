@@ -15,6 +15,11 @@ navbar %}
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                        <a class="nav-link" href="#"
+                            >🏰 RPPYG Maker</a
+                        >
+                </li>
                 <li class="nav-item dropdown">
                     <a
                         class="nav-link dropdown-toggle"
@@ -29,21 +34,21 @@ navbar %}
                             <a
                                 class="dropdown-item"
                                 href="{{ url_for('new_project') }}"
-                                >New Project</a
+                                >✌️ New Project</a
                             >
                         </li>
                         <li>
                             <a
                                 class="dropdown-item"
                                 href="{{ url_for('open_project') }}"
-                                >Open Project</a
+                                >✏️ Open Project</a
                             >
                         </li>
                         <li>
                             <a
                                 class="dropdown-item"
                                 href="{{ url_for('open_folder') }}"
-                                >Open Folder</a
+                                >📁 Open Folder</a
                             >
                         </li>
                         <li><hr class="dropdown-divider" /></li>
@@ -51,12 +56,12 @@ navbar %}
                             <a
                                 class="dropdown-item"
                                 href="{{ url_for('close_project') }}"
-                                >Close Project</a
+                                >❌ Close Project</a
                             >
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="#">Save</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">💾 Save</a></li>
                 <li class="nav-item dropdown">
                     <a
                         class="nav-link dropdown-toggle"
@@ -64,22 +69,22 @@ navbar %}
                         role="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                        >Export</a
+                        >Export 🚀</a
                     >
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Desktop</a></li>
+                        <li><a class="dropdown-item" href="#">Desktop 🖥️</a></li>
                         <li>
                             <a
                                 class="dropdown-item"
                                 href="{{ url_for('export_to_android') }}"
-                                >Android</a
+                                >Android 🟢</a
                             >
                         </li>
                         <li>
                             <a
                                 class="dropdown-item"
                                 href="{{ url_for('export_to_browser') }}"
-                                >Browser</a
+                                >Browser 🌐</a
                             >
                         </li>
                     </ul>
@@ -99,7 +104,7 @@ navbar %}
                                 class="dropdown-item"
                                 href="https://beepbox.co"
                                 target="_blank"
-                                >Beepbox</a
+                                >Beepbox 🎶</a
                             >
                         </li>
                         <li>
@@ -107,7 +112,7 @@ navbar %}
                                 class="dropdown-item"
                                 href="https://sfxr.me"
                                 target="_blank"
-                                >Sfxr</a
+                                >Sfxr 🔊</a
                             >
                         </li>
                         <li>
@@ -115,14 +120,21 @@ navbar %}
                                 class="dropdown-item"
                                 href="https://www.piskelapp.com/p/create/sprite"
                                 target="_blank"
-                                >Piskel</a
+                                >Piskel ✏️</a
                             >
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('start_game') }}"
-                        >Play Test</a
+                        >🎮 Play Test</a
+                    >
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"
+                        >🌗 Dark Mode</a
                     >
                 </li>
             </ul>
@@ -130,9 +142,24 @@ navbar %}
     </div>
 </nav>
 {% endblock %} {% block content %}
-<h1>RPPYG Maker</h1>
 
 {% if context.table %}
+
+<!-- Map Selection -->
+{% if context.maps %}
+<div class="mb-3">
+    <label for="map-select" class="form-label">Choose a Map 🗺️</label>
+    <select class="form-select" id="map-select" name="map-select" required>
+        {% for map in context.maps %}
+        <option value="{{ map['name'] }}" {% if map['name'] == context.selected_map %}selected{% endif %}>
+            {{ map['name'] }}
+        </option>
+        {% endfor %}
+    </select>
+
+</div>
+{% endif %}
+
 <!-- Layer Selection -->
 <div id="layer-controls">
     {% for layer_index, _ in context.table %}
@@ -148,13 +175,29 @@ navbar %}
     {% endfor %}
 </div>
 
+<!-- Tile Dictionary -->
+<div class="tile-container">
+    <table
+        class="map-layer"
+        data-layer="{{ layer_index }}"
+        cellspacing="0"
+        cellpadding="0"
+    >
+        {% for tile_id, tile_img in context.tile_dict.items() %}
+        <tr>
+            <td><img class="tile" src="data:image/png;base64,{{ tile_img }}" /></td>
+            <td>{{ tile_id }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 <!-- Map Rendering -->
-<div id="map-container">
+<div class="map-container">
     {% for layer_index, layer in context.table %}
     <table
         class="map-layer"
         data-layer="{{ layer_index }}"
-        border="None"
         cellspacing="0"
         cellpadding="0"
     >
@@ -177,4 +220,6 @@ navbar %}
 {% endif %}
 
 <script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
+<script src="{{url_for('static', filename='change_map.js')}}"></script>
+
 {% endblock %}

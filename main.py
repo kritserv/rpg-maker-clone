@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from sys import platform
 import os
 import shutil
@@ -18,6 +18,7 @@ def json_saver(data, path):
         dump(data, f, indent=4)
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 CONFIG_FILE = 'config.json'
 
@@ -47,48 +48,81 @@ def crop_sprite_from_sheet(image_path, sprite_width, sprite_height):
 
 @app.route('/')
 def index():
+    map_name = request.args.get('map_name') or session.get('map_name')
+
     config = json_loader(CONFIG_FILE)
     project_folder = config.get("current_project", {}).get("project_folder")
+
+    # Default to the starting map if not set
+    if not map_name:
+        game_data_path = os.path.join(config.get("current_project", {}).get("project_folder"), "game_data/db.json")
+        game_data = json_loader(game_data_path)
+        map_name = game_data.get('start_map', 'default_map')
+
+    # Store the selected map in the session
+    session['map_name'] = map_name
     table = []
+    base64_images = {}
+    start_map = {}
+    maps = []
 
     if project_folder:
-        tile_map_path = "game_data/data/maps/map001"
-        tile_map_layer_paths = [
-            os.path.join(project_folder, f"{tile_map_path}layer1.csv"),
-            os.path.join(project_folder, f"{tile_map_path}layer2.csv"),
-        ]
-        tile_map_setting_path = os.path.join(project_folder, "game_data/data/maps/tilesets.json")
-        game_data_path = os.path.join(project_folder, "game_data/db.json")
-        player_image_path = os.path.join(project_folder, "assets/img/sprite/player.png")
+        try:
+            game_data_path = os.path.join(project_folder, "game_data/db.json")
+            tile_map_setting_path = os.path.join(project_folder, "game_data/data/maps/tilesets.json")
+            player_image_path = os.path.join(project_folder, "assets/img/sprite/player.png")
 
-        # Load data
-        tile_mappings = json_loader(tile_map_setting_path)
-        game_data = json_loader(game_data_path)
-        player_position = game_data.get("player_start_position", (0, 0))
-        player_position = tuple([player_position[1]/16, player_position[0]/16])
+            game_data = json_loader(game_data_path)
+            tile_mappings = json_loader(tile_map_setting_path)
+            maps_dict = game_data.get("maps", {})
+            maps.extend(maps_dict)
 
-        # Prepare base64 images
-        base64_images = {
-            tile_id: encode_image_to_base64(os.path.join(project_folder, f"assets/img/tile/{image_name}"))
-            for tile_id, image_name in tile_mappings.get("forests", {}).items()
-        }
-        base64_images['player'] = crop_sprite_from_sheet(player_image_path, 16, 24)
+            start_map_name = game_data.get("start_map")
+            if not map_name:
+                map_name = start_map_name
 
-        # Read CSV layers into tables
-        table = [render_csv_layer(path, base64_images) for path in tile_map_layer_paths]
+            selected_map = next((m for m in maps_dict if m["name"] == map_name), None)
+            if not selected_map:
+                return render_template('error.html', message='Map not found')
 
-        # Add player position layer
-        player_layer = render_player_layer(tile_map_layer_paths[1], player_position, base64_images['player'])
-        table.append(player_layer)
+            tile_map_path = f"game_data/data/maps/{map_name}"
+            tile_map_layer_paths = [
+                os.path.join(project_folder, f"{tile_map_path}layer1.csv"),
+                os.path.join(project_folder, f"{tile_map_path}layer2.csv"),
+            ]
 
-    # Add enumerated layers to context
-    table_with_indices = [(index, layer) for index, layer in enumerate(table)]
+            # Prepare base64 images for tiles
+            base64_images = {
+                tile_id: encode_image_to_base64(os.path.join(project_folder, f"assets/img/tile/{image_name}"))
+                for tile_id, image_name in tile_mappings.get(selected_map['tileset'], {}).items()
+            }
+
+            # Load player sprite
+            base64_images['player'] = crop_sprite_from_sheet(player_image_path, 16, 24)
+
+            # Read CSV layers into tables
+            table = [render_csv_layer(path, base64_images) for path in tile_map_layer_paths]
+
+            # Add player position layer
+            player_position = game_data.get("player_start_position", (0, 0))
+            player_position = (player_position[1] // 16, player_position[0] // 16)
+            object_layer = render_player_layer(tile_map_layer_paths[1], player_position, base64_images['player'])
+            if map_name == start_map_name:
+                table.append(object_layer)
+
+        except Exception as e:
+            return render_template('error.html', message=str(e))
+
+    if base64_images:
+        # remove player from tile_dict
+        base64_images.popitem()
     context = {
-        "project_folder": project_folder,
-        "table": table_with_indices,
+        "maps": maps,
+        "selected_map": map_name,
+        "table": [(index, layer) for index, layer in enumerate(table)],
+        "tile_dict": base64_images,
     }
     return render_template('index.html', context=context)
-
 
 def render_csv_layer(csv_path, base64_images):
     """Render a CSV layer into a table of base64 images."""
@@ -116,6 +150,7 @@ def render_player_layer(csv_path, player_position, player_image):
 
 @app.route('/new-project', methods=['GET', 'POST'])
 def new_project():
+    current_map_name = request.args.get('map_name')
     if request.method == 'POST':
         project_name = request.form['name']
         if project_name:

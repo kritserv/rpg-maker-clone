@@ -1,35 +1,48 @@
-{% extends "base.html" %}
-
-{% block title %}RPPYG Maker Open Project{% endblock %}
-
-{% block navbar %}
+{% extends "base.html" %} {% block title %}RPPYG Maker Open Project{% endblock
+%} {% block navbar %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Go Back</a>
+                    <a class="nav-link" href="#">🏰 RPPYG Maker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}"
+                        >↩️ Go Back</a
+                    >
                 </li>
             </ul>
         </div>
     </div>
 </nav>
-{% endblock %}
-
-{% block content %}
-    <h1>Select a Project Folder</h1>
-    <form method="POST" action="/open-project">
-        <div class="mb-3">
-            <label for="project_folder" class="form-label">Choose a Project</label>
-            <select class="form-select" id="project_folder" name="project_folder" required>
-                {% for folder in project_folders %}
-                <option value="{{ folder }}">{{ folder }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Open Project</button>
-    </form>
+{% endblock %} {% block content %}
+<h1>Select a Project Folder</h1>
+<form method="POST" action="/open-project">
+    <div class="mb-3">
+        <label for="project_folder" class="form-label">Choose a Project</label>
+        <select
+            class="form-select"
+            id="project_folder"
+            name="project_folder"
+            required
+        >
+            {% for folder in project_folders %}
+            <option value="{{ folder }}">{{ folder }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Open Project</button>
+</form>
 {% endblock %}
