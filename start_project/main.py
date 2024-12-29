@@ -48,8 +48,6 @@ async def main():
 
     # load settings
     settings = json_loader(f"{full_path}user_data/settings.json")
-    scale_method = settings["scale_method"]
-    scale_on_x_axis = scale_method == "by windows width"
 
     clock = pg.time.Clock()
 
@@ -61,7 +59,7 @@ async def main():
     font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
     fps_font = pg.font.Font(font_path, 16)
 
-    pygame_event = PygameEvent(game_size=game_size, scale_on_x_axis=scale_on_x_axis)
+    pygame_event = PygameEvent(game_size=game_size)
 
     if pc:
         """
@@ -159,7 +157,7 @@ async def main():
 
         opengl = OpenGLStuff()
         input = Input('pc')
-        
+
         debug_message = ''
         while pygame_event.running:
             dt = delta_time.get()
@@ -178,7 +176,7 @@ async def main():
             rpgmap.draw(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
             top_ui.draw_fps(display, clock)
-            
+
             # Debug
             blit_text(display, f"{debug_message}", fps_font, BLACK, (5, 50))
 

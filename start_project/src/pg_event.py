@@ -6,7 +6,6 @@ class PygameEvent:
 	game_size: list
 	keydown: bool = False
 	keyup: bool = False
-	scale_on_x_axis: bool
 	running: bool = True
 
 	def check_type(self, event):
@@ -31,14 +30,15 @@ class PygameEvent:
 			running
 
 	def get_size_and_maintain_aspect_ratio(self, event) -> tuple:
-		if self.scale_on_x_axis:
-			ratio = event.w / self.game_size[0]
-			new_height = int(event.h / ratio)
-			return (self.game_size[0], new_height)
-		else:
-			ratio = event.h / self.game_size[1]
-			new_width = int(event.w / ratio)
-			return (new_width, self.game_size[1])
+	    # Scale On Width (still bug with drawing rpgmap)
+		# ratio = event.w / self.game_size[0]
+		# new_height = int(event.h / ratio)
+		# return (self.game_size[0], new_height)
+
+		# Scale On Height
+		ratio = event.h / self.game_size[1]
+		new_width = int(event.w / ratio)
+		return (new_width, self.game_size[1])
 
 	def check_quit_game(self, event, key) -> None:
 		running = True
