@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block title %}RPPYG Maker Git{% endblock %} {%
+block content %}
+<h1>Git</h1>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %} {% if messages
+%}
+<div id="hideMe">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %} {% endwith %}
+
+<!-- Git Pull -->
+<form method="POST" action="/git-pull">
+    <button type="submit" class="btn btn-info">Git Pull</button>
+</form>
+
+<div style="height: 22px"></div>
+
+<!-- Git Add -->
+<form method="POST" action="/git-add">
+    <button type="submit" class="btn btn-primary">Git add .</button>
+</form>
+
+<div style="height: 22px"></div>
+
+<!-- Git Commit and Push -->
+<form method="POST" action="/git-push">
+    <div class="mb-3">
+        <label for="message" class="form-label">Message</label>
+        <input
+            type="text"
+            class="form-control"
+            id="message"
+            name="message"
+            required
+        />
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+            class="form-control"
+            id="description"
+            name="description"
+            rows="4"
+        ></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Git Commit & Push</button>
+</form>
+{% endblock %}

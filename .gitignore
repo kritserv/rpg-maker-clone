@@ -12,7 +12,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+bin/
 build/
+.buildozer/
 develop-eggs/
 dist/
 downloads/

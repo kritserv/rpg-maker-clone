@@ -1,0 +1,144 @@
+{% extends "base.html" %} {% block title %}RPPYG Maker Database{% endblock %} {%
+block content %}
+<h1>Database</h1>
+<button type="button" class="btn btn-success">💾 Save</button>
+<div style="height: 22px"></div>
+
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link active"
+            id="pills-character-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-character"
+            type="button"
+            role="tab"
+            aria-controls="pills-character"
+            aria-selected="true"
+        >
+            Character 🦹‍♂️
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="pills-objects-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-objects"
+            type="button"
+            role="tab"
+            aria-controls="pills-objects"
+            aria-selected="false"
+        >
+            Objects 📜
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="pills-items-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-items"
+            type="button"
+            role="tab"
+            aria-controls="pills-items"
+            aria-selected="false"
+        >
+            Items 🍪
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="pills-maps-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-maps"
+            type="button"
+            role="tab"
+            aria-controls="pills-maps"
+            aria-selected="false"
+        >
+            Maps 🏞️
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="pills-maps-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-battles"
+            type="button"
+            role="tab"
+            aria-controls="pills-battles"
+            aria-selected="false"
+        >
+            Battles ⚔️
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="pills-games-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-games"
+            type="button"
+            role="tab"
+            aria-controls="pills-games"
+            aria-selected="false"
+        >
+            Games 🎮
+        </button>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+    <div
+        class="tab-pane fade show"
+        id="pills-character"
+        role="tabpanel"
+        aria-labelledby="pills-character-tab"
+    >
+        character...
+    </div>
+    <div
+        class="tab-pane fade"
+        id="pills-objects"
+        role="tabpanel"
+        aria-labelledby="pills-objects-tab"
+    >
+        objects...
+    </div>
+    <div
+        class="tab-pane fade"
+        id="pills-items"
+        role="tabpanel"
+        aria-labelledby="pills-items-tab"
+    >
+        items...
+    </div>
+    <div
+        class="tab-pane fade"
+        id="pills-maps"
+        role="tabpanel"
+        aria-labelledby="pills-maps-tab"
+    >
+        maps...
+    </div>
+    <div
+        class="tab-pane fade"
+        id="pills-battles"
+        role="tabpanel"
+        aria-labelledby="pills-battles-tab"
+    >
+        battles...
+    </div>
+    <div
+        class="tab-pane fade"
+        id="pills-games"
+        role="tabpanel"
+        aria-labelledby="pills-games-tab"
+    >
+        games...
+    </div>
+</div>
+
+{% endblock %}

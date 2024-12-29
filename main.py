@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from sys import platform
 import os
 import shutil
@@ -291,6 +291,111 @@ def run_pygame():
 
             subprocess.Popen(command, cwd=folder_path, shell=True)
 
+@app.route('/database', methods=['GET', 'POST'])
+def database():
+    return render_template('database/database.html')
+
+def _git_add_dot():
+    """Adds all changes in the current project's folder."""
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+        project_folder = current_project.get("project_folder") if current_project else None
+
+        if not project_folder or not os.path.exists(project_folder):
+            flash("Project folder not found!", "danger")
+            return False
+
+        command = "git add ."
+        result = subprocess.run(command, cwd=project_folder, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            flash("Files added successfully!", "success")
+        else:
+            flash(f"Error in git add: {result.stderr}", "danger")
+        return result.returncode == 0
+    except FileNotFoundError:
+        flash("Config file not found!", "danger")
+        return False
+
+def _git_pull():
+    """Pull change from current project"""
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+        project_folder = current_project.get("project_folder") if current_project else None
+
+        if not project_folder or not os.path.exists(project_folder):
+            flash("Project folder not found!", "danger")
+            return False
+
+        command = "git pull"
+        result = subprocess.run(command, cwd=project_folder, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            flash("Files added successfully!", "success")
+        else:
+            flash(f"Error in git pull: {result.stderr}", "danger")
+        return result.returncode == 0
+    except FileNotFoundError:
+        flash("Config file not found!", "danger")
+        return False
+
+
+def _git_commit_and_push(message, description):
+    """Commits and pushes changes in the current project's folder."""
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+        project_folder = current_project.get("project_folder") if current_project else None
+
+        if not project_folder or not os.path.exists(project_folder):
+            flash("Project folder not found!", "danger")
+            return False
+
+        commit_message = f"{message}\n\n{description}"
+        command = f'git commit -m "{commit_message}" && git push'
+        result = subprocess.run(command, cwd=project_folder, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            flash("Commit and push successful!", "success")
+        else:
+            flash(f"Error in git commit/push: {result.stderr}", "danger")
+        return result.returncode == 0
+    except FileNotFoundError:
+        flash("Config file not found!", "danger")
+        return False
+
+
+@app.route('/git-add', methods=['POST'])
+def git_add():
+    """Handles the git add . operation."""
+    success = _git_add_dot()
+    return redirect(url_for('git'))
+
+
+@app.route('/git-pull', methods=['POST'])
+def git_pull():
+    """Handles the git pull operation."""
+
+    success = _git_pull()
+    return redirect(url_for('git'))
+
+
+@app.route('/git-push', methods=['POST'])
+def git_push():
+    """Handles the git commit and push operation."""
+    message = request.form.get("message")
+    description = request.form.get("description")
+    if not message:
+        flash("Commit message is required!", "danger")
+        return redirect(url_for('git'))
+
+    success = _git_commit_and_push(message, description)
+    return redirect(url_for('git'))
+
+
+@app.route('/git', methods=['GET', 'POST'])
+def git():
+    """Renders the Git page."""
+    return render_template('git/git.html')
 
 @app.route('/start-game')
 def start_game():

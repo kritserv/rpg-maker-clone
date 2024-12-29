@@ -61,7 +61,11 @@ navbar %}
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="#">💾 Save</a></li>
+                <li class="nav-item">
+                    <a id="openGitDialog" class="nav-link" href="#"
+                    >🐈 Git</a
+                    >
+                </li>
                 <li class="nav-item dropdown">
                     <a
                         class="nav-link dropdown-toggle"
@@ -126,6 +130,11 @@ navbar %}
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" id="openDBDialog" href="#"
+                        >🛢 Database</a
+                    >
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('start_game') }}"
                         >🎮 Play Test</a
                     >
@@ -142,6 +151,16 @@ navbar %}
     </div>
 </nav>
 {% endblock %} {% block content %}
+
+<dialog id="DBDialog">
+  <iframe src="{{ url_for('database') }}"></iframe>
+  <button id="closeDBDialog" type="button" class="btn btn-danger">Close</button>
+</dialog>
+
+<dialog id="GitDialog">
+  <iframe src="{{ url_for('git') }}"></iframe>
+  <button id="closeGitDialog" type="button" class="btn btn-danger">Close</button>
+</dialog>
 
 {% if context.table %}
 
@@ -221,5 +240,6 @@ navbar %}
 
 <script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
 <script src="{{url_for('static', filename='change_map.js')}}"></script>
+<script src="{{url_for('static', filename='open_dialog.js')}}"></script>
 
 {% endblock %}

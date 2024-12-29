@@ -9,7 +9,10 @@ created_model
 
 # Distribution / packaging
 .Python
+bin/
 build/
+.buildozer/
+buildozer.spec
 develop-eggs/
 dist/
 downloads/
