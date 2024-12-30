@@ -1,22 +1,21 @@
 {% extends "base.html" %} {% block title %}RPPYG Maker Database{% endblock %} {%
 block content %}
 <h1>Database</h1>
-<button type="button" class="btn btn-success">💾 Save</button>
 <div style="height: 22px"></div>
 
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
         <button
             class="nav-link active"
-            id="pills-character-tab"
+            id="pills-characters-tab"
             data-bs-toggle="pill"
-            data-bs-target="#pills-character"
+            data-bs-target="#pills-characters"
             type="button"
             role="tab"
-            aria-controls="pills-character"
+            aria-controls="pills-characters"
             aria-selected="true"
         >
-            Character 🦹‍♂️
+            Characters 🦹‍♂️
         </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -36,6 +35,20 @@ block content %}
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
+            id="pills-attacks-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-attacks"
+            type="button"
+            role="tab"
+            aria-controls="pills-attacks"
+            aria-selected="false"
+        >
+            Attacks 💥
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
             id="pills-items-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-items"
@@ -45,6 +58,20 @@ block content %}
             aria-selected="false"
         >
             Items 🍪
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="pills-equipments-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-equipments"
+            type="button"
+            role="tab"
+            aria-controls="pills-equipments"
+            aria-selected="false"
+        >
+            Equipments 🪖
         </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -78,6 +105,20 @@ block content %}
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
+            id="pills-maps-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#pills-enemies"
+            type="button"
+            role="tab"
+            aria-controls="pills-enemies"
+            aria-selected="false"
+        >
+            Enemies 👿
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
             id="pills-games-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-games"
@@ -92,12 +133,20 @@ block content %}
 </ul>
 <div class="tab-content" id="pills-tabContent">
     <div
-        class="tab-pane fade show"
-        id="pills-character"
+        class="tab-pane fade show active"
+        id="pills-characters"
         role="tabpanel"
-        aria-labelledby="pills-character-tab"
+        aria-labelledby="pills-characters-tab"
     >
-        character...
+        characters...
+    </div>
+    <div
+        class="tab-pane fade"
+        id="pills-attacks"
+        role="tabpanel"
+        aria-labelledby="pills-attacks-tab"
+    >
+        attacks...
     </div>
     <div
         class="tab-pane fade"
@@ -117,6 +166,14 @@ block content %}
     </div>
     <div
         class="tab-pane fade"
+        id="pills-equipments"
+        role="tabpanel"
+        aria-labelledby="pills-equipments-tab"
+    >
+        equipments...
+    </div>
+    <div
+        class="tab-pane fade"
         id="pills-maps"
         role="tabpanel"
         aria-labelledby="pills-maps-tab"
@@ -133,12 +190,63 @@ block content %}
     </div>
     <div
         class="tab-pane fade"
+        id="pills-enemies"
+        role="tabpanel"
+        aria-labelledby="pills-enemies-tab"
+    >
+        enemies...
+    </div>
+    <div
+        class="tab-pane fade"
         id="pills-games"
         role="tabpanel"
         aria-labelledby="pills-games-tab"
     >
-        games...
+        <form id="mainTitleForm">
+            <button type="button" id="saveMainTitle" class="btn btn-success">
+                💾 Save
+            </button>
+            <div style="height: 22px"></div>
+
+            {% if context.dbjson %}
+            <label for="main_title" class="col-sm-2 col-form-label"
+                >Main Title</label
+            >
+            <div class="col-sm-10">
+                <input
+                    type="text"
+                    class="form-control"
+                    id="main_title"
+                    name="main_title"
+                    value="{{ context.dbjson['main']['main_title'] }}"
+                />
+            </div>
+            {% endif %}
+        </form>
     </div>
 </div>
+<script>
+    document
+        .getElementById("saveMainTitle")
+        .addEventListener("click", function () {
+            const mainTitle = document.getElementById("main_title").value;
+
+            fetch("/database", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ main_title: mainTitle }),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        alert("Data saved successfully!");
+                    } else {
+                        alert("Failed to save data.");
+                    }
+                })
+                .catch((error) => console.error("Error:", error));
+        });
+</script>
 
 {% endblock %}

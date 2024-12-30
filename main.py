@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from sys import platform
 import os
 import shutil
@@ -293,7 +293,38 @@ def run_pygame():
 
 @app.route('/database', methods=['GET', 'POST'])
 def database():
-    return render_template('database/database.html')
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+        project_folder = False
+        if config["current_project"]:
+            project_folder = config["current_project"]["project_folder"]
+    except FileNotFoundError:
+        return None
+
+    game_data_folder_path = False
+    dbjson = {}
+
+    if current_project and project_folder:
+        folder_path = current_project['project_folder']
+        game_data_folder_path = f"{folder_path}/game_data"
+        dbjson = json_loader(f"{game_data_folder_path}/db.json")
+
+    if request.method == 'POST':
+        data = request.json
+        new_main_title = data.get('main_title')
+        if new_main_title:
+            dbjson['main']['main_title'] = new_main_title
+            json_saver(dbjson, f"{game_data_folder_path}/db.json")
+            return jsonify({'message': 'Saved successfully!'}), 200
+        return jsonify({'message': 'Invalid data'}), 400
+
+    context = {
+        "game_data_folder_path": game_data_folder_path,
+        "dbjson": dbjson,
+    }
+
+    return render_template('database/database.html', context=context)
 
 def _git_add_dot():
     """Adds all changes in the current project's folder."""
