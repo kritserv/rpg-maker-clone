@@ -25,7 +25,7 @@ CONFIG_FILE = 'config.json'
 if not os.path.exists(CONFIG_FILE):
     initial_config = {
         "current_project": None,
-        "other_settings": {}
+        "other_settings": {},
     }
     json_saver(initial_config, CONFIG_FILE)
 
@@ -48,6 +48,9 @@ def crop_sprite_from_sheet(image_path, sprite_width, sprite_height):
 
 @app.route('/')
 def index():
+    if 'theme' not in session:
+        session['theme'] = 'light'
+
     map_name = request.args.get('map_name') or session.get('map_name')
 
     config = json_loader(CONFIG_FILE)
@@ -154,6 +157,14 @@ def render_player_layer(csv_path, player_position, player_image):
                     for col_index, _ in enumerate(row)
                 ])
     return table
+
+
+@app.route('/toggle-theme')
+def toggle_theme():
+    # Toggle between light and dark mode
+    current_theme = session.get('theme', 'light')
+    session['theme'] = 'dark' if current_theme == 'light' else 'light'
+    return redirect(url_for('index'))
 
 @app.route('/new-project', methods=['GET', 'POST'])
 def new_project():

@@ -142,8 +142,12 @@ navbar %}
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="#"
-                        >🌗 Dark Mode</a
+                    <a class="nav-link" href="{{ url_for('toggle_theme') }}"
+                        >{% if session.get('theme', 'light') == 'dark' %}
+                            🌞 Light Mode
+                        {% else %}
+                            🌙 Dark Mode
+                        {% endif %}</a
                     >
                 </li>
             </ul>
@@ -241,5 +245,6 @@ navbar %}
 <script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
 <script src="{{url_for('static', filename='change_map.js')}}"></script>
 <script src="{{url_for('static', filename='open_dialog.js')}}"></script>
+<script src="{{url_for('static', filename='darkmode_switch.js')}}"></script>
 
 {% endblock %}
