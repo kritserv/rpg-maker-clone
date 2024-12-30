@@ -225,28 +225,6 @@ block content %}
         </form>
     </div>
 </div>
-<script>
-    document
-        .getElementById("saveMainTitle")
-        .addEventListener("click", function () {
-            const mainTitle = document.getElementById("main_title").value;
-
-            fetch("/database", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ main_title: mainTitle }),
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        alert("Data saved successfully!");
-                    } else {
-                        alert("Failed to save data.");
-                    }
-                })
-                .catch((error) => console.error("Error:", error));
-        });
-</script>
+<script src="{{url_for('static', filename='save_database.js')}}"></script>
 
 {% endblock %}

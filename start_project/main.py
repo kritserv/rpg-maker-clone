@@ -192,7 +192,7 @@ async def main():
         pg.display.toggle_fullscreen()
         player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
 
-        input = Input('android', game_size)
+        input = Input('android', game_size, full_path)
 
         while pygame_event.running:
             dt = delta_time.get()
@@ -209,7 +209,7 @@ async def main():
             display.fill(GREY)
             rpgmap.draw_scaled_screen(display, camera, player.rect)
             display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
-            input.draw_for_android(display, RED, BLUE)
+            input.draw_for_android(display)
             top_ui.draw_fps(display, clock)
 
             pg.transform.scale(display, screen.get_size(), screen)
