@@ -51,13 +51,20 @@ def index():
     map_name = request.args.get('map_name') or session.get('map_name')
 
     config = json_loader(CONFIG_FILE)
-    project_folder = config.get("current_project", {}).get("project_folder")
+    current_project = config.get("current_project", dict())
+    project_folder = ''
+    if current_project:
+        project_folder = current_project.get("project_folder")
 
     # Default to the starting map if not set
     if not map_name:
-        game_data_path = os.path.join(config.get("current_project", {}).get("project_folder"), "game_data/db.json")
-        game_data = json_loader(game_data_path)
-        map_name = game_data.get('start_map', 'default_map')
+
+        current_project = config.get("current_project", dict())
+        if current_project:
+            if current_project.get("project_folder"):
+                game_data_path = os.path.join((current_project).get("project_folder"), "game_data/db.json")
+                game_data = json_loader(game_data_path)
+                map_name = game_data.get('start_map', 'default_map')
 
     # Store the selected map in the session
     session['map_name'] = map_name
