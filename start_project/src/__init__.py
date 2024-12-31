@@ -14,14 +14,6 @@ from .blit_text import blit_text
 
 from .top_ui import TopUI
 
-__all__ = [
-	json_loader,
-	Player,
-	RpgMap,
-	Camera,
-	DeltaTime,
-	PygameEvent,
-	Timer,
-	blit_text,
-	TopUI,
-	]
+from .pc_game_loop import run_pc_game_loop
+from .android_game_loop import run_android_game_loop
+from .web_game_loop import run_web_game_loop

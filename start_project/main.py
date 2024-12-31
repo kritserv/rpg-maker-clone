@@ -52,8 +52,6 @@ async def main():
     clock = pg.time.Clock()
 
     GREY = pg.Color("grey20")
-    RED = pg.Color("red")
-    BLUE = pg.Color("blue")
     BLACK = pg.Color("black")
 
     font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
@@ -63,7 +61,7 @@ async def main():
 
     if pc:
         """
-        OpenGL Stuff; for better FPS and for steam achievement
+        OpenGL Stuff; for better FPS, resizable game windows and for steam achievement overlay
         I don't know what any of these code do, I just copy it from dafluffypotato.
         """
         import moderngl
@@ -159,34 +157,12 @@ async def main():
         input = Input('pc')
 
         debug_message = ''
+        from src import run_pc_game_loop
         while pygame_event.running:
-            dt = delta_time.get()
-            clock.tick()
-
-            # Input
-            new_size, key, display = input.update_for_pc(pygame_event, display)
-            rpgmap.resize_view(new_size)
-
-            # Logic
-            player.update(key, dt)
-            camera.update(player)
-
-            # Graphic
-            display.fill(GREY)
-            rpgmap.draw(display, camera, player.rect)
-            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
-            top_ui.draw_fps(display, clock)
-
-            # Debug
-            blit_text(display, f"{debug_message}", fps_font, BLACK, (5, 50))
-
-
-            # Use OpenGL for desktop
-            opengl.draw(display)
-
+            run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl)
             await asyncio.sleep(0)
-    elif android:
 
+    elif android:
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
         pg.display.toggle_fullscreen()
@@ -194,27 +170,9 @@ async def main():
 
         input = Input('android', game_size, full_path)
 
+        from src import run_android_game_loop
         while pygame_event.running:
-            dt = delta_time.get()
-            clock.tick()
-
-            # Input
-            mobile_key = input.update_for_android(pygame_event)
-
-            # Logic
-            player.update(key=None, dt=dt, mobile_key=mobile_key)
-            camera.update(player)
-
-            # Graphic
-            display.fill(GREY)
-            rpgmap.draw_scaled_screen(display, camera, player.rect)
-            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
-            input.draw_for_android(display)
-            top_ui.draw_fps(display, clock)
-
-            pg.transform.scale(display, screen.get_size(), screen)
-            pg.display.flip()
-
+            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, screen)
             await asyncio.sleep(0)
     else:
         screen = pg.display.set_mode(
@@ -223,26 +181,10 @@ async def main():
         player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
 
         input = Input('web')
+
+        from src import run_web_game_loop
         while pygame_event.running:
-            dt = delta_time.get()
-            clock.tick()
-
-            # Input
-            key = input.update_for_web(pygame_event)
-
-            # Logic
-            player.update(key, dt)
-            camera.update(player)
-
-            # Graphic
-            display.fill(GREY)
-            rpgmap.draw(display, camera, player.rect)
-            display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
-            top_ui.draw_fps(display, clock)
-
-            pg.transform.scale(display, screen.get_size(), screen)
-            pg.display.flip()
-
+            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, screen)
             await asyncio.sleep(0)
 
     pg.quit()

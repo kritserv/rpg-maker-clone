@@ -1,9 +1,8 @@
-from PIL.Image import BOX
 import pygame as pg
 from .timer import Timer
 
 class Input:
-    def __init__(self, platform, game_size = [], full_path=False) -> None:
+    def __init__(self, platform, game_size = [], full_path='') -> None:
         if platform == 'pc':
             self.fullscreen_toggle_timer = Timer()
             self.fullscreen_toggle_timer.start()
