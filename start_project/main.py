@@ -1,7 +1,3 @@
-web = False
-android = False
-pc = True
-
 import asyncio
 import pygame as pg
 from sys import exit
@@ -14,11 +10,14 @@ pg.init()
 import os
 full_path = f"{os.path.abspath('.')}/"
 
+with open(f"{full_path}/game_data/game_mode.txt") as f:
+    game_mode = f.read().rstrip('\n') # pc / android / web
+
 game_size = [256, 137]
 native_res_multiplier = 3
 game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
 
-if android:
+if game_mode == 'android':
     phone_width, phone_height = pg.display.get_desktop_sizes()[0]
     # scale game_width to match phone_width
     phone_ratio = phone_width / phone_height
@@ -59,7 +58,7 @@ async def main():
 
     pygame_event = PygameEvent(game_size=game_size)
 
-    if pc:
+    if game_mode == 'pc':
         """
         OpenGL Stuff; for better FPS, resizable game windows and for steam achievement overlay
         I don't know what any of these code do, I just copy it from dafluffypotato.
@@ -162,7 +161,7 @@ async def main():
             run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl)
             await asyncio.sleep(0)
 
-    elif android:
+    elif game_mode == 'android':
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
         pg.display.toggle_fullscreen()
