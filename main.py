@@ -239,14 +239,6 @@ def open_folder():
 
     return redirect(url_for('index'))
 
-def change_web_line(main_file_path, boolean):
-    with open(main_file_path, "r") as file:
-        lines = file.readlines()
-    lines[0] = f"web = {boolean}\n"
-    with open(main_file_path, "w") as file:
-        file.writelines(lines)
-
-
 @app.route('/export-to-browser')
 def export_to_browser():
     try:
@@ -256,17 +248,7 @@ def export_to_browser():
         return redirect(url_for('index'))
 
     if current_project:
-        folder_path = current_project['project_folder']
-
-        main_file_path = os.path.join(folder_path, "main.py")
-        change_web_line(main_file_path, True)
-
-        command = 'pygbag --archive .'
-        subprocess.Popen(command, cwd=folder_path, shell=True)
-
-        change_web_line(main_file_path, False)
-
-        return redirect(url_for('index'))
+        return render_template('export/browser.html')
 
     return redirect(url_for('index'))
 

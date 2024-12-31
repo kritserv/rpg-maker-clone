@@ -23,3 +23,4 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     # Use OpenGL
     opengl.draw(display)
+    return display

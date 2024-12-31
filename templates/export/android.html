@@ -34,16 +34,22 @@ block navbar %}
         <strong>1. Open game folder</strong>
     </p>
     <p>
-        <strong>2. Edit <code>main.py</code>:</strong>
+        <strong>2. Edit <code>game_data/game_mode.txt</code>:</strong>
     </p>
     <ul>
-        <li><code>web = False</code></li>
-        <li><code>android = True</code></li>
-        <li><code>pc = False</code></li>
+        <li><code>android</code></li>
     </ul>
     <p>
         <strong
-            >3. Install Buildozer
+            >3. If you have previously exported to Browser, ensure you delete
+            the <code>folder name 'build'</code> before proceeding. Otherwise,
+            Buildozer might attempt to include the browser file alongside,
+            causing an error.</strong
+        >
+    </p>
+    <p>
+        <strong
+            >4. Install Buildozer
             <a
                 href="https://buildozer.readthedocs.io/en/latest/installation.html"
                 target="_blank"
@@ -62,7 +68,7 @@ block navbar %}
         </li>
     </ul>
 
-    <p><strong>4. Initialize Buildozer:</strong></p>
+    <p><strong>5. Initialize Buildozer:</strong></p>
     <ul>
         <li>Run <code>buildozer init</code>.</li>
         <li>Edit <code>buildozer.spec</code> as follows:</li>
@@ -70,7 +76,7 @@ block navbar %}
 
     <p>
         <strong
-            >5. Modify the following parameters in
+            >6. Modify the following parameters in
             <code>buildozer.spec</code>:</strong
         >
     </p>
@@ -94,7 +100,7 @@ block navbar %}
         <li><code>android.presplash_color = black</code></li>
     </ul>
 
-    <p><strong>6. Build and Run:</strong></p>
+    <p><strong>7. Build and Run:</strong></p>
     <ul>
         <li>Run <code>buildozer android debug deploy run logcat</code>.</li>
         <li>

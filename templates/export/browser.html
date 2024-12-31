@@ -1,0 +1,83 @@
+{% extends "base.html" %} {% block title %}RPPYG Maker Browser{% endblock %} {%
+block navbar %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">🏰 RPPYG Maker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}"
+                        >↩️ Go Back</a
+                    >
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %} {% block content %}
+<h1>Browser Export Instructions</h1>
+<div class="mb-3">
+    <p>
+        <strong>1. Open game folder</strong>
+    </p>
+    <p>
+        <strong>2. Edit <code>game_data/game_mode.txt</code>:</strong>
+    </p>
+    <ul>
+        <li><code>web</code></li>
+    </ul>
+    <p>
+        <strong
+            >3. If you have previously exported to Android, ensure you delete
+            the <code>folder names 'bin'</code> and
+            <code>hidden folder names '.buildozer'</code> before proceeding.
+            Otherwise, Pygbag might attempt to include the binary file alongside
+            WebAssembly, causing an error.</strong
+        >
+    </p>
+    <p><strong>4. Build and Run:</strong></p>
+    <ul>
+        <li>
+            Run <code>pygbag .</code> for test locally or
+            <code>pygbag --archive .</code> for a compressed file which can be
+            host on any static website such as github page or itch.io.
+        </li>
+        <li>
+            The process may take some time initially, but subsequent builds will
+            be faster.
+        </li>
+        <li>
+            Test on
+            <a href="http://localhost:8000/" target="_blank"
+                >http://localhost:8000/</a
+            >
+        </li>
+        <li>
+            or
+            <a href="http://localhost:8000/?-i" target="_blank"
+                >http://localhost:8000/?-i</a
+            >
+        </li>
+        <li>
+            check
+            <a target="_blank" href="https://pygame-web.github.io/wiki/pygbag/"
+                >documentation</a
+            >
+            for more info.
+        </li>
+    </ul>
+</div>
+{% endblock %}

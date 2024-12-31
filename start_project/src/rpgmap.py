@@ -62,7 +62,7 @@ class RpgMap(pg.sprite.Sprite):
                         layer_tiles.append(Tile(img_path, (x * self.tile_size, y * self.tile_size)))
         layer_tiles = tuple(layer_tiles)
         return layer_tiles
-        
+
     def resize_view(self, new_size):
         """
         Update View size when resize windows

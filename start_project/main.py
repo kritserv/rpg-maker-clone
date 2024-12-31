@@ -158,7 +158,7 @@ async def main():
         debug_message = ''
         from src import run_pc_game_loop
         while pygame_event.running:
-            run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl)
+            display = run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl)
             await asyncio.sleep(0)
 
     elif game_mode == 'android':
@@ -174,6 +174,8 @@ async def main():
             run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, screen)
             await asyncio.sleep(0)
     else:
+        import platform
+        # platform.window.canvas.style.imageRendering = "pixelated"
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
