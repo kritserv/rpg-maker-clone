@@ -174,8 +174,9 @@ async def main():
             run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, screen)
             await asyncio.sleep(0)
     else:
-        import platform
-        # platform.window.canvas.style.imageRendering = "pixelated"
+        import sys, platform
+        if sys.platform == "emscripten":
+            platform.window.canvas.style.imageRendering = "pixelated"
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
