@@ -11,7 +11,7 @@ import os
 full_path = f"{os.path.abspath('.')}/"
 
 with open(f"{full_path}/game_data/game_mode.txt") as f:
-    game_mode = f.read().rstrip('\n') # pc / android / web
+    game_mode = f.readlines()[0].rstrip('\n') # pc / android / web
 
 game_size = [256, 137]
 native_res_multiplier = 3
