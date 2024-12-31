@@ -101,12 +101,14 @@ class Player(pg.sprite.Sprite):
 			right = mobile_key["K_RIGHT"]
 			down = mobile_key["K_DOWN"]
 			cancel = mobile_key["K_B"]
+			select = mobile_key["K_ESCAPE"]
 		else:
 			up = key[pg.K_UP]
 			left = key[pg.K_LEFT]
 			right = key[pg.K_RIGHT]
 			down = key[pg.K_DOWN]
 			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x]
+			select = key[pg.K_ESCAPE]
 
 		if cancel:
 			self.speed = 90

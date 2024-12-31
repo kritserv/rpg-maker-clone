@@ -22,8 +22,12 @@ class Input:
                 self.b = pg.image.load(
                     f"{sprite_path}b.png"
                     ).convert_alpha()
+                self.select = pg.image.load(
+                    f"{sprite_path}select.png"
+                    ).convert_alpha()
                 self.a.set_alpha(155)
                 self.b.set_alpha(155)
+                self.select.set_alpha(155)
 
                 self.image_controls = {
                     "UP": (self.dpad_up, (40, 38)),
@@ -32,6 +36,7 @@ class Input:
                     "DOWN": (self.dpad_down, (40, 94)),
                     "A": (self.a, (game_size[0] - 85, 77)),
                     "B": (self.b, (game_size[0] - 50, 77)),
+                    "SELECT": (self.select, (game_size[0]//2-16, 100)),
                 }
                 self.active_touches = {}
 
@@ -65,7 +70,7 @@ class Input:
                 pygame_event.running = False
 
         # Update mobile keys
-        mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False, "K_A": False, "K_B": False}
+        mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False, "K_A": False, "K_B": False, "K_B": False, "K_ESCAPE": False}
         for direction in self.active_touches.values():
             if direction == "UP":
                 mobile_key["K_UP"] = True
@@ -79,6 +84,8 @@ class Input:
                 mobile_key["K_A"] = True
             if direction == "B":
                 mobile_key["K_B"] = True
+            if direction == "SELECT":
+                mobile_key["K_ESCAPE"] = True
         return mobile_key
 
     def draw_for_android(self, display):
