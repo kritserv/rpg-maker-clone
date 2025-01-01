@@ -42,7 +42,7 @@ class Input:
 
 
     def update_for_pc(self, pygame_event, display):
-        new_size = pygame_event.check()
+        new_size = pygame_event.check_pc()
         if new_size:
             display = new_size
         key = pg.key.get_pressed()
@@ -56,42 +56,12 @@ class Input:
         return new_size, key, display
 
     def update_for_android(self, pygame_event):
-        for event in pg.event.get():
-            if event.type == pg.FINGERDOWN or event.type == pg.FINGERMOTION:
-                touch_pos = (event.x * self.game_size[0], event.y * self.game_size[1])
-                for direction, (image, pos) in self.image_controls.items():
-                    image_rect = pg.Rect(pos[0], pos[1], image.get_width(), image.get_height())
-                    if image_rect.collidepoint(touch_pos):
-                        self.active_touches[event.finger_id] = direction
-            elif event.type == pg.FINGERUP:
-                if event.finger_id in self.active_touches:
-                    del self.active_touches[event.finger_id]
-            elif event.type == pg.QUIT:
-                pygame_event.running = False
-
-        # Update mobile keys
-        mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False, "K_A": False, "K_B": False, "K_B": False, "K_ESCAPE": False}
-        for direction in self.active_touches.values():
-            if direction == "UP":
-                mobile_key["K_UP"] = True
-            if direction == "LEFT":
-                mobile_key["K_LEFT"] = True
-            if direction == "RIGHT":
-                mobile_key["K_RIGHT"] = True
-            if direction == "DOWN":
-                mobile_key["K_DOWN"] = True
-            if direction == "A":
-                mobile_key["K_A"] = True
-            if direction == "B":
-                mobile_key["K_B"] = True
-            if direction == "SELECT":
-                mobile_key["K_ESCAPE"] = True
-        return mobile_key
+        return pygame_event.check_android(self.active_touches, self.image_controls)
 
     def draw_for_android(self, display):
         for direction, (image, pos) in self.image_controls.items():
             display.blit(image, pos)
 
     def update_for_web(self, pygame_event):
-        pygame_event.check()
+        pygame_event.check_pc()
         return pg.key.get_pressed()

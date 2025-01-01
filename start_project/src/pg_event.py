@@ -7,6 +7,7 @@ class PygameEvent:
 	keydown: bool = False
 	keyup: bool = False
 	running: bool = True
+	game_state: int = 0
 
 	def check_type(self, event):
 		keydown, keyup, running = False, True, True
@@ -49,6 +50,14 @@ class PygameEvent:
 				running = False
 		self.running = running
 
+	def check_game_state(self, key) -> None:
+		if self.keydown:
+			if key == pg.K_ESCAPE:  # Esc
+				if self.game_state == 0:
+					self.game_state = 1
+				elif self.game_state == 1:
+					self.game_state = 0
+
 	def check_key(self, event) -> bool:
 		try:
 			key = event.key
@@ -56,7 +65,7 @@ class PygameEvent:
 		except AttributeError:
 			return False
 
-	def check(self):
+	def check_pc(self):
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
@@ -65,4 +74,43 @@ class PygameEvent:
 				break
 			if key:
 				self.check_quit_game(event, key)
+				self.check_game_state(key)
 		return 0
+
+	def check_android(self, active_touches, image_controls):
+		for event in pg.event.get():
+			if event.type == pg.FINGERDOWN or event.type == pg.FINGERMOTION:
+				touch_pos = (event.x * self.game_size[0], event.y * self.game_size[1])
+				for direction, (image, pos) in image_controls.items():
+					image_rect = pg.Rect(pos[0], pos[1], image.get_width(), image.get_height())
+					if image_rect.collidepoint(touch_pos):
+						active_touches[event.finger_id] = direction
+			elif event.type == pg.FINGERUP:
+				if event.finger_id in active_touches:
+					# Handle the SELECT action on touch release
+					if active_touches[event.finger_id] == "SELECT":
+						if self.game_state == 0:
+							self.game_state = 1
+						elif self.game_state == 1:
+							self.game_state = 0
+					del active_touches[event.finger_id]
+			elif event.type == pg.QUIT:
+				self.running = False
+
+		mobile_key = {"K_UP": False, "K_LEFT": False, "K_RIGHT": False, "K_DOWN": False,
+					"K_A": False, "K_B": False, "K_ESCAPE": False}
+		for direction in active_touches.values():
+			if direction == "UP":
+				mobile_key["K_UP"] = True
+			if direction == "LEFT":
+				mobile_key["K_LEFT"] = True
+			if direction == "RIGHT":
+				mobile_key["K_RIGHT"] = True
+			if direction == "DOWN":
+				mobile_key["K_DOWN"] = True
+			if direction == "A":
+				mobile_key["K_A"] = True
+			if direction == "B":
+				mobile_key["K_B"] = True
+
+		return mobile_key

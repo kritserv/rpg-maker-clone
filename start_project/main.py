@@ -24,7 +24,7 @@ if game_mode == 'android':
     while game_size[0] / game_size[1] < phone_ratio:
         game_size[0] += 1
 
-from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI
+from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI
 
 def load_game(player_start_pos, start_map, db, screen):
     player = Player(full_path, player_start_pos)
@@ -33,7 +33,8 @@ def load_game(player_start_pos, start_map, db, screen):
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, game_size[0])
     top_ui = TopUI(full_path)
-    return player, rpgmap, camera, top_ui
+    menu_ui = MenuUI(full_path)
+    return player, rpgmap, camera, top_ui, menu_ui
 
 async def main():
     delta_time = DeltaTime()
@@ -54,7 +55,7 @@ async def main():
     BLACK = pg.Color("black")
 
     font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
-    fps_font = pg.font.Font(font_path, 16)
+    fps_font = pg.font.Font(font_path, 9)
 
     pygame_event = PygameEvent(game_size=game_size)
 
@@ -150,28 +151,29 @@ async def main():
         # Window.from_display_module().maximize()
 
         pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
-        player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui, menu_ui = load_game(player_start_pos, start_map, db, screen)
 
         opengl = OpenGLStuff()
         input = Input('pc')
+        game_state = 1
 
         debug_message = ''
         from src import run_pc_game_loop
         while pygame_event.running:
-            display = run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl)
+            display = run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui)
             await asyncio.sleep(0)
 
     elif game_mode == 'android':
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
         pg.display.toggle_fullscreen()
-        player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui, menu_ui = load_game(player_start_pos, start_map, db, screen)
 
         input = Input('android', game_size, full_path)
 
         from src import run_android_game_loop
         while pygame_event.running:
-            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, screen)
+            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, screen)
             await asyncio.sleep(0)
     else:
         import sys, platform
@@ -180,13 +182,13 @@ async def main():
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
-        player, rpgmap, camera, top_ui = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui, menu_ui = load_game(player_start_pos, start_map, db, screen)
 
         input = Input('web')
 
         from src import run_web_game_loop
         while pygame_event.running:
-            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, screen)
+            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, screen)
             await asyncio.sleep(0)
 
     pg.quit()

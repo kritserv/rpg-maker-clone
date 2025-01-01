@@ -5,7 +5,7 @@ from .blit_text import blit_text
 class TopUI:
     def __init__(self, full_path):
         font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
-        self.fps_font = pg.font.Font(font_path, 16)
+        self.fps_font = pg.font.Font(font_path, 9)
         self.fps = 0
         self.fps_update_timer = Timer()
         self.fps_update_timer.start()
