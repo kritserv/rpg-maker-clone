@@ -66,8 +66,11 @@ def index():
         if current_project:
             if current_project.get("project_folder"):
                 game_data_path = os.path.join((current_project).get("project_folder"), "game_data/db.json")
-                game_data = json_loader(game_data_path)
-                map_name = game_data.get('start_map', 'default_map')
+                try:
+                    game_data = json_loader(game_data_path)
+                    map_name = game_data.get('start_map', 'default_map')
+                except FileNotFoundError:
+                    return render_template('index.html', context={})
 
     # Store the selected map in the session
     session['map_name'] = map_name
