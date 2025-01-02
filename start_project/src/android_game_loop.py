@@ -1,7 +1,7 @@
 from .blit_text import blit_text
 import pygame as pg
 
-def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, screen):
+def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, menu_ui_save, screen):
     dt = delta_time.get()
     clock.tick()
 
@@ -21,7 +21,9 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
 
     if pygame_event.game_state == 1:
         current_time = pg.time.get_ticks()
-        menu_ui.update_for_android(mobile_key, dt, current_time)
+        select_submenu = menu_ui.update_for_android(mobile_key, dt, current_time)
+        if select_submenu:
+            pygame_event.game_state = 0
         menu_ui.draw(display)
 
     input.draw_for_android(display)

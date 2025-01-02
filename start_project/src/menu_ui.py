@@ -1,20 +1,20 @@
 import pygame as pg
 from .blit_text import blit_text
 
-class MenuUI:
-    def __init__(self, full_path):
+class BaseMenuUI:
+    def __init__(self, full_path, menu_items):
         font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
         self.menu_font = pg.font.Font(font_path, 9)
         self.cursor = 0
 
         self.DARKBLUE = pg.Color('darkblue')
-        self.BLUE = pg.Color('BLUE')
+        self.BLUE = pg.Color('blue')
         self.GREY = pg.Color('grey90')
         self.YELLOW = pg.Color('yellow')
         self.WHITE = pg.Color('white')
 
-        self.menu = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
-        self.menu_len = len(self.menu) - 1
+        self.menu = menu_items
+        self.menu_len = len(menu_items) - 1
 
         # Cooldown settings for cursor movement
         self.cursor_cooldown_time = 150  # milliseconds
@@ -56,6 +56,7 @@ class MenuUI:
                 if self.cursor > self.menu_len:
                     self.cursor = 0
                 self.last_cursor_move_time = current_time
+        return False
 
     def update_for_android(self, mobile_key, dt, current_time):
         up = mobile_key["K_UP"]
@@ -74,3 +75,41 @@ class MenuUI:
                 if self.cursor > self.menu_len:
                     self.cursor = 0
                 self.last_cursor_move_time = current_time
+
+class MenuUI(BaseMenuUI):
+    def __init__(self, full_path):
+        menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
+        super().__init__(full_path, menu_items)
+
+    def update_for_pc(self, key, dt, current_time):
+        super().update_for_pc(key, dt, current_time)
+        action = key[pg.K_RETURN]
+        select_submenu = False
+
+        if action:
+            self.last_action_time = current_time
+            if self.cursor == 3:  # Save option selected
+                select_submenu = 'save'
+            elif self.cursor == 4:  # Load option selected
+                select_submenu = 'load'
+
+        return select_submenu
+
+    def update_for_android(self, mobile_key, dt, current_time):
+        super().update_for_android(mobile_key, dt, current_time)
+        action = mobile_key["K_A"]
+        select_submenu = False
+
+        if action:
+            self.last_action_time = current_time
+            if self.cursor == 3:  # Save option selected
+                select_submenu = 'save'
+            elif self.cursor == 4:  # Load option selected
+                select_submenu = 'load'
+
+        return select_submenu
+
+class MenuUISave(BaseMenuUI):
+    def __init__(self, full_path, player, map):
+        menu_items = ('Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6')
+        super().__init__(full_path, menu_items)

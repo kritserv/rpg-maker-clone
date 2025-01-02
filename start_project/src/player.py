@@ -9,6 +9,9 @@ class Player(pg.sprite.Sprite):
 		pg.sprite.Sprite.__init__(self)
 		self.full_path = full_path
 
+		self.levels = 0
+		self.items = {}
+
 		self.speed = 80
 		self.is_running = False
 
