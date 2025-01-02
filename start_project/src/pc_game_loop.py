@@ -14,6 +14,8 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         player.update(key, dt)
         camera.update(player)
         menu_ui.cursor = 0
+        menu_ui.menu_x = 0
+        menu_ui.speed = 900
 
     # Graphic
     display.fill(GREY)
@@ -25,7 +27,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         select_submenu = menu_ui.update_for_pc(key, dt, current_time)
         if select_submenu:
             pygame_event.game_state = 0
-        menu_ui.draw(display)
+        menu_ui.draw(display, dt)
 
     top_ui.draw_fps(display, clock)
 

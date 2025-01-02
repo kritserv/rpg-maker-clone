@@ -16,27 +16,39 @@ class BaseMenuUI:
         self.menu = menu_items
         self.menu_len = len(menu_items) - 1
 
+        self.menu_x = 0
+
         # Cooldown settings for cursor movement
         self.cursor_cooldown_time = 150  # milliseconds
         self.last_cursor_move_time = 0   # Time of last cursor movement
 
-    def draw(self, display):
-        menu_x = display.get_size()[0] - 112
+        self.speed = 900
+        self.animate_in = False
+
+    def draw(self, display, dt):
+        menu_x_finish = display.get_size()[0] - 112
+        if self.menu_x < menu_x_finish:
+            self.menu_x += self.speed * dt
+            self.speed -= 1400*dt
+            self.animate_in = True
+        else:
+            self.animate_in = False
+            self.speed = 900
+
         menu_y = 2
         menu_w = 110
         menu_h = display.get_size()[1] - 49
-        pg.draw.rect(display, self.DARKBLUE, (menu_x, menu_y, menu_w, menu_h))
-        menu_text_x = display.get_size()[0] - 100
+        pg.draw.rect(display, self.DARKBLUE, (self.menu_x, menu_y, menu_w, menu_h))
         menu_text_y = 6
         for i, menu_text in enumerate(self.menu):
             if i == self.cursor:
-                pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
-                blit_text(display, '>' + menu_text, self.menu_font, self.YELLOW, (menu_text_x, menu_text_y))
+                pg.draw.rect(display, self.BLUE, (self.menu_x, menu_text_y-3, menu_w, 12))
+                blit_text(display, '>' + menu_text, self.menu_font, self.YELLOW, (self.menu_x+12, menu_text_y))
             else:
-                blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_text_x, menu_text_y))
+                blit_text(display, menu_text, self.menu_font, self.WHITE, (self.menu_x+12, menu_text_y))
             menu_text_y += 12
         for i in range(4):
-            pg.draw.rect(display, self.GREY, (menu_x - i, menu_y - i, menu_w + 1, menu_h + 1), 1)
+            pg.draw.rect(display, self.GREY, (self.menu_x - i, menu_y - i, menu_w + 1, menu_h + 1), 1)
 
     def update_for_pc(self, key, dt, current_time):
         """Update menu cursor position based on key input and cooldown logic."""
@@ -82,30 +94,32 @@ class MenuUI(BaseMenuUI):
         super().__init__(full_path, menu_items)
 
     def update_for_pc(self, key, dt, current_time):
-        super().update_for_pc(key, dt, current_time)
-        action = key[pg.K_RETURN]
         select_submenu = False
+        if not self.animate_in:
+            super().update_for_pc(key, dt, current_time)
+            action = key[pg.K_RETURN]
 
-        if action:
-            self.last_action_time = current_time
-            if self.cursor == 3:  # Save option selected
-                select_submenu = 'save'
-            elif self.cursor == 4:  # Load option selected
-                select_submenu = 'load'
+            if action:
+                self.last_action_time = current_time
+                if self.cursor == 3:  # Save option selected
+                    select_submenu = 'save'
+                elif self.cursor == 4:  # Load option selected
+                    select_submenu = 'load'
 
         return select_submenu
 
     def update_for_android(self, mobile_key, dt, current_time):
-        super().update_for_android(mobile_key, dt, current_time)
-        action = mobile_key["K_A"]
         select_submenu = False
+        if not self.animate_in:
+            super().update_for_android(mobile_key, dt, current_time)
+            action = mobile_key["K_A"]
 
-        if action:
-            self.last_action_time = current_time
-            if self.cursor == 3:  # Save option selected
-                select_submenu = 'save'
-            elif self.cursor == 4:  # Load option selected
-                select_submenu = 'load'
+            if action:
+                self.last_action_time = current_time
+                if self.cursor == 3:  # Save option selected
+                    select_submenu = 'save'
+                elif self.cursor == 4:  # Load option selected
+                    select_submenu = 'load'
 
         return select_submenu
 

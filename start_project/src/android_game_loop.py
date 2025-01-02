@@ -13,6 +13,8 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
         player.update(key=None, dt=dt, mobile_key=mobile_key)
         camera.update(player)
         menu_ui.cursor = 0
+        menu_ui.menu_x = 0
+        menu_ui.speed = 900
 
     # Graphic
     display.fill(GREY)
@@ -24,7 +26,7 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
         select_submenu = menu_ui.update_for_android(mobile_key, dt, current_time)
         if select_submenu:
             pygame_event.game_state = 0
-        menu_ui.draw(display)
+        menu_ui.draw(display, dt)
 
     input.draw_for_android(display)
     top_ui.draw_fps(display, clock)
