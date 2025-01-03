@@ -22,18 +22,16 @@ class BaseMenuUI:
         self.cursor_cooldown_time = 150  # milliseconds
         self.last_cursor_move_time = 0   # Time of last cursor movement
 
-        self.speed = 900
-        self.animate_in = False
+        self.speed = 450
+        self.animate_in = True
 
     def draw(self, display, dt):
         menu_x_finish = display.get_size()[0] - 112
         if self.menu_x < menu_x_finish:
             self.menu_x += self.speed * dt
-            self.speed -= 1400*dt
             self.animate_in = True
         else:
             self.animate_in = False
-            self.speed = 900
 
         menu_y = 2
         menu_w = 110
@@ -68,7 +66,19 @@ class BaseMenuUI:
                 if self.cursor > self.menu_len:
                     self.cursor = 0
                 self.last_cursor_move_time = current_time
-        return False
+
+        select_submenu = False
+        if not self.animate_in:
+            action = key[pg.K_RETURN] or key[pg.K_z]
+            cancel = key[pg.K_x] or key[pg.K_ESCAPE]
+
+            if action:
+                select_submenu = self.menu[self.cursor]
+
+            elif cancel:
+                select_submenu = 'Back'
+
+        return select_submenu
 
     def update_for_android(self, mobile_key, dt, current_time):
         up = mobile_key["K_UP"]
@@ -88,40 +98,23 @@ class BaseMenuUI:
                     self.cursor = 0
                 self.last_cursor_move_time = current_time
 
+        select_submenu = False
+        if not self.animate_in:
+            action = mobile_key["K_A"]
+            cancel = mobile_key["K_B"] or mobile_key["K_ESCAPE"]
+
+            if action:
+                select_submenu = self.menu[self.cursor]
+
+            elif cancel:
+                select_submenu = 'Back'
+
+        return select_submenu
+
 class MenuUI(BaseMenuUI):
     def __init__(self, full_path):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
         super().__init__(full_path, menu_items)
-
-    def update_for_pc(self, key, dt, current_time):
-        select_submenu = False
-        if not self.animate_in:
-            super().update_for_pc(key, dt, current_time)
-            action = key[pg.K_RETURN]
-
-            if action:
-                self.last_action_time = current_time
-                if self.cursor == 3:  # Save option selected
-                    select_submenu = 'save'
-                elif self.cursor == 4:  # Load option selected
-                    select_submenu = 'load'
-
-        return select_submenu
-
-    def update_for_android(self, mobile_key, dt, current_time):
-        select_submenu = False
-        if not self.animate_in:
-            super().update_for_android(mobile_key, dt, current_time)
-            action = mobile_key["K_A"]
-
-            if action:
-                self.last_action_time = current_time
-                if self.cursor == 3:  # Save option selected
-                    select_submenu = 'save'
-                elif self.cursor == 4:  # Load option selected
-                    select_submenu = 'load'
-
-        return select_submenu
 
 class MenuUISave(BaseMenuUI):
     def __init__(self, full_path, player, map):
