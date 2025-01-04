@@ -1,8 +1,11 @@
 import pygame as pg
 from .blit_text import blit_text
+from .load_json import json_loader, json_saver
+from datetime import datetime
 
 class BaseMenuUI:
     def __init__(self, full_path, menu_items):
+        self.full_path = full_path
         font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
         self.menu_font = pg.font.Font(font_path, 9)
         self.cursor = 0
@@ -48,7 +51,7 @@ class BaseMenuUI:
         for i in range(4):
             pg.draw.rect(display, self.GREY, (self.menu_x - i, menu_y - i, menu_w + 1, menu_h + 1), 1)
 
-    def update_for_pc(self, key, dt, current_time):
+    def update_for_pc(self, key, dt, current_time, *args, **kwargs):
         """Update menu cursor position based on key input and cooldown logic."""
         up = key[pg.K_UP]
         down = key[pg.K_DOWN]
@@ -80,7 +83,7 @@ class BaseMenuUI:
 
         return select_submenu
 
-    def update_for_android(self, mobile_key, dt, current_time):
+    def update_for_android(self, mobile_key, dt, current_time, *args, **kwargs):
         up = mobile_key["K_UP"]
         down = mobile_key["K_DOWN"]
 
@@ -117,6 +120,48 @@ class MenuUI(BaseMenuUI):
         super().__init__(full_path, menu_items)
 
 class MenuUISave(BaseMenuUI):
-    def __init__(self, full_path, player, map):
-        menu_items = ('Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6')
+    def __init__(self, full_path):
+        self.save_path = f"{full_path}/user_data/save.json"
+        save_slots = json_loader(self.save_path)
+        menu_items = []
+        for key, items in save_slots.items():
+            if items.get('name', False):
+                menu_items.append(items.get('name'))
+            else:
+                menu_items.append(key)
         super().__init__(full_path, menu_items)
+
+    def save_game(self, select_slot, player, rpgmap):
+        select_slot = f"Slot {self.cursor}"
+        save_slots = json_loader(self.save_path)
+
+        select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
+
+        save_name = f"{select_slot} {datetime.now().strftime('%Y%m%d')}"
+        save_slots[select_slot] = {
+            'name': save_name,
+            'player_levels': player.levels,
+            'player_items': player.items,
+            'player_pos': [player.pos[0], player.pos[1]],
+            'current_map': rpgmap.curr_map,
+            'time': datetime.now().strftime('%Y:%m:%d %H:%M:%S')
+            }
+
+        json_saver(self.save_path, save_slots)
+        self.menu[self.cursor] = save_name
+
+    def update_for_pc(self, key, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUISave, self).update_for_pc(key, dt, current_time)
+        if select_slot:
+            if select_slot != "Back":
+                self.save_game(select_slot, player, rpgmap)
+
+        return select_slot
+
+    def update_for_android(self, mobile_key, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUISave, self).update_for_android(mobile_key, dt, current_time)
+        if select_slot:
+            if select_slot != "Back":
+                self.save_game(select_slot, player, rpgmap)
+
+        return select_slot

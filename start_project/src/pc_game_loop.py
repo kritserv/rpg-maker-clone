@@ -27,22 +27,22 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     rpgmap.draw(display, camera, player.rect)
     display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
+    current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
-        current_time = pg.time.get_ticks()
         select_submenu = menu_ui.update_for_pc(key, dt, current_time)
         if select_submenu:
             if select_submenu == 'Save':
                 pygame_event.game_state = 2
+                reset_menu(menu_ui_save)
             elif select_submenu == 'Back':
                 pygame_event.game_state -= 1
         menu_ui.draw(display, dt)
 
     elif pygame_event.game_state == 2:
-        current_time = pg.time.get_ticks()
-        select_submenu = menu_ui_save.update_for_pc(key, dt, current_time)
+        select_submenu = menu_ui_save.update_for_pc(key, dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
-                pygame_event.game_state = 1
+                pygame_event.game_state -= 1
                 reset_menu(menu_ui, 3)
             else:
                 pygame_event.game_state = 0

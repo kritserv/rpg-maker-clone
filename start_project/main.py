@@ -34,7 +34,7 @@ def load_game(player_start_pos, start_map, db, screen):
     camera = Camera(camera_width, camera_height, game_size[0])
     top_ui = TopUI(full_path)
     menu_ui = MenuUI(full_path)
-    menu_ui_save = MenuUISave(full_path, player, map)
+    menu_ui_save = MenuUISave(full_path)
     return player, rpgmap, camera, top_ui, menu_ui, menu_ui_save
 
 async def main():
