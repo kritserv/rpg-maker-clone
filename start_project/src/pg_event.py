@@ -8,6 +8,8 @@ class PygameEvent:
 	keyup: bool = False
 	running: bool = True
 	game_state: int = 0
+	is_save_state: bool = False
+	is_load_state: bool = False
 
 	def check_type(self, event):
 		keydown, keyup, running = False, True, True

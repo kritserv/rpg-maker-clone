@@ -7,7 +7,7 @@ def reset_menu(menu, cursor = 0):
     menu.speed = 450
     menu.animate_in = True
 
-def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, debug_font, opengl, menu_ui, menu_ui_save):
+def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, debug_font, opengl, menu_ui, menu_ui_save, menu_ui_load):
     dt = delta_time.get()
     clock.tick()
 
@@ -21,6 +21,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         camera.update(player)
         reset_menu(menu_ui)
         reset_menu(menu_ui_save)
+        reset_menu(menu_ui_load)
 
     # Graphic
     display.fill(GREY)
@@ -29,24 +30,50 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
+        menu_ui.draw(display, dt)
         select_submenu = menu_ui.update_for_pc(key, dt, current_time)
         if select_submenu:
             if select_submenu == 'Save':
                 pygame_event.game_state = 2
+                pygame_event.is_save_state = True
+                pygame_event.is_load_state = False
                 reset_menu(menu_ui_save)
+                reset_menu(menu_ui_load)
+
+            elif select_submenu == 'Load':
+                pygame_event.game_state = 2
+                pygame_event.is_load_state = True
+                pygame_event.is_save_state = False
+                reset_menu(menu_ui_save)
+                reset_menu(menu_ui_load)
+
             elif select_submenu == 'Back':
                 pygame_event.game_state -= 1
-        menu_ui.draw(display, dt)
+                pygame_event.is_save_state = False
+                pygame_event.is_load_state = False
 
     elif pygame_event.game_state == 2:
-        select_submenu = menu_ui_save.update_for_pc(key, dt, current_time, player, rpgmap)
+        select_submenu = False
+        if pygame_event.is_save_state:
+            menu_ui_save.draw(display, dt)
+            select_submenu = menu_ui_save.update_for_pc(key, dt, current_time, player, rpgmap)
+        elif pygame_event.is_load_state:
+            menu_ui_load.draw(display, dt)
+            select_submenu = menu_ui_load.update_for_pc(key, dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
                 pygame_event.game_state -= 1
-                reset_menu(menu_ui, 3)
+                if pygame_event.is_save_state:
+                    reset_menu(menu_ui, 3)
+                    pygame_event.is_save_state = False
+                elif pygame_event.is_load_state:
+                    reset_menu(menu_ui, 4)
+                    pygame_event.is_load_state = False
             else:
+                menu_ui_load.menu = menu_ui_save.menu
                 pygame_event.game_state = 0
-        menu_ui_save.draw(display, dt)
+                pygame_event.is_save_state = False
+                pygame_event.is_load_state = False
 
     top_ui.draw_fps(display, clock)
 

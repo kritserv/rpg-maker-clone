@@ -165,3 +165,44 @@ class MenuUISave(BaseMenuUI):
                 self.save_game(select_slot, player, rpgmap)
 
         return select_slot
+
+class MenuUILoad(BaseMenuUI):
+    def __init__(self, full_path):
+        self.save_path = f"{full_path}/user_data/save.json"
+        save_slots = json_loader(self.save_path)
+        menu_items = []
+        for key, items in save_slots.items():
+            if items.get('name', False):
+                menu_items.append(items.get('name'))
+            else:
+                menu_items.append(key)
+        super().__init__(full_path, menu_items)
+
+    def load_game(self, select_slot, player, rpgmap):
+        select_slot = f"Slot {self.cursor}"
+        save_slots = json_loader(self.save_path)
+
+        select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
+
+        if select_save_slot:
+            player.pos = select_save_slot.get('player_pos')
+            player.levels = select_save_slot.get('player_levels')
+            player.items = select_save_slot.get('player_items')
+            rpgmap.curr_map = select_save_slot.get('current_map')
+
+    def update_for_pc(self, key, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUILoad, self).update_for_pc(key, dt, current_time)
+        if select_slot:
+            if select_slot != "Back":
+                self.load_game(select_slot, player, rpgmap)
+
+        return select_slot
+
+    def update_for_android(self, mobile_key, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUILoad, self).update_for_android(mobile_key, dt, current_time)
+        if select_slot:
+            if select_slot != "Back":
+                self.load_game(select_slot, player, rpgmap)
+
+        return select_slot
+        super().__init__(full_path, menu_items)
