@@ -1,12 +1,9 @@
 from json import load, dump
 
-def json_loader(path) -> dict:
+def json_loader(path):
 	with open(path) as f:
-		json_load = load(f)
-		f.close()
-	return json_load
+		return load(f)
 
 def json_saver(path, data):
 	with open(path, "w") as f:
-		dump(data, f)
-	f.close()
+		dump(data, f, indent=4)

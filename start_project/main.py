@@ -26,7 +26,7 @@ if game_mode == 'android':
 
 from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad
 
-def load_game(player_start_pos, start_map, db, screen):
+def load_game(player_start_pos, start_map, db, screen, save_file_path):
     player = Player(full_path, player_start_pos)
     rpgmap = RpgMap(full_path, start_map, game_size)
     rpgmap.load_map_data(db["maps"])
@@ -34,8 +34,8 @@ def load_game(player_start_pos, start_map, db, screen):
     camera = Camera(camera_width, camera_height, game_size[0])
     top_ui = TopUI(full_path)
     menu_ui = MenuUI(full_path)
-    menu_ui_save = MenuUISave(full_path)
-    menu_ui_load = MenuUILoad(full_path)
+    menu_ui_save = MenuUISave(full_path, save_file_path)
+    menu_ui_load = MenuUILoad(full_path, save_file_path)
     return player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load
 
 async def main():
@@ -153,7 +153,7 @@ async def main():
         # Window.from_display_module().maximize()
 
         pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, False)
 
         opengl = OpenGLStuff()
         input = Input('pc')
@@ -166,10 +166,15 @@ async def main():
             await asyncio.sleep(0)
 
     elif game_mode == 'android':
+
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
         pg.display.toggle_fullscreen()
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen)
+        from android.storage import app_storage_path
+        from android.permissions import request_permissions, check_permission, Permission
+        request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+
+        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, app_storage_path())
 
         input = Input('android', game_size, full_path)
 
@@ -184,7 +189,7 @@ async def main():
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen)
+        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, False)
 
         input = Input('web')
 

@@ -120,9 +120,29 @@ class MenuUI(BaseMenuUI):
         super().__init__(full_path, menu_items)
 
 class MenuUISave(BaseMenuUI):
-    def __init__(self, full_path):
+    def __init__(self, full_path, save_file_path):
         self.save_path = f"{full_path}/user_data/save.json"
-        save_slots = json_loader(self.save_path)
+        if save_file_path:
+            '''
+            file path for android (need to save externally so it doesn't get reset when game update)
+            example path: /data/user/0/org.test.myapp/files/save.json
+            '''
+            self.save_path = f"{save_file_path}/save.json"
+
+        try:
+            save_slots = json_loader(self.save_path)
+        except FileNotFoundError:
+            json_saver(self.save_path, {
+              "Slot 0": {},
+              "Slot 1": {},
+              "Slot 2": {},
+              "Slot 3": {},
+              "Slot 4": {},
+              "Slot 5": {},
+              "Slot 6": {}
+            })
+            save_slots = json_loader(self.save_path)
+
         menu_items = []
         for key, items in save_slots.items():
             if items.get('name', False):
@@ -167,9 +187,30 @@ class MenuUISave(BaseMenuUI):
         return select_slot
 
 class MenuUILoad(BaseMenuUI):
-    def __init__(self, full_path):
+    def __init__(self, full_path, save_file_path):
         self.save_path = f"{full_path}/user_data/save.json"
-        save_slots = json_loader(self.save_path)
+        if save_file_path:
+            '''
+            file path for android (need to save externally so it doesn't get reset when game update)
+            example path: /data/user/0/org.test.myapp/files/save.json
+            '''
+
+            self.save_path = f"{save_file_path}/save.json"
+
+        try:
+            save_slots = json_loader(self.save_path)
+        except FileNotFoundError:
+            json_saver(self.save_path, {
+              "Slot 0": {},
+              "Slot 1": {},
+              "Slot 2": {},
+              "Slot 3": {},
+              "Slot 4": {},
+              "Slot 5": {},
+              "Slot 6": {}
+            })
+            save_slots = json_loader(self.save_path)
+
         menu_items = []
         for key, items in save_slots.items():
             if items.get('name', False):
