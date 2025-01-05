@@ -29,6 +29,7 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
 
     current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
+        menu_ui.draw(display, dt)
         select_submenu = menu_ui.update_for_android(mobile_key, dt, current_time)
         if select_submenu:
             if select_submenu == 'Save':
