@@ -198,6 +198,19 @@ navbar %}
     {% endfor %}
 </div>
 
+<div class="zoom-controls mb-3">
+    <label for="zoom-slider" class="form-label">Zoom: <span id="zoom-level">100%</span></label>
+    <input
+        type="range"
+        class="form-range"
+        id="zoom-slider"
+        min="50"
+        max="500"
+        value="100"
+        step="10"
+    />
+</div>
+
 <!-- Tile Dictionary -->
 <div class="tile-container">
     <table
@@ -216,7 +229,7 @@ navbar %}
 </div>
 
 <!-- Map Rendering -->
-<div class="map-container">
+<div class="map-container" id="map-container">
     {% for layer_index, layer in context.table %}
     <table
         class="map-layer"
@@ -245,5 +258,5 @@ navbar %}
 <script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
 <script src="{{url_for('static', filename='change_map.js')}}"></script>
 <script src="{{url_for('static', filename='open_dialog.js')}}"></script>
-
+<script src="{{ url_for('static', filename='zoom.js') }}"></script>
 {% endblock %}
