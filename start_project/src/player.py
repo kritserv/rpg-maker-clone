@@ -5,7 +5,7 @@ from .timer import Timer
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, full_path, xy):
-		x, y = xy
+		x, y = xy[0], xy[1]
 		pg.sprite.Sprite.__init__(self)
 		self.full_path = full_path
 

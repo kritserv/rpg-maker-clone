@@ -26,15 +26,14 @@ class BaseMenuUI:
         self.last_cursor_move_time = 0   # Time of last cursor movement
 
         self.speed = 450
-        self.animate_in = True
 
     def draw(self, display, dt):
         menu_x_finish = display.get_size()[0] - 112
-        if self.menu_x < menu_x_finish:
-            self.menu_x += self.speed * dt
-            self.animate_in = True
+        if self.menu_x > menu_x_finish:
+            self.menu_x -= self.speed * dt
+            slide_in = True
         else:
-            self.animate_in = False
+            slide_in = False
 
         menu_y = 2
         menu_w = 110
@@ -50,6 +49,10 @@ class BaseMenuUI:
             menu_text_y += 12
         for i in range(4):
             pg.draw.rect(display, self.GREY, (self.menu_x - i, menu_y - i, menu_w + 1, menu_h + 1), 1)
+
+        return slide_in
+
+
 
     def update_for_pc(self, key, dt, current_time, *args, **kwargs):
         """Update menu cursor position based on key input and cooldown logic."""
@@ -71,15 +74,14 @@ class BaseMenuUI:
                 self.last_cursor_move_time = current_time
 
         select_submenu = False
-        if not self.animate_in:
-            action = key[pg.K_RETURN] or key[pg.K_z]
-            cancel = key[pg.K_x] or key[pg.K_ESCAPE]
+        action = key[pg.K_RETURN] or key[pg.K_z]
+        cancel = key[pg.K_x] or key[pg.K_ESCAPE]
 
-            if action:
-                select_submenu = self.menu[self.cursor]
+        if action:
+            select_submenu = self.menu[self.cursor]
 
-            elif cancel:
-                select_submenu = 'Back'
+        elif cancel:
+            select_submenu = 'Back'
 
         return select_submenu
 
@@ -102,15 +104,14 @@ class BaseMenuUI:
                 self.last_cursor_move_time = current_time
 
         select_submenu = False
-        if not self.animate_in:
-            action = mobile_key["K_A"]
-            cancel = mobile_key["K_B"] or mobile_key["K_ESCAPE"]
+        action = mobile_key["K_A"]
+        cancel = mobile_key["K_B"] or mobile_key["K_ESCAPE"]
 
-            if action:
-                select_submenu = self.menu[self.cursor]
+        if action:
+            select_submenu = self.menu[self.cursor]
 
-            elif cancel:
-                select_submenu = 'Back'
+        elif cancel:
+            select_submenu = 'Back'
 
         return select_submenu
 
