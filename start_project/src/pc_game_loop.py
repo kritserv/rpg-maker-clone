@@ -84,6 +84,8 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     # Debug
     # debug_message = f"{menu_ui_save.menu_x}"
     blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 50))
+    pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
+    pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
     # Use OpenGL
     opengl.draw(display)

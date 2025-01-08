@@ -180,7 +180,7 @@ async def main():
 
         from src import run_android_game_loop
         while pygame_event.running:
-            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen)
+            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen)
             await asyncio.sleep(0)
     else:
         import sys, platform
@@ -195,7 +195,7 @@ async def main():
 
         from src import run_web_game_loop
         while pygame_event.running:
-            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen)
+            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen)
             await asyncio.sleep(0)
 
     pg.quit()

@@ -7,7 +7,7 @@ def reset_menu(menu, display, cursor = 0):
     menu.speed = 450
     menu.animate_in = True
 
-def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen):
+def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen):
     dt = delta_time.get()
     clock.tick()
 
@@ -78,6 +78,8 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
 
     input.draw_for_android(display)
     top_ui.draw_fps(display, clock)
+    pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
+    pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
     pg.transform.scale(display, screen.get_size(), screen)
     pg.display.flip()
