@@ -239,47 +239,46 @@ class Player(pg.sprite.Sprite):
 		      self.img = self.imgs['running_'+self.direction][self.current_img]
 
 	def move_to_finish_pos(self, dt, one_move, ease_out) -> None:
-		distant_to_finish_x ,\
-		distant_to_finish_y = self.calculate_distant_to_finish(one_move)
+		distant_to_finish = self.calculate_distant_to_finish(one_move)
 
 		if ease_out:
-			if distant_to_finish_x > one_move:
+			if distant_to_finish.x > one_move:
 				if self.direction == "left":
-					if not self.pos[0] - one_move < self.finish_pos[0]:
+					if not self.pos.x - one_move < self.finish_pos.x:
 						self.move(self.last_dir.x, 0, dt)
 					else:
 						self.move(self.last_dir.x*0.37, 0, dt)
 				elif self.direction == "right":
-					if not self.pos[0] + one_move < self.finish_pos[0]:
+					if not self.pos.x + one_move < self.finish_pos.x:
 						self.move(self.last_dir.x, 0, dt)
 					else:
 						self.move(self.last_dir.x*0.37, 0, dt)
 
-			if distant_to_finish_y > one_move:
+			if distant_to_finish.y > one_move:
 				if self.direction == "top":
-					if not self.pos[1] + one_move < self.finish_pos[1]:
+					if not self.pos.y + one_move < self.finish_pos.y:
 						self.move(0, self.last_dir.y, dt)
 					else:
 						self.move(0, self.last_dir.y*0.37, dt)
 				elif self.direction == "bottom":
-					if not self.pos[1] - one_move < self.finish_pos[1]:
+					if not self.pos.y - one_move < self.finish_pos.y:
 						self.move(0, self.last_dir.y, dt)
 					else:
 						self.move(0, self.last_dir.y*0.37, dt)
 
 		else:
-			if distant_to_finish_x > one_move:
+			if distant_to_finish.x > one_move:
 				self.move(self.last_dir.x, 0, dt)
-			if distant_to_finish_y > one_move:
+			if distant_to_finish.y > one_move:
 				self.move(0, self.last_dir.y, dt)
 
-		if distant_to_finish_x <= one_move:
-			self.pos[0] = self.finish_pos[0]
-			self.rect.x = self.pos[0]
+		if distant_to_finish.x <= one_move:
+			self.pos.x = self.finish_pos.x
+			self.rect.x = self.pos.x
 			self.finished_x_move = True
-		if distant_to_finish_y <= one_move:
-			self.pos[1] = self.finish_pos[1]
-			self.rect.y = self.pos[1]
+		if distant_to_finish.y <= one_move:
+			self.pos.y = self.finish_pos.y
+			self.rect.y = self.pos.y
 			self.finished_y_move = True
 
 
