@@ -5,7 +5,6 @@ from .timer import Timer
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, full_path, xy):
-		x, y = xy[0], xy[1]
 		pg.sprite.Sprite.__init__(self)
 		self.full_path = full_path
 
@@ -36,13 +35,13 @@ class Player(pg.sprite.Sprite):
 
 		self.rect = self.img.get_rect()
 
-		self.pos = pg.math.Vector2([x, y])
+		self.pos = pg.math.Vector2(xy)
 
-		self.finish_pos = [self.pos[0], self.pos[1]]
-		distant_to_finish_x, distant_to_finish_y = 0, 0
+		self.finish_pos = pg.math.Vector2(xy)
+
 		self.finished_x_move = True
 		self.finished_y_move = True
-		self.last_dx, self.last_dy = 0, 0
+		self.last_dir = pg.math.Vector2(0, 0)
 		self.key_pressed = False
 
 		self.turn_around_timer = Timer()
@@ -93,7 +92,7 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key, mobile_key) -> (int, int):
+	def calculate_val_from_key(self, key, mobile_key) -> list:
 		dx = 0
 		dy = 0
 		self.key_pressed = False
@@ -154,7 +153,7 @@ class Player(pg.sprite.Sprite):
 					dx = 0
 
 				if dx != 0:
-					self.last_dx = dx
+					self.last_dir.x = dx
 					self.key_pressed = True
 					self.finished_x_move = False
 
@@ -187,7 +186,7 @@ class Player(pg.sprite.Sprite):
 					dy = 0
 
 				if dy != 0:
-					self.last_dy = dy
+					self.last_dir.y = dy
 					self.key_pressed = True
 					self.finished_y_move = False
 		else:
@@ -204,48 +203,27 @@ class Player(pg.sprite.Sprite):
 				num -= 1
 		return num
 
-	def expect_finish_pos(self, one_move) -> [int, int]:
-		expect_pos = []
-		for axis in [0, 1]:
-			if axis == 1:
-				last_val = self.last_dy
-				pos = self.pos[1]
-			else:
-				last_val = self.last_dx
-				pos = self.pos[0]
+	def expect_finish_pos(self, one_move) -> pg.math.Vector2:
+		finish_pos = pg.math.Vector2(
+            self.make_divisible_by(16, ceil(self.pos.x) if self.last_dir.x > 0 else floor(self.pos.x)),
+            self.make_divisible_by(16, ceil(self.pos.y) if self.last_dir.y > 0 else floor(self.pos.y))
+        )
+		return finish_pos
 
-			if last_val > 0:
-				check = ceil(pos)
-			elif last_val < 0:
-				check = floor(pos)
-			else:
-				check = 0
+	def calculate_distant_to_finish(self, one_move) -> pg.math.Vector2:
+		distant_to_finish = self.pos - self.finish_pos
 
-			if -one_move < check < one_move:
-				expect_val = 0
-			else:
-				expect_val = self.make_divisible_by(16, check)
+		if distant_to_finish.x < one_move:
+			distant_to_finish.x *= -1
+		if distant_to_finish.y < one_move:
+			distant_to_finish.y *= -1
 
-			expect_pos.append(expect_val)
-
-		return expect_pos
-
-	def calculate_distant_to_finish(self, one_move) -> (float, float):
-		distant_to_finish_x = self.pos[0] - self.finish_pos[0]
-		distant_to_finish_y = self.pos[1] - self.finish_pos[1]
-
-		if distant_to_finish_x < one_move:
-			distant_to_finish_x *= -1
-		if distant_to_finish_y < one_move:
-			distant_to_finish_y *= -1
-
-		return distant_to_finish_x, distant_to_finish_y
+		return distant_to_finish
 
 	def move(self, dx, dy, dt) -> None:
-		self.pos[0] += dx * self.speed * dt
-		self.pos[1] += dy * self.speed * dt
-		self.rect.x = self.pos[0]
-		self.rect.y = self.pos[1]
+		direction = pg.math.Vector2(dx, dy)
+		self.pos += direction * self.speed * dt
+		self.rect.topleft = self.pos
 
 	def animate(self, is_idle, dt) -> None:
 		if is_idle:
@@ -268,32 +246,32 @@ class Player(pg.sprite.Sprite):
 			if distant_to_finish_x > one_move:
 				if self.direction == "left":
 					if not self.pos[0] - one_move < self.finish_pos[0]:
-						self.move(self.last_dx, 0, dt)
+						self.move(self.last_dir.x, 0, dt)
 					else:
-						self.move(self.last_dx*0.37, 0, dt)
+						self.move(self.last_dir.x*0.37, 0, dt)
 				elif self.direction == "right":
 					if not self.pos[0] + one_move < self.finish_pos[0]:
-						self.move(self.last_dx, 0, dt)
+						self.move(self.last_dir.x, 0, dt)
 					else:
-						self.move(self.last_dx*0.37, 0, dt)
+						self.move(self.last_dir.x*0.37, 0, dt)
 
 			if distant_to_finish_y > one_move:
 				if self.direction == "top":
 					if not self.pos[1] + one_move < self.finish_pos[1]:
-						self.move(0, self.last_dy, dt)
+						self.move(0, self.last_dir.y, dt)
 					else:
-						self.move(0, self.last_dy*0.37, dt)
+						self.move(0, self.last_dir.y*0.37, dt)
 				elif self.direction == "bottom":
 					if not self.pos[1] - one_move < self.finish_pos[1]:
-						self.move(0, self.last_dy, dt)
+						self.move(0, self.last_dir.y, dt)
 					else:
-						self.move(0, self.last_dy*0.37, dt)
+						self.move(0, self.last_dir.y*0.37, dt)
 
 		else:
 			if distant_to_finish_x > one_move:
-				self.move(self.last_dx, 0, dt)
+				self.move(self.last_dir.x, 0, dt)
 			if distant_to_finish_y > one_move:
-				self.move(0, self.last_dy, dt)
+				self.move(0, self.last_dir.y, dt)
 
 		if distant_to_finish_x <= one_move:
 			self.pos[0] = self.finish_pos[0]

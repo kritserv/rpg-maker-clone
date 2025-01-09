@@ -15,5 +15,5 @@
   ],
 
   "start_map": "map001",
-  "player_start_position": [0, 64]
+  "player_start_position": [64, 64]
 }

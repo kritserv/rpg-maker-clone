@@ -227,7 +227,7 @@ class MenuUILoad(BaseMenuUI):
         select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
 
         if select_save_slot:
-            player.pos = select_save_slot.get('player_pos')
+            player.pos = pg.math.Vector2(select_save_slot.get('player_pos'))
             player.levels = select_save_slot.get('player_levels')
             player.items = select_save_slot.get('player_items')
             rpgmap.curr_map = select_save_slot.get('current_map')
