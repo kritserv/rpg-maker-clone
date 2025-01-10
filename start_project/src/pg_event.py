@@ -32,6 +32,12 @@ class PygameEvent:
 			keyup, \
 			running
 
+	def check_joystick(self, event):
+		if event.type == pg.JOYDEVICEADDED:
+			joy = pg.joystick.Joystick(event.device_index)
+			return joy
+		return False
+
 	def get_size_and_maintain_aspect_ratio(self, event) -> tuple:
 	    # Scale On Width (still bug with drawing rpgmap)
 		# ratio = event.w / self.game_size[0]
@@ -71,16 +77,18 @@ class PygameEvent:
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
+			joy = self.check_joystick(event)
 			if new_size:
-				return new_size
-				break
+				return (new_size, joy)
 			if key:
 				self.check_quit_game(event, key)
 				self.check_game_state(key)
-		return 0
+		return (False, False)
 
 	def check_android(self, active_touches, image_controls):
+		joy = False
 		for event in pg.event.get():
+			joy = self.check_joystick(event)
 			if event.type == pg.FINGERDOWN or event.type == pg.FINGERMOTION:
 				touch_pos = (event.x * self.game_size[0], event.y * self.game_size[1])
 				for direction, (image, pos) in image_controls.items():
@@ -115,4 +123,4 @@ class PygameEvent:
 			if direction == "B":
 				mobile_key["K_B"] = True
 
-		return mobile_key
+		return (mobile_key, joy)

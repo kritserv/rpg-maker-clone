@@ -5,6 +5,7 @@ from sys import exit
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.font.init()
+pg.joystick.init()
 pg.init()
 
 import os

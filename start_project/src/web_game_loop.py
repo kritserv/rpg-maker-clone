@@ -13,10 +13,13 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
 
     # Input
     key = input.update_for_web(pygame_event)
+    for joystick in input.joysticks:
+        if joystick.get_button(10):
+            pygame_event.game_state = 1
 
     # Logic
     if pygame_event.game_state == 0:
-        player.update(key, dt)
+        player.update(key, dt, joysticks=input.joysticks)
         camera.update(player)
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
@@ -32,7 +35,7 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
         select_submenu = False
         slide_in = menu_ui.draw(display, dt)
         if not slide_in:
-            select_submenu = menu_ui.update_for_pc(key, dt, current_time)
+            select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
         if select_submenu:
             if select_submenu == 'Save':
                 pygame_event.game_state = 2
@@ -58,11 +61,11 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
         if pygame_event.is_save_state:
             slide_in = menu_ui_save.draw(display, dt)
             if not slide_in:
-                select_submenu = menu_ui_save.update_for_pc(key, dt, current_time, player, rpgmap)
+                select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
         elif pygame_event.is_load_state:
             slide_in = menu_ui_load.draw(display, dt)
             if not slide_in:
-                select_submenu = menu_ui_load.update_for_pc(key, dt, current_time, player, rpgmap)
+                select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
                 pygame_event.game_state -= 1

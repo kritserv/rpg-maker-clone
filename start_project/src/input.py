@@ -3,6 +3,10 @@ from .timer import Timer
 
 class Input:
     def __init__(self, platform, game_size = [], full_path='') -> None:
+        try:
+            self.joysticks = [pg.joystick.Joystick(0)]
+        except pg.error:
+            self.joysticks = []
         if platform == 'pc':
             self.fullscreen_toggle_timer = Timer()
             self.fullscreen_toggle_timer.start()
@@ -42,9 +46,11 @@ class Input:
 
 
     def update_for_pc(self, pygame_event, display):
-        new_size = pygame_event.check_pc()
+        new_size, joystick = pygame_event.check_pc()
         if new_size:
             display = new_size
+        if joystick:
+            self.joysticks.append(joystick)
         key = pg.key.get_pressed()
         if key[pg.K_F11]:
             if self.fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
@@ -56,12 +62,17 @@ class Input:
         return new_size, key, display
 
     def update_for_android(self, pygame_event):
-        return pygame_event.check_android(self.active_touches, self.image_controls)
+        mobile_key, joystick = pygame_event.check_android(self.active_touches, self.image_controls)
+        if joystick:
+            self.joysticks.append(joystick)
+        return mobile_key
 
     def draw_for_android(self, display):
         for direction, (image, pos) in self.image_controls.items():
             display.blit(image, pos)
 
     def update_for_web(self, pygame_event):
-        pygame_event.check_pc()
+        _, joystick = pygame_event.check_pc()
+        if joystick:
+            self.joysticks.append(joystick)
         return pg.key.get_pressed()

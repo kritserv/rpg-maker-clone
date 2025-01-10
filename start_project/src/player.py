@@ -92,7 +92,7 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key, mobile_key) -> list:
+	def calculate_val_from_key(self, key, mobile_key={}, joysticks=[]) -> list:
 		dx = 0
 		dy = 0
 		self.key_pressed = False
@@ -111,6 +111,20 @@ class Player(pg.sprite.Sprite):
 			down = key[pg.K_DOWN]
 			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x]
 			select = key[pg.K_ESCAPE]
+		for joystick in joysticks:
+			up, left, right, down, cancel, select = False, False, False, False, False, False
+			if joystick.get_axis(0) < -0.6:
+				left = True
+			elif joystick.get_axis(0) > 0.6:
+				right = True
+			elif joystick.get_axis(1) < -0.6:
+				up = True
+			elif joystick.get_axis(1) > 0.6:
+				down = True
+			if joystick.get_button(1):
+				cancel = True
+			if joystick.get_button(10):
+				select = True
 
 		if cancel:
 			self.speed = 90
@@ -282,8 +296,8 @@ class Player(pg.sprite.Sprite):
 			self.finished_y_move = True
 
 
-	def update(self, key, dt, mobile_key={}) -> None:
-		dx, dy = self.calculate_val_from_key(key, mobile_key)
+	def update(self, key, dt, mobile_key={}, joysticks=[]) -> None:
+		dx, dy = self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks)
 
 		one_move = self.speed * dt
 

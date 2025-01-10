@@ -13,11 +13,14 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     # Input
     new_size, key, display = input.update_for_pc(pygame_event, display)
+    for joystick in input.joysticks:
+        if joystick.get_button(10):
+            pygame_event.game_state = 1
     rpgmap.resize_view(new_size)
 
     # Logic
     if pygame_event.game_state == 0:
-        player.update(key, dt)
+        player.update(key, dt, joysticks=input.joysticks)
         camera.update(player)
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
@@ -33,7 +36,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         select_submenu = False
         slide_in = menu_ui.draw(display, dt)
         if not slide_in:
-            select_submenu = menu_ui.update_for_pc(key, dt, current_time)
+            select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
         if select_submenu:
             if select_submenu == 'Save':
                 pygame_event.game_state = 2
@@ -59,11 +62,11 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         if pygame_event.is_save_state:
             slide_in = menu_ui_save.draw(display, dt)
             if not slide_in:
-                select_submenu = menu_ui_save.update_for_pc(key, dt, current_time, player, rpgmap)
+                select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
         elif pygame_event.is_load_state:
             slide_in = menu_ui_load.draw(display, dt)
             if not slide_in:
-                select_submenu = menu_ui_load.update_for_pc(key, dt, current_time, player, rpgmap)
+                select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
                 pygame_event.game_state -= 1
@@ -82,8 +85,8 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     top_ui.draw_fps(display, clock)
 
     # Debug
-    # debug_message = f"{menu_ui_save.menu_x}"
-    blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 50))
+    debug_message = f"{pg.joystick.get_count()}"
+    blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 40))
     pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
     pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 

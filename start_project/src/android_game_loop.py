@@ -13,10 +13,13 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
 
     # Input
     mobile_key = input.update_for_android(pygame_event)
+    for joystick in input.joysticks:
+        if joystick.get_button(10):
+            pygame_event.game_state = 1
 
     # Logic
     if pygame_event.game_state == 0:
-        player.update(key=None, dt=dt, mobile_key=mobile_key)
+        player.update(key=None, dt=dt, mobile_key=mobile_key, joysticks=input.joysticks)
         camera.update(player)
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
@@ -30,7 +33,7 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
     current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
         menu_ui.draw(display, dt)
-        select_submenu = menu_ui.update_for_android(mobile_key, dt, current_time)
+        select_submenu = menu_ui.update_for_android(mobile_key, input.joysticks, dt, current_time)
         if select_submenu:
             if select_submenu == 'Save':
                 pygame_event.game_state = 2
@@ -56,11 +59,11 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
         if pygame_event.is_save_state:
             slide_in = menu_ui_save.draw(display, dt)
             if not slide_in:
-                select_submenu = menu_ui_save.update_for_android(mobile_key, dt, current_time, player, rpgmap)
+                select_submenu = menu_ui_save.update_for_android(mobile_key, input.joysticks, dt, current_time, player, rpgmap)
         elif pygame_event.is_load_state:
             slide_in = menu_ui_load.draw(display, dt)
             if not slide_in:
-                select_submenu = menu_ui_load.update_for_android(mobile_key, dt, current_time, player, rpgmap)
+                select_submenu = menu_ui_load.update_for_android(mobile_key, input.joysticks, dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
                 pygame_event.game_state -= 1

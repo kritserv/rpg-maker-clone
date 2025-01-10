@@ -54,10 +54,27 @@ class BaseMenuUI:
 
 
 
-    def update_for_pc(self, key, dt, current_time, *args, **kwargs):
+    def update_for_pc(self, key, joysticks, dt, current_time, *args, **kwargs):
         """Update menu cursor position based on key input and cooldown logic."""
-        up = key[pg.K_UP]
-        down = key[pg.K_DOWN]
+
+        up, left, right, down, cancel, action = False, False, False, False, False, False
+
+        for joystick in joysticks:
+            if joystick.get_axis(1) < -0.6:
+                up = True
+            elif joystick.get_axis(1) > 0.6:
+                down = True
+            if joystick.get_button(0):
+                action = True
+            if joystick.get_button(1):
+                cancel = True
+            if joystick.get_button(10):
+                cancel = True
+
+        if not up:
+            up = key[pg.K_UP]
+        if not down:
+            down = key[pg.K_DOWN]
 
         # Check cooldown
         if current_time - self.last_cursor_move_time > self.cursor_cooldown_time:
@@ -74,8 +91,10 @@ class BaseMenuUI:
                 self.last_cursor_move_time = current_time
 
         select_submenu = False
-        action = key[pg.K_RETURN] or key[pg.K_z]
-        cancel = key[pg.K_x] or key[pg.K_ESCAPE]
+        if not action:
+            action = key[pg.K_RETURN] or key[pg.K_z]
+        if not cancel:
+            cancel = key[pg.K_x] or key[pg.K_ESCAPE]
 
         if action:
             select_submenu = self.menu[self.cursor]
@@ -85,9 +104,26 @@ class BaseMenuUI:
 
         return select_submenu
 
-    def update_for_android(self, mobile_key, dt, current_time, *args, **kwargs):
-        up = mobile_key["K_UP"]
-        down = mobile_key["K_DOWN"]
+    def update_for_android(self, mobile_key, joysticks, dt, current_time, *args, **kwargs):
+
+        up, left, right, down, cancel, action = False, False, False, False, False, False
+
+        for joystick in joysticks:
+            if joystick.get_axis(1) < -0.6:
+                up = True
+            elif joystick.get_axis(1) > 0.6:
+                down = True
+            if joystick.get_button(0):
+                action = True
+            if joystick.get_button(1):
+                cancel = True
+            if joystick.get_button(10):
+                cancel = True
+
+        if not up:
+            up = mobile_key["K_UP"]
+        if not down:
+            down = mobile_key["K_DOWN"]
 
         # Check cooldown
         if current_time - self.last_cursor_move_time > self.cursor_cooldown_time:
@@ -104,8 +140,10 @@ class BaseMenuUI:
                 self.last_cursor_move_time = current_time
 
         select_submenu = False
-        action = mobile_key["K_A"]
-        cancel = mobile_key["K_B"] or mobile_key["K_ESCAPE"]
+        if not action:
+            action = mobile_key["K_A"]
+        if not cancel:
+            cancel = mobile_key["K_B"] or mobile_key["K_ESCAPE"]
 
         if action:
             select_submenu = self.menu[self.cursor]
@@ -171,16 +209,16 @@ class MenuUISave(BaseMenuUI):
         json_saver(self.save_path, save_slots)
         self.menu[self.cursor] = save_name
 
-    def update_for_pc(self, key, dt, current_time, player, rpgmap):
-        select_slot = super(MenuUISave, self).update_for_pc(key, dt, current_time)
+    def update_for_pc(self, key, joysticks, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUISave, self).update_for_pc(key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
                 self.save_game(select_slot, player, rpgmap)
 
         return select_slot
 
-    def update_for_android(self, mobile_key, dt, current_time, player, rpgmap):
-        select_slot = super(MenuUISave, self).update_for_android(mobile_key, dt, current_time)
+    def update_for_android(self, mobile_key, joysticks, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUISave, self).update_for_android(mobile_key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
                 self.save_game(select_slot, player, rpgmap)
@@ -232,16 +270,16 @@ class MenuUILoad(BaseMenuUI):
             player.items = select_save_slot.get('player_items')
             rpgmap.curr_map = select_save_slot.get('current_map')
 
-    def update_for_pc(self, key, dt, current_time, player, rpgmap):
-        select_slot = super(MenuUILoad, self).update_for_pc(key, dt, current_time)
+    def update_for_pc(self, key, joysticks, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUILoad, self).update_for_pc(key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
                 self.load_game(select_slot, player, rpgmap)
 
         return select_slot
 
-    def update_for_android(self, mobile_key, dt, current_time, player, rpgmap):
-        select_slot = super(MenuUILoad, self).update_for_android(mobile_key, dt, current_time)
+    def update_for_android(self, mobile_key, joysticks, dt, current_time, player, rpgmap):
+        select_slot = super(MenuUILoad, self).update_for_android(mobile_key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
                 self.load_game(select_slot, player, rpgmap)
