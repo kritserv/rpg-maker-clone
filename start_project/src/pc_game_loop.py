@@ -33,6 +33,8 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
+        if new_size:
+            reset_menu(menu_ui, display, cursor = menu_ui.cursor)
         select_submenu = False
         slide_in = menu_ui.draw(display, dt)
         if not slide_in:
@@ -60,10 +62,14 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     elif pygame_event.game_state == 2:
         select_submenu = False
         if pygame_event.is_save_state:
+            if new_size:
+                reset_menu(menu_ui_save, display, cursor = menu_ui_save.cursor)
             slide_in = menu_ui_save.draw(display, dt)
             if not slide_in:
                 select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
         elif pygame_event.is_load_state:
+            if new_size:
+                reset_menu(menu_ui_load, display, cursor = menu_ui_load.cursor)
             slide_in = menu_ui_load.draw(display, dt)
             if not slide_in:
                 select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
@@ -85,7 +91,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     top_ui.draw_fps(display, clock)
 
     # Debug
-    debug_message = f"{pg.joystick.get_count()}"
+    # debug_message = f"{pg.joystick.get_count()}"
     blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 40))
     pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
     pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
