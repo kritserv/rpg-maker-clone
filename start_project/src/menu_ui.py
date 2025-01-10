@@ -94,7 +94,7 @@ class BaseMenuUI:
         if not action:
             action = key[pg.K_RETURN] or key[pg.K_z]
         if not cancel:
-            cancel = key[pg.K_x] or key[pg.K_ESCAPE]
+            cancel = key[pg.K_x] or key[pg.K_ESCAPE] or key[pg.K_KP_0]
 
         if action:
             select_submenu = self.menu[self.cursor]
