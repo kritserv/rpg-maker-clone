@@ -239,9 +239,10 @@ class Player(pg.sprite.Sprite):
 
 		can_move = True
 		for collision_rect in collision_rects:
-			if pg.Rect.colliderect(collision_rect, next_move):
-				can_move = False
-				return can_move
+			if next_move:
+				if pg.Rect.colliderect(collision_rect, next_move):
+					can_move = False
+					return can_move
 		return can_move
 
 	def update(self, key, dt, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
