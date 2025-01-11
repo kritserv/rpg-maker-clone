@@ -72,9 +72,9 @@ class BaseMenuUI:
                 cancel = True
 
         if not up:
-            up = key[pg.K_UP]
+            up = key[pg.K_UP] or key[pg.K_w]
         if not down:
-            down = key[pg.K_DOWN]
+            down = key[pg.K_DOWN] or key[pg.K_s]
 
         # Check cooldown
         if current_time - self.last_cursor_move_time > self.cursor_cooldown_time:

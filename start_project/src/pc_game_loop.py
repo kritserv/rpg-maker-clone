@@ -18,18 +18,20 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
             pygame_event.game_state = 1
     rpgmap.resize_view(new_size)
 
+    # Graphic
+    display.fill(GREY)
+    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
+    collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
+    display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
+    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
+
     # Logic
     if pygame_event.game_state == 0:
-        player.update(key, dt, joysticks=input.joysticks)
+        player.update(key, dt, joysticks=input.joysticks, collision_rects=collision_rects)
         camera.update(player)
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
         reset_menu(menu_ui_load, display)
-
-    # Graphic
-    display.fill(GREY)
-    rpgmap.draw(display, camera, player.rect)
-    display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
     current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
@@ -91,8 +93,10 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     top_ui.draw_fps(display, clock)
 
     # Debug
-    # debug_message = f"{pg.joystick.get_count()}"
+    debug_message = f"{player.pos}"
     blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 40))
+    debug_message = f"{player.finish_pos}"
+    blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 50))
     pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
     pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 

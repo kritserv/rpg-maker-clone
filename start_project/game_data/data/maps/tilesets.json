@@ -1,5 +1,6 @@
 {
   "forests": {
+    "0": "collision.png",
     "1": "grass_1.png",
     "2": "flower1_1.png",
     "3": "flower1_2.png",

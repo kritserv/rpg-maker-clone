@@ -105,10 +105,10 @@ class Player(pg.sprite.Sprite):
 			cancel = mobile_key["K_B"]
 			select = mobile_key["K_ESCAPE"]
 		else:
-			up = key[pg.K_UP]
-			left = key[pg.K_LEFT]
-			right = key[pg.K_RIGHT]
-			down = key[pg.K_DOWN]
+			up = key[pg.K_UP] or key[pg.K_w]
+			left = key[pg.K_LEFT] or key[pg.K_a]
+			right = key[pg.K_RIGHT] or key[pg.K_d]
+			down = key[pg.K_DOWN] or key[pg.K_s]
 			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x] or key[pg.K_KP_0]
 			select = key[pg.K_ESCAPE]
 		for joystick in joysticks:
@@ -209,18 +209,18 @@ class Player(pg.sprite.Sprite):
 		return dx, dy
 
 	def make_divisible_by(self, tile_size, num) -> int:
-		if num > 0:
-			while num % tile_size != 0:
-				num += 1
+		remainder = num % tile_size
+		if remainder == 0:
+			return num
+		elif num > 0:
+			return num + (tile_size - remainder)
 		elif num < 0:
-			while num % tile_size != 0:
-				num -= 1
-		return num
+			return num - remainder
 
 	def expect_finish_pos(self, one_move) -> pg.math.Vector2:
 		finish_pos = pg.math.Vector2(
             self.make_divisible_by(16, ceil(self.pos.x) if self.last_dir.x > 0 else floor(self.pos.x)),
-            self.make_divisible_by(16, ceil(self.pos.y) if self.last_dir.y > 0 else floor(self.pos.y))
+            self.make_divisible_by(16, ceil(self.pos.y) if self.last_dir.y > 0 else ceil(self.pos.y))
         )
 		return finish_pos
 
@@ -295,18 +295,43 @@ class Player(pg.sprite.Sprite):
 			self.rect.y = self.pos.y
 			self.finished_y_move = True
 
+	def check_obstacles(self, collision_rects):
 
-	def update(self, key, dt, mobile_key={}, joysticks=[]) -> None:
+		if self.direction == "top":
+			next_move = self.finish_pos - (0, 16)
+
+		elif self.direction == "bottom":
+			next_move = self.finish_pos + (0, 16)
+
+		elif self.direction == "left":
+			next_move = self.finish_pos - (16, 0)
+
+		elif self.direction == "right":
+			next_move = self.finish_pos + (16, 0)
+
+		else:
+			next_move = self.finish_pos
+
+		can_move = True
+		for collision_rect in collision_rects:
+			if collision_rect.collidepoint(next_move):
+				can_move = False
+				return can_move
+		return can_move
+
+	def update(self, key, dt, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
 		dx, dy = self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks)
 
 		one_move = self.speed * dt
 
 		self.finish_pos = self.expect_finish_pos(one_move)
-
-		if self.key_pressed:
-			self.move(dx, dy, dt)
+		can_move = self.check_obstacles(collision_rects)
 
 		is_idle = self.finished_x_move and self.finished_y_move
+		if self.key_pressed:
+			if can_move:
+				self.move(dx, dy, dt)
+
 
 		ease_out = False
 		if dt > 0.018:

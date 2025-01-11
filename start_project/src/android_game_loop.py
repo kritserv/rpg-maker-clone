@@ -17,18 +17,20 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
         if joystick.get_button(10):
             pygame_event.game_state = 1
 
+    # Graphic
+    display.fill(GREY)
+    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
+    collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
+    display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
+    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
+
     # Logic
     if pygame_event.game_state == 0:
-        player.update(key=None, dt=dt, mobile_key=mobile_key, joysticks=input.joysticks)
+        player.update(key=None, dt=dt, mobile_key=mobile_key, joysticks=input.joysticks, collision_rects=collision_rects)
         camera.update(player)
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
         reset_menu(menu_ui_load, display)
-
-    # Graphic
-    display.fill(GREY)
-    rpgmap.draw_scaled_screen(display, camera, player.rect)
-    display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
 
     current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:

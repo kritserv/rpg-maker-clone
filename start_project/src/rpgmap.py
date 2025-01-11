@@ -38,7 +38,7 @@ class RpgMap(pg.sprite.Sprite):
             # Prepare layers for the current map
             map_layers = {}
 
-            for layer_index in range(1, 3):  # Adjust range as needed for more layers
+            for layer_index in range(1, 5):  # Adjust range as needed for more layers
                 layer_name = f"layer{layer_index}"
                 csv_path = f"{self.full_path}game_data/data/maps/{map_name}{layer_name}.csv"
 
@@ -60,7 +60,6 @@ class RpgMap(pg.sprite.Sprite):
                     if tile_id.strip():  # Ignore empty tiles
                         img_path = f"{self.full_path}assets/img/tile/{tileset[tile_id]}"
                         layer_tiles.append(Tile(img_path, (x * self.tile_size, y * self.tile_size)))
-        layer_tiles = tuple(layer_tiles)
         return layer_tiles
 
     def resize_view(self, new_size):
@@ -72,11 +71,14 @@ class RpgMap(pg.sprite.Sprite):
             self.view_height = self.game_size[1]//2+self.tile_size
             self.view_width = self.game_size[0]//2+self.tile_size
 
-    def draw(self, display, camera, player_rect, layers=None):
+    def draw(self, display, camera, player_rect, layers=None, get_collision=False):
         """
         Draw specified layers of the current map onto the display.
         If no layers are specified, all layers will be drawn.
         """
+        draw_count = 0
+        collision_rects = []
+
         layers_to_draw = layers or self.map_data[self.curr_map].keys()
         bottom_edge = player_rect.y - self.view_height
         top_edge = player_rect.y + self.view_height
@@ -85,15 +87,29 @@ class RpgMap(pg.sprite.Sprite):
         for layer_name in layers_to_draw:
             for tile in self.map_data[self.curr_map].get(layer_name, []):
                 if bottom_edge < tile.rect.y < top_edge and right_edge < tile.rect.x < left_edge:
-                    adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2
-                    adjusted_y = tile.rect.y - camera.offset_y
-                    display.blit(tile.img, (adjusted_x, adjusted_y))
+                    if get_collision:
+                        adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2
+                        adjusted_y = tile.rect.y - camera.offset_y
+                        display.blit(tile.img, (adjusted_x, adjusted_y))
+                        collision_rects.append(tile.rect)
+                    else:
+                        adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2
+                        adjusted_y = tile.rect.y - camera.offset_y
+                        display.blit(tile.img, (adjusted_x, adjusted_y))
+                        draw_count += 1
+        if get_collision:
+            return collision_rects
+        else:
+            return draw_count
 
     def draw_scaled_screen(self, display, camera, player_rect, layers=None):
         """
         Draw specified layers of the current map onto a scaled display.
         If no layers are specified, all layers will be drawn.
         """
+        draw_count = 0
+        collision_rects = []
+
         layers_to_draw = layers or self.map_data[self.curr_map].keys()
         bottom_edge = player_rect.y - self.view_height
         top_edge = player_rect.y + self.view_height
@@ -103,6 +119,11 @@ class RpgMap(pg.sprite.Sprite):
         for layer_name in layers_to_draw:
             for tile in self.map_data[self.curr_map].get(layer_name, []):
                 if bottom_edge < tile.rect.y < top_edge and right_edge < tile.rect.x < left_edge:
-                    adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2 - self.game_size[0]
-                    adjusted_y = tile.rect.y - camera.offset_y - self.game_size[1]
-                    display.blit(tile.img, (adjusted_x, adjusted_y))
+                    if layer_name == 'layer3':
+                        collision_rects.append(tile.rect)
+                    else:
+                        adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2 - self.game_size[0]
+                        adjusted_y = tile.rect.y - camera.offset_y - self.game_size[1]
+                        display.blit(tile.img, (adjusted_x, adjusted_y))
+                        draw_count += 1
+        return draw_count, collision_rects
