@@ -201,7 +201,7 @@ class MenuUISave(BaseMenuUI):
             'name': save_name,
             'player_levels': player.levels,
             'player_items': player.items,
-            'player_pos': [player.pos[0], player.pos[1]],
+            'player_pos': [player.last_pos.x, player.last_pos.y],
             'current_map': rpgmap.curr_map,
             'time': datetime.now().strftime('%Y:%m:%d %H:%M:%S')
             }
@@ -266,6 +266,8 @@ class MenuUILoad(BaseMenuUI):
 
         if select_save_slot:
             player.pos = pg.math.Vector2(select_save_slot.get('player_pos'))
+            player.last_pos = pg.math.Vector2(select_save_slot.get('player_pos'))
+            player.next_pos = pg.math.Vector2(select_save_slot.get('player_pos'))
             player.levels = select_save_slot.get('player_levels')
             player.items = select_save_slot.get('player_items')
             rpgmap.curr_map = select_save_slot.get('current_map')

@@ -92,9 +92,9 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
 
     # Debug
     debug_message = f"rem {len(player.remembered_obstacle_pos)}"
-    blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 40))
-    debug_message = player.pos
     blit_text(display, f"{debug_message}", menu_ui.menu_font, BLACK, (5, 40))
+    debug_message = player.pos
+    blit_text(display, f"{debug_message}", menu_ui.menu_font, BLACK, (5, 52))
 
     pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
     pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))

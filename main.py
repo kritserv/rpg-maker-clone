@@ -102,6 +102,8 @@ def index():
             tile_map_layer_paths = [
                 os.path.join(project_folder, f"{tile_map_path}layer1.csv"),
                 os.path.join(project_folder, f"{tile_map_path}layer2.csv"),
+                os.path.join(project_folder, f"{tile_map_path}layer3.csv"),
+                os.path.join(project_folder, f"{tile_map_path}layer4.csv"),
             ]
 
             # Prepare base64 images for tiles

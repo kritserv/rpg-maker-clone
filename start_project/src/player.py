@@ -29,10 +29,10 @@ class Player(pg.sprite.Sprite):
 
 		self.current_img = 0
 		self.img = self.imgs["bottom"][self.current_img]
-		self.collision_border_right = []
-		self.collision_border_left = []
-		self.collision_border_top = []
-		self.collision_border_bottom = []
+
+		# this stackoverflow answer is very helpful in implement tile base movement and collision
+		# https://stackoverflow.com/questions/74332401/how-to-make-a-collision-system-in-pygame
+		self.collision = []
 
 		self.direction = "bottom"
 		self.remembered_obstacle_pos = {}

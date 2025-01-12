@@ -66,6 +66,7 @@ async def main():
         """
         OpenGL Stuff; for better FPS, resizable game windows and for steam achievement overlay
         I don't know what any of these code do, I just copy it from dafluffypotato.
+        https://dafluffypotato.itch.io/hue-flowing
         """
         import moderngl
         from array import array
@@ -170,10 +171,14 @@ async def main():
 
         screen = pg.display.set_mode((game_size),
             pg.SCALED)
-        pg.display.toggle_fullscreen()
-        from android.storage import app_storage_path
-        from android.permissions import request_permissions, check_permission, Permission
-        request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+        try:
+            from android.storage import app_storage_path
+            from android.permissions import request_permissions, check_permission, Permission
+            request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+            pg.display.toggle_fullscreen()
+        except:
+            def app_storage_path():
+                return full_path
 
         player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, app_storage_path())
 
