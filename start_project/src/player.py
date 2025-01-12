@@ -1,3 +1,4 @@
+from sys import _current_frames
 import pygame as pg
 from math import floor, ceil
 import os
@@ -34,15 +35,23 @@ class Player(pg.sprite.Sprite):
 		self.collision_border_bottom = []
 
 		self.direction = "bottom"
+		self.remembered_obstacle_pos = {}
 		self.animation_time = 0.09
-		self.current_frame = 0
 
-		self.rect = self.img.get_rect()
 
+		self.walk_buffer = 50
 		self.pos = pg.math.Vector2(xy)
+		self.dirvec = pg.math.Vector2(0, 0)
+		self.last_pos = self.pos
+		self.next_pos = self.pos
 
-		self.last_dir = pg.math.Vector2(0, 0)
-		self.key_pressed = False
+		self.current_frame = 0
+		self.last_update = pg.time.get_ticks()
+		self.between_tiles = False
+
+		self.image = pg.Surface((16, 16))
+		self.image.fill((255, 0, 0))
+		self.rect = self.image.get_rect()
 
 		self.turn_around_timer = Timer()
 		self.turn_around_timer.start()
@@ -93,8 +102,7 @@ class Player(pg.sprite.Sprite):
 						)
 
 	def calculate_val_from_key(self, key, mobile_key={}, joysticks=[], dt=0.016):
-		dx = 0
-		dy = 0
+		now = pg.time.get_ticks()
 		self.key_pressed = False
 
 		if mobile_key:
@@ -127,92 +135,75 @@ class Player(pg.sprite.Sprite):
 				select = True
 
 		if cancel:
-			self.speed = 90
-			if dt > 0.33:
-				self.speed = 70
+			self.speed = 130
 			self.animation_time = 0.1
 			self.is_running = True
 		else:
-			self.speed = 60
-			if dt > 0.33:
-				self.speed = 45
+			self.speed = 80
 			self.animation_time = 0.19
 			self.is_running = False
 
 		if self.turn_around_timer.get_elapsed_time() > 1.15:
 			self.turn_around_timer.pause()
 
-		if left or right:
-			if left:
-				if cancel:
-					dx = -1
-					self.direction = "left"
-				else:
-					if self.direction == "left" and self.turn_around_timer.get_elapsed_time() <= 0.9:
-						dx = -1
-					else:
+		if now - self.last_update > self.walk_buffer:
+			self.last_update = now
+
+			new_dir_vec = pg.math.Vector2(0, 0)
+			if self.dirvec.y == 0:
+				if left:
+					if cancel:
 						self.direction = "left"
-						self.turn_around_timer.elapsed_time = 0.9
-
-			elif right:
-				if cancel:
-					dx = 1
-					self.direction = "right"
-				else:
-					if self.direction == "right" and self.turn_around_timer.get_elapsed_time() <= 0.9:
-						dx = 1
+						new_dir_vec = pg.math.Vector2(-1, 0)
 					else:
+						if self.direction == "left" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							new_dir_vec = pg.math.Vector2(-1, 0)
+						else:
+							self.direction = "left"
+							self.turn_around_timer.elapsed_time = 0.9
+
+				elif right:
+					if cancel:
 						self.direction = "right"
-						self.turn_around_timer.elapsed_time = 0.9
-
-			if left and right:
-				self.direction = "bottom"
-				dx = 0
-
-			if dx != 0:
-				self.last_dir.x = dx
-				self.key_pressed = True
-
-		elif up or down:
-			if up:
-				if cancel:
-					dy = -1
-					self.direction = "top"
-				else:
-					if self.direction == "top" and self.turn_around_timer.get_elapsed_time() <= 0.9:
-						dy = -1
+						new_dir_vec = pg.math.Vector2(1, 0)
 					else:
+						if self.direction == "right" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							new_dir_vec = pg.math.Vector2(1, 0)
+						else:
+							self.direction = "right"
+							self.turn_around_timer.elapsed_time = 0.9
+
+			if self.dirvec.x == 0:
+				if up:
+					if cancel:
 						self.direction = "top"
-						self.turn_around_timer.elapsed_time = 0.9
-
-			elif down:
-				if cancel:
-					dy = 1
-					self.direction = "bottom"
-				else:
-					if self.direction == "bottom" and self.turn_around_timer.get_elapsed_time() <= 0.9:
-						dy = 1
+						new_dir_vec = pg.math.Vector2(0, -1)
 					else:
+						if self.direction == "top" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							new_dir_vec = pg.math.Vector2(0, -1)
+						else:
+							self.direction = "top"
+							self.turn_around_timer.elapsed_time = 0.9
+
+				elif down:
+					if cancel:
 						self.direction = "bottom"
-						self.turn_around_timer.elapsed_time = 0.9
+						new_dir_vec = pg.math.Vector2(0, 1)
+					else:
+						if self.direction == "bottom" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+							new_dir_vec = pg.math.Vector2(0, 1)
+						else:
+							self.direction = "bottom"
+							self.turn_around_timer.elapsed_time = 0.9
+			else:
+				self.turn_around_timer.restart()
 
-			if up and down:
-				self.direction = "bottom"
-				dy = 0
-
-			if dy != 0:
-				self.last_dir.y = dy
-				self.key_pressed = True
-		else:
-			self.turn_around_timer.restart()
-
-		return dx, dy
-
-	def move(self, dx, dy, dt, collision_rects) -> None:
-		direction = pg.math.Vector2(dx, dy)
-		next_move = self.pos + (direction * self.speed * dt)
-		self.pos = next_move
-		self.rect.topleft = self.pos
+			if new_dir_vec != pg.math.Vector2(0, 0):
+				self.dirvec = new_dir_vec
+				self.between_tiles = True
+				current_index = self.rect.centerx // 16, self.rect.centery // 16
+				self.last_pos = pg.math.Vector2(current_index) * 16
+				self.next_pos = self.last_pos + self.dirvec * 16
 
 	def animate(self, is_idle, dt) -> None:
 		if is_idle:
@@ -227,37 +218,40 @@ class Player(pg.sprite.Sprite):
 		if self.is_running:
 		      self.img = self.imgs['running_'+self.direction][self.current_img]
 
-	def check_obstacles(self, collision_rects):
-		next_move = []
-		if self.direction == "top":
-			next_move = self.collision_border_top
-
-		elif self.direction == "bottom":
-			next_move = self.collision_border_bottom
-
-		elif self.direction == "left":
-			next_move = self.collision_border_left
-
-		elif self.direction == "right":
-			next_move = self.collision_border_right
-
-		can_move = True
-		for collision_rect in collision_rects:
-			if next_move:
-				if pg.Rect.colliderect(collision_rect, next_move):
-					can_move = False
-					return can_move
-		return can_move
-
 	def update(self, key, dt, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
-		dx, dy = self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks, dt=dt)
-		can_move = self.check_obstacles(collision_rects)
-		if self.key_pressed:
+		self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks, dt=dt)
+		self.rect = self.image.get_rect()
+		is_idle = True
+		if self.pos != self.next_pos:
 			is_idle = False
-			if can_move:
-				self.move(dx, dy, dt, collision_rects)
-		else:
-			is_idle = True
-			self.rect.topleft = self.pos
+
+			delta = self.next_pos - self.pos
+			if delta.length() > (self.dirvec * self.speed * dt).length():
+				if self.remembered_obstacle_pos.get((self.pos.x, self.pos.y), '') != self.direction:
+					self.pos += self.dirvec * self.speed * dt
+				else:
+					self.pos = self.last_pos
+					self.next_pos = self.last_pos
+					self.dirvec = pg.math.Vector2(0, 0)
+					self.between_tiles = False
+					self.rect.topleft = self.pos
+			else:
+				self.pos = self.next_pos
+				self.dirvec = pg.math.Vector2(0, 0)
+				self.between_tiles = False
+
+		self.rect.topleft = self.pos
+
+		# check collision
+		for rect in collision_rects:
+			if self.collision.colliderect(rect):
+				if (self.last_pos.x, self.last_pos.y) not in self.remembered_obstacle_pos:
+					self.remembered_obstacle_pos[(self.last_pos.x, self.last_pos.y)] = self.direction
+				self.pos = self.last_pos
+				self.next_pos = self.last_pos
+				self.dirvec = pg.math.Vector2(0, 0)
+				self.between_tiles = False
+				self.rect.topleft = self.pos
+				break
 
 		self.animate(is_idle, dt)
