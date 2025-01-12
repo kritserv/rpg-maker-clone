@@ -90,7 +90,7 @@ class RpgMap(pg.sprite.Sprite):
                     if get_collision:
                         adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2
                         adjusted_y = tile.rect.y - camera.offset_y
-                        # display.blit(tile.img, (adjusted_x, adjusted_y))
+                        display.blit(tile.img, (adjusted_x, adjusted_y))
                         collision_rects.append(pg.Rect(adjusted_x, adjusted_y, self.tile_size, self.tile_size))
                     else:
                         adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2

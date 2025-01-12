@@ -31,10 +31,43 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
     collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
 
-    # pg.draw.rect(display, pg.Color('green'), player.collision_border_right) # right border
-    # pg.draw.rect(display, pg.Color('green'), player.collision_border_left) # left border
-    # pg.draw.rect(display, pg.Color('green'), player.collision_border_top) # top border
-    # pg.draw.rect(display, pg.Color('green'), player.collision_border_bottom) # bottom border
+    # handle low fps collision
+    if dt > 0.016:
+        next_move = []
+        if player.direction == "top":
+            next_move = player.collision_border_top
+
+        elif player.direction == "bottom":
+            next_move = player.collision_border_bottom
+
+        elif player.direction == "left":
+            next_move = player.collision_border_left
+
+        elif player.direction == "right":
+            next_move = player.collision_border_right
+
+        can_move = True
+        for collision_rect in collision_rects:
+            if next_move:
+                if pg.Rect.colliderect(collision_rect, next_move):
+                    can_move = False
+                    if player.direction == "top":
+                        player.pos.y += 1
+                        player.rect.topleft = player.pos
+                    elif player.direction == "bottom":
+                        player.pos.y -= 1
+                        player.rect.topleft = player.pos
+                    elif player.direction == "left":
+                        player.pos.x += 1
+                        player.rect.topleft = player.pos
+                    elif player.direction == "right":
+                        player.pos.x -= 1
+                        player.rect.topleft = player.pos
+
+    pg.draw.rect(display, pg.Color('green'), player.collision_border_right) # right border
+    pg.draw.rect(display, pg.Color('green'), player.collision_border_left) # left border
+    pg.draw.rect(display, pg.Color('green'), player.collision_border_top) # top border
+    pg.draw.rect(display, pg.Color('green'), player.collision_border_bottom) # bottom border
 
     display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-22])
     draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)

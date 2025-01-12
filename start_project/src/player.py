@@ -92,7 +92,7 @@ class Player(pg.sprite.Sprite):
 						self.imgs[direction][0]
 						)
 
-	def calculate_val_from_key(self, key, mobile_key={}, joysticks=[]):
+	def calculate_val_from_key(self, key, mobile_key={}, joysticks=[], dt=0.016):
 		dx = 0
 		dy = 0
 		self.key_pressed = False
@@ -127,11 +127,15 @@ class Player(pg.sprite.Sprite):
 				select = True
 
 		if cancel:
-			self.speed = 60
+			self.speed = 90
+			if dt > 0.33:
+				self.speed = 70
 			self.animation_time = 0.1
 			self.is_running = True
 		else:
-			self.speed = 30
+			self.speed = 60
+			if dt > 0.33:
+				self.speed = 45
 			self.animation_time = 0.19
 			self.is_running = False
 
@@ -246,7 +250,7 @@ class Player(pg.sprite.Sprite):
 		return can_move
 
 	def update(self, key, dt, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
-		dx, dy = self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks)
+		dx, dy = self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks, dt=dt)
 		can_move = self.check_obstacles(collision_rects)
 		if self.key_pressed:
 			is_idle = False
