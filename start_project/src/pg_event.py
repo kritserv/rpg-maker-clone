@@ -60,7 +60,7 @@ class PygameEvent:
 
 	def check_game_state(self, key) -> None:
 		if self.keydown:
-			if key == pg.K_ESCAPE:  # Esc
+			if key == pg.K_ESCAPE or key == pg.K_KP0:  # Esc, Keypad 0
 				if self.game_state == 0:
 					self.game_state = 1
 				elif self.game_state == 1:

@@ -117,8 +117,8 @@ class Player(pg.sprite.Sprite):
 			left = key[pg.K_LEFT] or key[pg.K_a]
 			right = key[pg.K_RIGHT] or key[pg.K_d]
 			down = key[pg.K_DOWN] or key[pg.K_s]
-			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x] or key[pg.K_KP_0]
-			select = key[pg.K_ESCAPE]
+			cancel = key[pg.K_LSHIFT] or key[pg.K_RSHIFT] or key[pg.K_x]
+			select = key[pg.K_ESCAPE] or key[pg.K_KP_0]
 		for joystick in joysticks:
 			up, left, right, down, cancel, select = False, False, False, False, False, False
 			if joystick.get_axis(0) < -0.6:
