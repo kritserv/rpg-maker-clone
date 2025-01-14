@@ -162,6 +162,23 @@ class MenuUITitle(BaseMenuUI):
     def __init__(self, full_path):
         menu_items = ('New Game', 'Continue', 'Option', 'Quit')
         super().__init__(full_path, menu_items)
+        self.menu_y = 0
+
+    def draw(self, display, dt):
+        menu_w = 110
+        menu_h = display.get_size()[1] - 49
+        pg.draw.rect(display, self.DARKBLUE, (0, self.menu_y, menu_w, menu_h))
+        menu_text_y = 4
+        for i, menu_text in enumerate(self.menu):
+            if i == self.cursor:
+                pg.draw.rect(display, self.BLUE, (0, menu_text_y-3, menu_w, 12))
+                blit_text(display, '>' + menu_text, self.menu_font, self.YELLOW, (12, menu_text_y))
+            else:
+                blit_text(display, menu_text, self.menu_font, self.WHITE, (12, menu_text_y))
+            menu_text_y += 12
+        for i in range(4):
+            pg.draw.rect(display, self.GREY, (0 - i, self.menu_y - i, menu_w + 1, menu_h + 1), 1)
+        return False
 
 class MenuUISave(BaseMenuUI):
     def __init__(self, full_path, save_file_path):

@@ -17,16 +17,11 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     new_size, key, display = input.update_for_pc(pygame_event, display)
 
     if pygame_event.game_state == -2:
-        reset_menu(menu_ui_title, display)
         pygame_event.game_state = -1
 
     if pygame_event.game_state == -1:
-        if new_size:
-            reset_menu(menu_ui_title, display, cursor = menu_ui_title.cursor)
-        select_submenu = False
-        slide_in = menu_ui_title.draw(display, dt)
-        if not slide_in:
-            select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
+        menu_ui_title.draw(display, dt)
+        select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
         if select_submenu == 'New Game' or select_submenu == 'Continue':
             pygame_event.game_state = 0
         elif select_submenu == 'Quit':
@@ -92,6 +87,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
                     pygame_event.is_load_state = False
 
                 elif select_submenu == 'Exit to title':
+                    pg.time.wait(300)
                     pygame_event.game_state = -2
 
         elif pygame_event.game_state == 2:
