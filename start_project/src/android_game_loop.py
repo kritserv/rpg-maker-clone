@@ -7,9 +7,10 @@ def reset_menu(menu, display, cursor = 0):
     menu.speed = 450
     menu.animate_in = True
 
-def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen):
+def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen):
     dt = delta_time.get()
     clock.tick()
+    current_time = pg.time.get_ticks()
 
     # Input
     mobile_key = input.update_for_android(pygame_event)
@@ -36,7 +37,6 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
         reset_menu(menu_ui_save, display)
         reset_menu(menu_ui_load, display)
 
-    current_time = pg.time.get_ticks()
     if pygame_event.game_state == 1:
         select_submenu = False
         slide_in = menu_ui.draw(display, dt)

@@ -7,7 +7,7 @@ class PygameEvent:
 	keydown: bool = False
 	keyup: bool = False
 	running: bool = True
-	game_state: int = 0
+	game_state: int = -2
 	is_save_state: bool = False
 	is_load_state: bool = False
 

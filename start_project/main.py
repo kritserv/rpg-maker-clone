@@ -25,7 +25,7 @@ if game_mode == 'android':
     while game_size[0] / game_size[1] < phone_ratio:
         game_size[0] += 1
 
-from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad
+from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad, MenuUITitle
 
 def load_game(player_start_pos, start_map, db, screen, save_file_path):
     player = Player(full_path, player_start_pos)
@@ -37,7 +37,8 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     menu_ui = MenuUI(full_path)
     menu_ui_save = MenuUISave(full_path, save_file_path)
     menu_ui_load = MenuUILoad(full_path, save_file_path)
-    return player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load
+    menu_ui_title = MenuUITitle(full_path)
+    return player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title
 
 async def main():
     delta_time = DeltaTime()
@@ -155,7 +156,7 @@ async def main():
         # Window.from_display_module().maximize()
 
         pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, False)
+        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
 
         opengl = OpenGLStuff()
         input = Input('pc')
@@ -164,7 +165,7 @@ async def main():
         debug_message = ''
         from src import run_pc_game_loop
         while pygame_event.running:
-            display = run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load)
+            display = run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title)
             await asyncio.sleep(0)
 
     elif game_mode == 'android':
@@ -180,13 +181,13 @@ async def main():
             def app_storage_path():
                 return full_path
 
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, app_storage_path())
+        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, app_storage_path())
 
         input = Input('android', game_size, full_path)
 
         from src import run_android_game_loop
         while pygame_event.running:
-            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen)
+            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
             await asyncio.sleep(0)
     else:
         import sys, platform
@@ -195,13 +196,13 @@ async def main():
         screen = pg.display.set_mode(
             (game_size_native),
             pg.RESIZABLE)
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load = load_game(player_start_pos, start_map, db, screen, False)
+        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
 
         input = Input('web')
 
         from src import run_web_game_loop
         while pygame_event.running:
-            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, screen)
+            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
             await asyncio.sleep(0)
 
     pg.quit()

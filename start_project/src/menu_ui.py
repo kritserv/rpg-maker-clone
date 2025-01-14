@@ -158,6 +158,11 @@ class MenuUI(BaseMenuUI):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
         super().__init__(full_path, menu_items)
 
+class MenuUITitle(BaseMenuUI):
+    def __init__(self, full_path):
+        menu_items = ('New Game', 'Continue', 'Option', 'Quit')
+        super().__init__(full_path, menu_items)
+
 class MenuUISave(BaseMenuUI):
     def __init__(self, full_path, save_file_path):
         self.save_path = f"{full_path}/user_data/save.json"
