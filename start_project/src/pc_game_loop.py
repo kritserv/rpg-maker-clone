@@ -15,17 +15,21 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     # Input
     new_size, key, display = input.update_for_pc(pygame_event, display)
+    rpgmap.resize_view(new_size)
 
     if pygame_event.game_state == -2:
+        menu_ui_title.menu_y = 137
         pygame_event.game_state = -1
 
     if pygame_event.game_state == -1:
-        menu_ui_title.draw(display, dt)
-        select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
-        if select_submenu == 'New Game' or select_submenu == 'Continue':
-            pygame_event.game_state = 0
-        elif select_submenu == 'Quit':
-            pygame_event.running = False
+        slide_in = menu_ui_title.draw(display, dt)
+        select_submenu = False
+        if not slide_in:
+            select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
+            if select_submenu == 'New Game' or select_submenu == 'Continue':
+                pygame_event.game_state = 0
+            elif select_submenu == 'Quit':
+                pygame_event.running = False
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
         reset_menu(menu_ui_load, display)
@@ -35,7 +39,6 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         for joystick in input.joysticks:
             if joystick.get_button(10):
                 pygame_event.game_state = 1
-        rpgmap.resize_view(new_size)
 
         center_x = display.get_size()[0]//2
         center_y = display.get_size()[1]//2
@@ -87,7 +90,6 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
                     pygame_event.is_load_state = False
 
                 elif select_submenu == 'Exit to title':
-                    pg.time.wait(300)
                     pygame_event.game_state = -2
 
         elif pygame_event.game_state == 2:
@@ -119,15 +121,15 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
                     pygame_event.is_save_state = False
                     pygame_event.is_load_state = False
 
-    top_ui.draw_fps(display, clock)
 
-    # Debug
-    debug_message = f"rem {len(player.remembered_obstacle_pos)}"
-    blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 40))
-    debug_message = f"pos {player.pos}"
-    blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 52)) #pg.Surface((16, 16))
-    pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
-    pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
+        # Debug
+        debug_message = f"rem {len(player.remembered_obstacle_pos)}"
+        blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 5))
+        debug_message = f"pos {player.pos}"
+        blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 17)) #pg.Surface((16, 16))
+        pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
+        pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
+    top_ui.draw_fps(display, clock)
 
     # Use OpenGL
     opengl.draw(display)

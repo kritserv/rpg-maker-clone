@@ -16,4 +16,4 @@ class TopUI:
         if self.fps_update_timer.get_elapsed_time() >= 0.5:
             self.fps = round(clock.get_fps(), 2)
             self.fps_update_timer.restart()
-        blit_text(display, f'Fps:{self.fps}', self.fps_font, self.BLACK, (10, 10))
+        blit_text(display, f'Fps:{self.fps}', self.fps_font, self.BLACK, (5, 125))
