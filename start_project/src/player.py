@@ -39,7 +39,7 @@ class Player(pg.sprite.Sprite):
 		self.animation_time = 0.09
 
 
-		self.walk_buffer = 50
+		self.walk_buffer = 75
 		self.pos = pg.math.Vector2(xy)
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos

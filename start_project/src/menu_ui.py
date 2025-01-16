@@ -163,12 +163,13 @@ class MenuUITitle(BaseMenuUI):
     def __init__(self, full_path):
         menu_items = ('New Game', 'Continue', 'Option', 'Quit')
         super().__init__(full_path, menu_items)
-        self.speed = 200
+        self.speed = 20
 
     def draw(self, display, dt):
         menu_y_finish = 60
         if self.menu_y > menu_y_finish:
             self.menu_y -= self.speed * dt
+            self.speed += 800 * dt
             slide_in = True
         else:
             slide_in = False

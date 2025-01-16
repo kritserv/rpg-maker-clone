@@ -18,6 +18,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     rpgmap.resize_view(new_size)
 
     if pygame_event.game_state == -2:
+        menu_ui_title.speed = 20
         menu_ui_title.menu_y = 137
         pygame_event.game_state = -1
 
