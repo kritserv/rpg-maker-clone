@@ -9,6 +9,7 @@ class BaseMenuUI:
         font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
         self.menu_font = pg.font.Font(font_path, 9)
         self.cursor = 0
+        self.cursor_blink_interval = 200
 
         self.DARKBLUE = pg.Color('darkblue')
         self.BLUE = pg.Color('blue')
@@ -28,7 +29,7 @@ class BaseMenuUI:
 
         self.speed = 450
 
-    def draw(self, display, dt):
+    def draw(self, display, dt, current_time):
         menu_x_finish = display.get_size()[0] - 112
         if self.menu_x > menu_x_finish:
             self.menu_x -= self.speed * dt
@@ -41,10 +42,14 @@ class BaseMenuUI:
         menu_h = display.get_size()[1] - 49
         pg.draw.rect(display, self.DARKBLUE, (self.menu_x, menu_y, menu_w, menu_h))
         menu_text_y = 6
+        blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
         for i, menu_text in enumerate(self.menu):
             if i == self.cursor:
                 pg.draw.rect(display, self.BLUE, (self.menu_x, menu_text_y-3, menu_w, 12))
-                blit_text(display, '>' + menu_text, self.menu_font, self.YELLOW, (self.menu_x+12, menu_text_y))
+                if blink_on:
+                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (self.menu_x+12, menu_text_y))
+                else:
+                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (self.menu_x+12, menu_text_y))
             else:
                 blit_text(display, menu_text, self.menu_font, self.WHITE, (self.menu_x+12, menu_text_y))
             menu_text_y += 12
@@ -165,7 +170,7 @@ class MenuUITitle(BaseMenuUI):
         super().__init__(full_path, menu_items)
         self.speed = 20
 
-    def draw(self, display, dt):
+    def draw(self, display, dt, current_time):
         menu_y_finish = 60
         if self.menu_y > menu_y_finish:
             self.menu_y -= self.speed * dt
@@ -179,10 +184,14 @@ class MenuUITitle(BaseMenuUI):
         menu_h = 55
         pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
         menu_text_y = self.menu_y + 6
+        blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
         for i, menu_text in enumerate(self.menu):
             if i == self.cursor:
                 pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
-                blit_text(display, '>' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                if blink_on:
+                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                else:
+                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
             else:
                 blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
             menu_text_y += 12

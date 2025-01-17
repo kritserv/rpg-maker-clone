@@ -23,7 +23,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
         pygame_event.game_state = -1
 
     if pygame_event.game_state == -1:
-        slide_in = menu_ui_title.draw(display, dt)
+        slide_in = menu_ui_title.draw(display, dt, current_time)
         select_submenu = False
         if not slide_in:
             select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
@@ -67,7 +67,7 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
             if new_size:
                 reset_menu(menu_ui, display, cursor = menu_ui.cursor)
             select_submenu = False
-            slide_in = menu_ui.draw(display, dt)
+            slide_in = menu_ui.draw(display, dt, current_time)
             if not slide_in:
                 select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
             if select_submenu:
@@ -98,13 +98,13 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
             if pygame_event.is_save_state:
                 if new_size:
                     reset_menu(menu_ui_save, display, cursor = menu_ui_save.cursor)
-                slide_in = menu_ui_save.draw(display, dt)
+                slide_in = menu_ui_save.draw(display, dt, current_time)
                 if not slide_in:
                     select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
             elif pygame_event.is_load_state:
                 if new_size:
                     reset_menu(menu_ui_load, display, cursor = menu_ui_load.cursor)
-                slide_in = menu_ui_load.draw(display, dt)
+                slide_in = menu_ui_load.draw(display, dt, current_time)
                 if not slide_in:
                     select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
             if select_submenu:
