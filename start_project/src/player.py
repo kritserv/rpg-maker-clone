@@ -8,6 +8,7 @@ class Player(pg.sprite.Sprite):
 	def __init__(self, full_path, xy):
 		pg.sprite.Sprite.__init__(self)
 		self.full_path = full_path
+		self.start_position = xy
 
 		self.levels = 0
 		self.items = {}
@@ -55,6 +56,20 @@ class Player(pg.sprite.Sprite):
 
 		self.turn_around_timer = Timer()
 		self.turn_around_timer.start()
+
+	def start_new_game(self):
+		self.pos = pg.math.Vector2(self.start_position)
+		self.dirvec = pg.math.Vector2(0, 0)
+		self.last_pos = self.pos
+		self.next_pos = self.pos
+		self.direction = "bottom"
+
+		self.levels = 0
+		self.items = {}
+
+		self.speed = 50
+		self.is_running = False
+		self.turn_around_timer.restart()
 
 	def load_sprites(self) -> None:
 		load_spritesheet = pg.image.load(

@@ -313,12 +313,18 @@ class MenuUILoad(BaseMenuUI):
             player.levels = select_save_slot.get('player_levels')
             player.items = select_save_slot.get('player_items')
             rpgmap.curr_map = select_save_slot.get('current_map')
+            return True
+        return False
 
     def update_for_pc(self, key, joysticks, dt, current_time, player, rpgmap):
         select_slot = super(MenuUILoad, self).update_for_pc(key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                self.load_game(select_slot, player, rpgmap)
+                load_success = self.load_game(select_slot, player, rpgmap)
+                if load_success:
+                    return select_slot
+                else:
+                    select_slot = False
 
         return select_slot
 
@@ -326,7 +332,11 @@ class MenuUILoad(BaseMenuUI):
         select_slot = super(MenuUILoad, self).update_for_android(mobile_key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                self.load_game(select_slot, player, rpgmap)
+                load_success = self.load_game(select_slot, player, rpgmap)
+                if load_success:
+                    return select_slot
+                else:
+                    select_slot = False
 
         return select_slot
         super().__init__(full_path, menu_items)

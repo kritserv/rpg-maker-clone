@@ -17,23 +17,49 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
     new_size, key, display = input.update_for_pc(pygame_event, display)
     rpgmap.resize_view(new_size)
 
-    if pygame_event.game_state == -2:
-        menu_ui_title.speed = 20
-        menu_ui_title.menu_y = 137
-        pygame_event.game_state = -1
-
     if pygame_event.game_state == -1:
         slide_in = menu_ui_title.draw(display, dt, current_time)
         select_submenu = False
         if not slide_in:
             select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
-            if select_submenu == 'New Game' or select_submenu == 'Continue':
+            if select_submenu == 'New Game':
+                player.start_new_game()
                 pygame_event.game_state = 0
+            elif select_submenu == 'Continue':
+                reset_menu(menu_ui_load, display)
+                pygame_event.game_state = -3
             elif select_submenu == 'Quit':
                 pygame_event.running = False
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
         reset_menu(menu_ui_load, display)
+
+    elif pygame_event.game_state == -2:
+        menu_ui_title.speed = 20
+        menu_ui_title.menu_y = display.get_size()[1]
+        pygame_event.game_state = -1
+
+    elif pygame_event.game_state == -3:
+        select_submenu = False
+        if new_size:
+            reset_menu(menu_ui_load, display, cursor = menu_ui_load.cursor)
+        slide_in = menu_ui_load.draw(display, dt, current_time)
+        if not slide_in:
+            select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
+        if select_submenu:
+            if select_submenu == 'Back':
+                pygame_event.game_state = -1
+                if pygame_event.is_save_state:
+                    reset_menu(menu_ui, display, 3)
+                    pygame_event.is_save_state = False
+                elif pygame_event.is_load_state:
+                    reset_menu(menu_ui, display, 4)
+                    pygame_event.is_load_state = False
+            else:
+                menu_ui_load.menu = menu_ui_save.menu
+                pygame_event.game_state = 0
+                pygame_event.is_save_state = False
+                pygame_event.is_load_state = False
 
     else:
 
