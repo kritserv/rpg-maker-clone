@@ -11,70 +11,41 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
     dt = delta_time.get()
     clock.tick()
     current_time = pg.time.get_ticks()
+    display.fill(GREY)
 
     # Input
     mobile_key = input.update_for_android(pygame_event)
 
-    center_x = display.get_size()[0]//2
-    center_y = display.get_size()[1]//2
-
-    # Graphic
-    display.fill(GREY)
-    draw_count = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
-    collision_rects = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer3'], get_collision=True)
-
-    player.collision = pg.Rect(center_x-16, center_y-2, 16, 16)
-    # pg.draw.rect(display, pg.Color('green'), player.collision) # player collision box
-
-    display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-18])
-    draw_count = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer4'], get_collision=False)
-
-    # Logic
-    if pygame_event.game_state == 0:
-        player.update(key=None, dt=dt, mobile_key=mobile_key, joysticks=[], collision_rects=collision_rects)
-        camera.update(player)
+    if pygame_event.game_state == -1:
+        slide_in = menu_ui_title.draw(display, dt, current_time)
+        select_submenu = False
+        if not slide_in:
+            select_submenu = menu_ui_title.update_for_android(mobile_key, [], dt, current_time)
+            if select_submenu == 'New Game':
+                player.start_new_game()
+                pygame_event.game_state = 0
+            elif select_submenu == 'Continue':
+                reset_menu(menu_ui_load, display)
+                pygame_event.game_state = -3
+            elif select_submenu == 'Quit':
+                pygame_event.running = False
         reset_menu(menu_ui, display)
         reset_menu(menu_ui_save, display)
         reset_menu(menu_ui_load, display)
 
-    if pygame_event.game_state == 1:
+    elif pygame_event.game_state == -2:
+        menu_ui_title.speed = 20
+        menu_ui_title.menu_y = display.get_size()[1]
+        pygame_event.game_state = -1
+
+    elif pygame_event.game_state == -3:
         select_submenu = False
-        slide_in = menu_ui.draw(display, dt)
+        slide_in = menu_ui_load.draw(display, dt, current_time)
         if not slide_in:
-            select_submenu = menu_ui.update_for_android(mobile_key, [], dt, current_time)
-        if select_submenu:
-            if select_submenu == 'Save':
-                pygame_event.game_state = 2
-                pygame_event.is_save_state = True
-                pygame_event.is_load_state = False
-                reset_menu(menu_ui_save, display)
-                reset_menu(menu_ui_load, display)
-
-            elif select_submenu == 'Load':
-                pygame_event.game_state = 2
-                pygame_event.is_load_state = True
-                pygame_event.is_save_state = False
-                reset_menu(menu_ui_save, display)
-                reset_menu(menu_ui_load, display)
-
-            elif select_submenu == 'Back':
-                pygame_event.game_state -= 1
-                pygame_event.is_save_state = False
-                pygame_event.is_load_state = False
-
-    elif pygame_event.game_state == 2:
-        select_submenu = False
-        if pygame_event.is_save_state:
-            slide_in = menu_ui_save.draw(display, dt)
-            if not slide_in:
-                select_submenu = menu_ui_save.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
-        elif pygame_event.is_load_state:
-            slide_in = menu_ui_load.draw(display, dt)
-            if not slide_in:
-                select_submenu = menu_ui_load.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
+            select_submenu = menu_ui_load.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
-                pygame_event.game_state -= 1
+                pygame_event.game_state = -1
                 if pygame_event.is_save_state:
                     reset_menu(menu_ui, display, 3)
                     pygame_event.is_save_state = False
@@ -86,18 +57,96 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
                 pygame_event.game_state = 0
                 pygame_event.is_save_state = False
                 pygame_event.is_load_state = False
+    else:
+
+        center_x = display.get_size()[0]//2
+        center_y = display.get_size()[1]//2
+
+        # Graphic
+        draw_count = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
+        collision_rects = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer3'], get_collision=True)
+
+        player.collision = pg.Rect(center_x-16, center_y-2, 16, 16)
+        # pg.draw.rect(display, pg.Color('green'), player.collision) # player collision box
+
+        display.blit(player.img, [display.get_size()[0]//2-16, display.get_size()[1]//2+-18])
+        draw_count = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer4'], get_collision=False)
+
+        # Logic
+        if pygame_event.game_state == 0:
+            player.update(key=None, dt=dt, mobile_key=mobile_key, joysticks=[], collision_rects=collision_rects)
+            camera.update(player)
+            reset_menu(menu_ui, display)
+            reset_menu(menu_ui_save, display)
+            reset_menu(menu_ui_load, display)
+            reset_menu(menu_ui_title, display)
+
+        if pygame_event.game_state == 1:
+            select_submenu = False
+            slide_in = menu_ui.draw(display, dt, current_time)
+            if not slide_in:
+                select_submenu = menu_ui.update_for_android(mobile_key, [], dt, current_time)
+            if select_submenu:
+                if select_submenu == 'Save':
+                    pygame_event.game_state = 2
+                    pygame_event.is_save_state = True
+                    pygame_event.is_load_state = False
+                    reset_menu(menu_ui_save, display)
+                    reset_menu(menu_ui_load, display)
+
+                elif select_submenu == 'Load':
+                    pygame_event.game_state = 2
+                    pygame_event.is_load_state = True
+                    pygame_event.is_save_state = False
+                    reset_menu(menu_ui_save, display)
+                    reset_menu(menu_ui_load, display)
+
+                elif select_submenu == 'Back':
+                    pygame_event.game_state -= 1
+                    pygame_event.is_save_state = False
+                    pygame_event.is_load_state = False
+
+                elif select_submenu == 'Exit to title':
+                    pygame_event.game_state = -2
+
+        elif pygame_event.game_state == 2:
+            select_submenu = False
+            if pygame_event.is_save_state:
+                slide_in = menu_ui_save.draw(display, dt, current_time)
+                if not slide_in:
+                    select_submenu = menu_ui_save.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
+            elif pygame_event.is_load_state:
+                slide_in = menu_ui_load.draw(display, dt, current_time)
+                if not slide_in:
+                    select_submenu = menu_ui_load.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
+            if select_submenu:
+                if select_submenu == 'Back':
+                    pygame_event.game_state -= 1
+                    if pygame_event.is_save_state:
+                        reset_menu(menu_ui, display, 3)
+                        pygame_event.is_save_state = False
+                    elif pygame_event.is_load_state:
+                        reset_menu(menu_ui, display, 4)
+                        pygame_event.is_load_state = False
+                else:
+                    menu_ui_load.menu = menu_ui_save.menu
+                    pygame_event.game_state = 0
+                    pygame_event.is_save_state = False
+                    pygame_event.is_load_state = False
+
+
+        # Debug
+        debug_message = f"rem {len(player.remembered_obstacle_pos)}"
+        blit_text(display, f"{debug_message}", menu_ui.menu_font, BLACK, (5, 5))
+
+        pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
+        pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
     input.draw_for_android(display)
     top_ui.draw_fps(display, clock)
 
-    # Debug
-    debug_message = f"rem {len(player.remembered_obstacle_pos)}"
-    blit_text(display, f"{debug_message}", menu_ui.menu_font, BLACK, (5, 40))
-    debug_message = player.pos
-    blit_text(display, f"{debug_message}", menu_ui.menu_font, BLACK, (5, 52))
 
-    pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
-    pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
+
 
     pg.transform.scale(display, screen.get_size(), screen)
     pg.display.flip()
