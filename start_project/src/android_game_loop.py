@@ -80,8 +80,12 @@ def run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgma
             reset_menu(menu_ui_save, display)
             reset_menu(menu_ui_load, display)
             reset_menu(menu_ui_title, display)
+            menu_ui.is_open = False
 
         if pygame_event.game_state == 1:
+            if menu_ui.is_open == False:
+                menu_ui.is_open = True
+                menu_ui.open_menu_sfx.play()
             select_submenu = False
             slide_in = menu_ui.draw(display, dt, current_time)
             if not slide_in:

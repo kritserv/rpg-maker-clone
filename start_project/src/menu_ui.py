@@ -11,6 +11,8 @@ class BaseMenuUI:
         self.cursor = 0
         self.cursor_blink_interval = 200
 
+        self.play_sound = False
+
         self.DARKBLUE = pg.Color('darkblue')
         self.BLUE = pg.Color('blue')
         self.GREY = pg.Color('grey90')
@@ -89,12 +91,16 @@ class BaseMenuUI:
                 if self.cursor < 0:
                     self.cursor = self.menu_len
                 self.last_cursor_move_time = current_time
+                if self.play_sound:
+                    self.select_sfx.play()
 
             elif down:
                 self.cursor += 1
                 if self.cursor > self.menu_len:
                     self.cursor = 0
                 self.last_cursor_move_time = current_time
+                if self.play_sound:
+                    self.select_sfx.play()
 
         select_submenu = False
         if not action:
@@ -104,9 +110,14 @@ class BaseMenuUI:
 
         if action:
             select_submenu = self.menu[self.cursor]
+            if select_submenu and self.play_sound:
+                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Option', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
+                    self.select_sfx.play()
 
         elif cancel:
             select_submenu = 'Back'
+            if self.play_sound:
+                self.select_sfx.play()
 
         return select_submenu
 
@@ -138,12 +149,16 @@ class BaseMenuUI:
                 if self.cursor < 0:
                     self.cursor = self.menu_len
                 self.last_cursor_move_time = current_time
+                if self.play_sound:
+                    self.select_sfx.play()
 
             elif down:
                 self.cursor += 1
                 if self.cursor > self.menu_len:
                     self.cursor = 0
                 self.last_cursor_move_time = current_time
+                if self.play_sound:
+                    self.select_sfx.play()
 
         select_submenu = False
         if not action:
@@ -153,9 +168,14 @@ class BaseMenuUI:
 
         if action:
             select_submenu = self.menu[self.cursor]
+            if select_submenu and self.play_sound:
+                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Option', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
+                    self.select_sfx.play()
 
         elif cancel:
             select_submenu = 'Back'
+            if self.play_sound:
+                self.select_sfx.play()
 
         return select_submenu
 
@@ -163,6 +183,11 @@ class MenuUI(BaseMenuUI):
     def __init__(self, full_path):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
         super().__init__(full_path, menu_items)
+        self.open_menu_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/open_menu.wav")
+        self.select_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/select.wav")
+
+        self.is_open = False
+        self.play_sound = True
 
 class MenuUITitle(BaseMenuUI):
     def __init__(self, full_path):
@@ -231,6 +256,8 @@ class MenuUISave(BaseMenuUI):
             else:
                 menu_items.append(key)
         super().__init__(full_path, menu_items)
+        self.select_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/select.wav")
+        self.play_sound = True
 
     def save_game(self, select_slot, player, rpgmap):
         select_slot = f"Slot {self.cursor}"
@@ -300,6 +327,8 @@ class MenuUILoad(BaseMenuUI):
             else:
                 menu_items.append(key)
         super().__init__(full_path, menu_items)
+        self.select_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/select.wav")
+        self.play_sound = True
 
     def load_game(self, select_slot, player, rpgmap):
         select_slot = f"Slot {self.cursor}"

@@ -45,6 +45,7 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
             select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
         if select_submenu:
             if select_submenu == 'Back':
+                menu_ui.select_sfx.play()
                 pygame_event.game_state = -1
                 if pygame_event.is_save_state:
                     reset_menu(menu_ui, display, 3)
@@ -85,8 +86,12 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
             reset_menu(menu_ui, display)
             reset_menu(menu_ui_save, display)
             reset_menu(menu_ui_load, display)
+            menu_ui.is_open = False
 
         if pygame_event.game_state == 1:
+            if menu_ui.is_open == False:
+                menu_ui.is_open = True
+                menu_ui.open_menu_sfx.play()
             select_submenu = False
             slide_in = menu_ui.draw(display, dt)
             if not slide_in:
@@ -107,6 +112,7 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
                     reset_menu(menu_ui_load, display)
 
                 elif select_submenu == 'Back':
+                    menu_ui.select_sfx.play()
                     pygame_event.game_state -= 1
                     pygame_event.is_save_state = False
                     pygame_event.is_load_state = False
@@ -123,6 +129,7 @@ def run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, p
                     select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
             if select_submenu:
                 if select_submenu == 'Back':
+                    menu_ui.select_sfx.play()
                     pygame_event.game_state -= 1
                     if pygame_event.is_save_state:
                         reset_menu(menu_ui, display, 3)

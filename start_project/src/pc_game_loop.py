@@ -88,8 +88,12 @@ def run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, pl
             reset_menu(menu_ui_save, display)
             reset_menu(menu_ui_load, display)
             reset_menu(menu_ui_title, display)
+            menu_ui.is_open = False
 
         if pygame_event.game_state == 1:
+            if menu_ui.is_open == False:
+                menu_ui.is_open = True
+                menu_ui.open_menu_sfx.play()
             if new_size:
                 reset_menu(menu_ui, display, cursor = menu_ui.cursor)
             select_submenu = False
