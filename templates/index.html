@@ -242,9 +242,9 @@ navbar %}
             {% for cell in row %}
             <td>
                 {% if cell %} {% if layer_index == 4 %}
-                <img class="object" src="data:image/png;base64,{{ cell }}" />
+                <img draggable="false" class="object" src="data:image/png;base64,{{ cell }}" />
                 {% else %}
-                <img src="data:image/png;base64,{{ cell }}" />
+                <img draggable="false" src="data:image/png;base64,{{ cell }}" />
                 {% endif %} {% endif %}
             </td>
             {% endfor %}
@@ -259,4 +259,5 @@ navbar %}
 <script src="{{url_for('static', filename='change_map.js')}}"></script>
 <script src="{{url_for('static', filename='open_dialog.js')}}"></script>
 <script src="{{ url_for('static', filename='zoom.js') }}"></script>
+<script src="{{ url_for('static', filename='map_editor.js') }}"></script>
 {% endblock %}

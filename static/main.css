@@ -15,6 +15,8 @@ body {
 .map-container table {
     margin-left: 120px;
     border: None;
+    transform-origin: top left;
+    transition: transform 0.2s;
 }
 
 td {
@@ -25,10 +27,6 @@ td {
     text-align: center;
 }
 
-img:hover {
-    border: 1px solid white;
-}
-
 img {
     width: 100%;
     height: 100%;
@@ -36,6 +34,11 @@ img {
 .map-layer {
     position: absolute;
     display: block;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 .object {
@@ -90,4 +93,17 @@ iframe {
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+.selected-tile {
+    border: 2px solid red;
+}
+
+.tile-container img {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.tile-container img:hover {
+    transform: scale(1.1);
 }
