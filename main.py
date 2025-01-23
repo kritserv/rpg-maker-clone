@@ -75,6 +75,7 @@ def index():
     # Store the selected map in the session
     session['map_name'] = map_name
     table = []
+    cell_table = []
     base64_images = {}
     start_map = {}
     maps = []
@@ -117,6 +118,7 @@ def index():
 
             # Read CSV layers into tables
             table = [render_csv_layer(path, base64_images) for path in tile_map_layer_paths]
+            cell_table = [get_cell_csv_layer(path, base64_images) for path in tile_map_layer_paths]
 
             # Add player position layer
             player_position = game_data.get("player_start_position", (0, 0))
@@ -135,6 +137,7 @@ def index():
         "maps": maps,
         "selected_map": map_name,
         "table": [(index, layer) for index, layer in enumerate(table)],
+        "cell_table": [(index, value) for index, value in enumerate(cell_table)],
         "tile_dict": base64_images,
     }
     return render_template('index.html', context=context)
@@ -148,6 +151,16 @@ def render_csv_layer(csv_path, base64_images):
             for row in csv_reader:
                 table.append([base64_images.get(cell, "") for cell in row])
     return table
+
+def get_cell_csv_layer(csv_path, base64_images):
+    """Render a CSV layer into a table of base64 images."""
+    cell_table = []
+    if os.path.exists(csv_path):
+        with open(csv_path, "r") as csv_file:
+            csv_reader = csv.reader(csv_file)
+            for row in csv_reader:
+                cell_table.append([cell for cell in row])
+    return cell_table
 
 
 def render_player_layer(csv_path, player_position, player_image):

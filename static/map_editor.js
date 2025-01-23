@@ -2,8 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const mapContainer = document.getElementById("map-container");
   const tileContainer = document.querySelector(".tile-container");
   const layerToggles = document.querySelectorAll(".layer-toggle");
-  const zoomSlider = document.getElementById("zoom-slider");
-  const zoomLevel = document.getElementById("zoom-level");
   let selectedTile = null;
 
   // Tile selection
@@ -100,13 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
         layer.style.display = event.target.checked ? "table" : "none";
       }
     });
-  });
-
-  // Zoom functionality
-  zoomSlider.addEventListener("input", (event) => {
-    const zoomValue = event.target.value;
-    mapContainer.style.transform = `scale(${zoomValue / 100})`;
-    zoomLevel.textContent = `${zoomValue}%`;
   });
 
   // Prevent context menu on map container (useful for right-click functionality in future)

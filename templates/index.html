@@ -168,6 +168,19 @@ navbar %}
 
 {% if context.table %}
 
+<div class="zoom-controls mb-3">
+    <label for="zoom-slider" class="form-label">Zoom: <span id="zoom-level">100%</span></label>
+    <input
+        type="range"
+        class="form-range"
+        id="zoom-slider"
+        min="50"
+        max="500"
+        value="100"
+        step="10"
+    />
+</div>
+
 <!-- Map Selection -->
 {% if context.maps %}
 <div class="mb-3">
@@ -198,17 +211,17 @@ navbar %}
     {% endfor %}
 </div>
 
-<div class="zoom-controls mb-3">
-    <label for="zoom-slider" class="form-label">Zoom: <span id="zoom-level">100%</span></label>
-    <input
-        type="range"
-        class="form-range"
-        id="zoom-slider"
-        min="50"
-        max="500"
-        value="100"
-        step="10"
-    />
+<!-- Edit on Layer Selection -->
+<div class="mb-3">
+    <label for="layer-select" class="form-label">Choose a Layer to edit</label>
+    <select class="form-select" id="layer-select" name="layer-select" required>
+        {% for layer_index, _ in context.table %}
+        <option value="{{ layer_index + 1 }}">
+            Layer {{ layer_index + 1 }}
+        </option>
+        {% endfor %}
+    </select>
+
 </div>
 
 <!-- Tile Dictionary -->
@@ -254,6 +267,22 @@ navbar %}
     {% endfor %}
 </div>
 {% endif %}
+
+<div style="margin-top: 600px;">
+    {% for layer_index, layer in context.cell_table %}
+    <table>
+        {% for row in layer %}
+        <tr>
+            {% for value in row %}
+            <td>
+                {{ value }}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</div>
 
 <script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
 <script src="{{url_for('static', filename='change_map.js')}}"></script>
