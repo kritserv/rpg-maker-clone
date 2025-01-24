@@ -215,7 +215,7 @@ navbar %}
 <div class="mb-3">
     <label for="layer-select" class="form-label">Choose a Layer to edit</label>
     <select class="form-select" id="layer-select" name="layer-select" required>
-      <option value="default">Nothing</option>
+      <option value="default" selected>Nothing</option>
       {% for layer_index, _ in context.table %}
       <option value="{{ layer_index + 1 }}">Layer {{ layer_index + 1 }}</option>
       {% endfor %}
