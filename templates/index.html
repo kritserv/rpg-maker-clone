@@ -215,11 +215,10 @@ navbar %}
 <div class="mb-3">
     <label for="layer-select" class="form-label">Choose a Layer to edit</label>
     <select class="form-select" id="layer-select" name="layer-select" required>
-        {% for layer_index, _ in context.table %}
-        <option value="{{ layer_index + 1 }}">
-            Layer {{ layer_index + 1 }}
-        </option>
-        {% endfor %}
+      <option value="default">Nothing</option>
+      {% for layer_index, _ in context.table %}
+      <option value="{{ layer_index + 1 }}">Layer {{ layer_index + 1 }}</option>
+      {% endfor %}
     </select>
 
 </div>
@@ -227,7 +226,7 @@ navbar %}
 <!-- Tile Dictionary -->
 <div class="tile-container">
     <table
-        class="map-layer"
+        style="position: absolute;"
         data-layer="{{ layer_index }}"
         cellspacing="0"
         cellpadding="0"

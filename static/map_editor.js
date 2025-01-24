@@ -100,6 +100,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Layer interactivity control
+  const layerSelect = document.getElementById("layer-select");
+
+  layerSelect.addEventListener("change", (event) => {
+    const selectedOption = event.target.value;
+
+    document.querySelectorAll(".map-layer").forEach((layer) => {
+      if (selectedOption === "default") {
+        // Default view: all layers visible but uninteractable
+        layer.style.pointerEvents = "none"; // Disable interactivity
+        layer.style.opacity = "1"; // Fully visible
+      } else {
+        const layerIndex = parseInt(layer.getAttribute("data-layer"));
+        const selectedLayer = parseInt(selectedOption) - 1;
+
+        if (layerIndex === selectedLayer) {
+          layer.style.pointerEvents = "auto"; // Enable interactivity
+          layer.style.opacity = "1"; // Fully visible
+        } else {
+          layer.style.pointerEvents = "none"; // Disable interactivity
+          layer.style.opacity = "0.5"; // Make less visible
+        }
+      }
+    });
+  });
+
   // Prevent context menu on map container (useful for right-click functionality in future)
   mapContainer.addEventListener("contextmenu", (event) =>
     event.preventDefault(),
