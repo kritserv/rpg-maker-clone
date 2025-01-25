@@ -1,17 +1,17 @@
 {
   "forests": {
-    "0": "collision.png",
-    "1": "grass_1.png",
-    "2": "flower1_1.png",
-    "3": "flower1_2.png",
-    "4": "dirt_1.png",
-    "5": "dirtgrass_1.png",
-    "6": "dirtgrass_2.png",
-    "7": "dirtgrass_3.png",
-    "8": "dirtgrass_4.png",
-    "9": "dirtgrass_5.png",
-    "10": "dirtgrass_6.png",
-    "11": "dirtgrass_7.png",
-    "12": "dirtgrass_8.png"
+    "0": "collision",
+    "1": "grass_1",
+    "2": "flower1_1",
+    "3": "flower1_2",
+    "4": "dirt_1",
+    "5": "dirtgrass_1",
+    "6": "dirtgrass_2",
+    "7": "dirtgrass_3",
+    "8": "dirtgrass_4",
+    "9": "dirtgrass_5",
+    "10": "dirtgrass_6",
+    "11": "dirtgrass_7",
+    "12": "dirtgrass_8"
   }
 }

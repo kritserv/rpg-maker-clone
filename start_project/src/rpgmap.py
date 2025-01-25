@@ -1,13 +1,14 @@
 from .load_json import json_loader
+from .load_asset import asset_loader
 from csv import reader
 import pygame as pg
 import os
 
 class Tile(pg.sprite.Sprite):
     """Represents a single tile in the game."""
-    def __init__(self, img_path, pos):
+    def __init__(self, img_name, pos):
         super().__init__()
-        self.img = pg.image.load(img_path).convert_alpha()
+        self.img = asset_loader('tile', img_name)
         self.rect = self.img.get_rect(topleft=pos)
 
 
@@ -58,8 +59,8 @@ class RpgMap(pg.sprite.Sprite):
             for y, row in enumerate(csv_reader):
                 for x, tile_id in enumerate(row):
                     if tile_id.strip():  # Ignore empty tiles
-                        img_path = f"{self.full_path}assets/img/tile/{tileset[tile_id]}"
-                        layer_tiles.append(Tile(img_path, (x * self.tile_size, y * self.tile_size)))
+                        img_name = tileset[tile_id]
+                        layer_tiles.append(Tile(img_name, (x * self.tile_size, y * self.tile_size)))
         return layer_tiles
 
     def resize_view(self, new_size):

@@ -109,7 +109,7 @@ def index():
 
             # Prepare base64 images for tiles
             base64_images = {
-                tile_id: encode_image_to_base64(os.path.join(project_folder, f"assets/img/tile/{image_name}"))
+                tile_id: encode_image_to_base64(os.path.join(project_folder, f"assets/img/tile/{image_name}.png"))
                 for tile_id, image_name in tile_mappings.get(selected_map['tileset'], {}).items()
             }
 

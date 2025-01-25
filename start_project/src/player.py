@@ -1,5 +1,6 @@
 from sys import _current_frames
 import pygame as pg
+from .load_asset import asset_loader
 from math import floor, ceil
 import os
 from .timer import Timer
@@ -72,9 +73,7 @@ class Player(pg.sprite.Sprite):
 		self.turn_around_timer.restart()
 
 	def load_sprites(self) -> None:
-		load_spritesheet = pg.image.load(
-			f"{self.full_path}assets/img/sprite/player.png"
-			)
+		load_spritesheet = asset_loader('sprite', 'player')
 		sprite_width = 16
 		sprite_height = 24
 		directions = [
@@ -235,7 +234,6 @@ class Player(pg.sprite.Sprite):
 
 	def update(self, key, dt, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
 		self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks, dt=dt)
-		self.rect = self.image.get_rect()
 		is_idle = True
 		if self.pos != self.next_pos:
 			is_idle = False

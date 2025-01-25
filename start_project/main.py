@@ -25,7 +25,7 @@ if game_mode == 'android':
     while game_size[0] / game_size[1] < phone_ratio:
         game_size[0] += 1
 
-from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad, MenuUITitle
+from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad, MenuUITitle, asset_loader
 
 def load_game(player_start_pos, start_map, db, screen, save_file_path):
     player = Player(full_path, player_start_pos)
@@ -58,8 +58,7 @@ async def main():
     GREY = pg.Color("grey20")
     BLACK = pg.Color("black")
 
-    font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
-    fps_font = pg.font.Font(font_path, 9)
+    fps_font = asset_loader('font', 'PixelatedElegance')
 
     pygame_event = PygameEvent(game_size=game_size)
 
@@ -155,7 +154,7 @@ async def main():
         # from pygame._sdl2 import Window
         # Window.from_display_module().maximize()
 
-        pg.display.set_icon(pg.image.load("assets/icon.png").convert_alpha())
+        pg.display.set_icon(asset_loader('img', 'icon'))
         player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
 
         opengl = OpenGLStuff()

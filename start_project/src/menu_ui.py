@@ -1,13 +1,13 @@
 import pygame as pg
 from .blit_text import blit_text
 from .load_json import json_loader, json_saver
+from .load_asset import asset_loader
 from datetime import datetime
 
 class BaseMenuUI:
     def __init__(self, full_path, menu_items):
         self.full_path = full_path
-        font_path = f"{full_path}assets/fonts/PixelatedElegance.ttf"
-        self.menu_font = pg.font.Font(font_path, 9)
+        self.menu_font = asset_loader('font', 'PixelatedElegance')
         self.cursor = 0
         self.cursor_blink_interval = 200
 
@@ -104,7 +104,7 @@ class BaseMenuUI:
 
         select_submenu = False
         if not action:
-            action = key[pg.K_RETURN] or key[pg.K_z] or key[pg.K_SPACE]
+            action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
         if not cancel:
             cancel = key[pg.K_x] or key[pg.K_ESCAPE] or key[pg.K_KP_0]
 
@@ -183,8 +183,8 @@ class MenuUI(BaseMenuUI):
     def __init__(self, full_path):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
         super().__init__(full_path, menu_items)
-        self.open_menu_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/open_menu.wav")
-        self.select_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/select.wav")
+        self.open_menu_sfx = asset_loader('sfx', 'open_menu')
+        self.select_sfx = asset_loader('sfx', 'select')
 
         self.is_open = False
         self.play_sound = True
@@ -256,7 +256,7 @@ class MenuUISave(BaseMenuUI):
             else:
                 menu_items.append(key)
         super().__init__(full_path, menu_items)
-        self.select_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/select.wav")
+        self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
     def save_game(self, select_slot, player, rpgmap):
@@ -327,7 +327,7 @@ class MenuUILoad(BaseMenuUI):
             else:
                 menu_items.append(key)
         super().__init__(full_path, menu_items)
-        self.select_sfx = pg.mixer.Sound(f"{full_path}assets/sfx/select.wav")
+        self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
     def load_game(self, select_slot, player, rpgmap):

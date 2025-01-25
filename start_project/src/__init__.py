@@ -1,4 +1,5 @@
 from .load_json import json_loader
+from .load_asset import asset_loader
 
 from .player import Player
 from .rpgmap import RpgMap
