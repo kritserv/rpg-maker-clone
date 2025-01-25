@@ -25,7 +25,7 @@ if game_mode == 'android':
     while game_size[0] / game_size[1] < phone_ratio:
         game_size[0] += 1
 
-from src import json_loader, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad, MenuUITitle, asset_loader
+from src import json_loader, run_game_loop, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad, MenuUITitle, asset_loader
 
 def load_game(player_start_pos, start_map, db, screen, save_file_path):
     player = Player(full_path, player_start_pos)
@@ -61,6 +61,8 @@ async def main():
     fps_font = asset_loader('font', 'PixelatedElegance')
 
     pygame_event = PygameEvent(game_size=game_size)
+
+    debug_message = ''
 
     if game_mode == 'pc':
         """
@@ -161,10 +163,8 @@ async def main():
         input = Input('pc')
         game_state = 1
 
-        debug_message = ''
-        from src import run_pc_game_loop
         while pygame_event.running:
-            display = run_pc_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title)
+            display = run_game_loop(game_mode, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
             await asyncio.sleep(0)
 
     elif game_mode == 'android':
@@ -183,10 +183,10 @@ async def main():
         player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, app_storage_path())
 
         input = Input('android', game_size, full_path)
+        opengl = False
 
-        from src import run_android_game_loop
         while pygame_event.running:
-            run_android_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
+            run_game_loop(game_mode, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
             await asyncio.sleep(0)
     else:
         import sys, platform
@@ -198,10 +198,10 @@ async def main():
         player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
 
         input = Input('web')
+        opengl = False
 
-        from src import run_web_game_loop
         while pygame_event.running:
-            run_web_game_loop(delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
+            run_game_loop(game_mode, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
             await asyncio.sleep(0)
 
     pg.quit()
