@@ -3,7 +3,6 @@ import pygame as pg
 from .load_asset import asset_loader
 from math import floor, ceil
 import os
-from .timer import Timer
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, full_path, xy):
@@ -41,7 +40,7 @@ class Player(pg.sprite.Sprite):
 		self.animation_time = 0.09
 
 
-		self.walk_buffer = 75
+		self.walk_buffer = 80
 		self.pos = pg.math.Vector2(xy)
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos
@@ -55,9 +54,6 @@ class Player(pg.sprite.Sprite):
 		self.image.fill((255, 0, 0))
 		self.rect = self.image.get_rect()
 
-		self.turn_around_timer = Timer()
-		self.turn_around_timer.start()
-
 	def start_new_game(self):
 		self.pos = pg.math.Vector2(self.start_position)
 		self.dirvec = pg.math.Vector2(0, 0)
@@ -70,7 +66,6 @@ class Player(pg.sprite.Sprite):
 
 		self.speed = 50
 		self.is_running = False
-		self.turn_around_timer.restart()
 
 	def load_sprites(self) -> None:
 		load_spritesheet = asset_loader('sprite', 'player')
@@ -152,13 +147,12 @@ class Player(pg.sprite.Sprite):
 			self.speed = 100
 			self.animation_time = 0.1
 			self.is_running = True
+			self.walk_buffer = 50
 		else:
 			self.speed = 60
 			self.animation_time = 0.14
 			self.is_running = False
-
-		if self.turn_around_timer.get_elapsed_time() > 1.15:
-			self.turn_around_timer.pause()
+			self.walk_buffer = 80
 
 		if now - self.last_update > self.walk_buffer:
 			self.last_update = now
@@ -170,22 +164,20 @@ class Player(pg.sprite.Sprite):
 						self.direction = "left"
 						new_dir_vec = pg.math.Vector2(-1, 0)
 					else:
-						if self.direction == "left" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+						if self.direction == "left":
 							new_dir_vec = pg.math.Vector2(-1, 0)
 						else:
 							self.direction = "left"
-							self.turn_around_timer.elapsed_time = 0.9
 
 				elif right:
 					if cancel:
 						self.direction = "right"
 						new_dir_vec = pg.math.Vector2(1, 0)
 					else:
-						if self.direction == "right" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+						if self.direction == "right":
 							new_dir_vec = pg.math.Vector2(1, 0)
 						else:
 							self.direction = "right"
-							self.turn_around_timer.elapsed_time = 0.9
 
 			if self.dirvec.x == 0:
 				if up:
@@ -193,24 +185,20 @@ class Player(pg.sprite.Sprite):
 						self.direction = "top"
 						new_dir_vec = pg.math.Vector2(0, -1)
 					else:
-						if self.direction == "top" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+						if self.direction == "top":
 							new_dir_vec = pg.math.Vector2(0, -1)
 						else:
 							self.direction = "top"
-							self.turn_around_timer.elapsed_time = 0.9
 
 				elif down:
 					if cancel:
 						self.direction = "bottom"
 						new_dir_vec = pg.math.Vector2(0, 1)
 					else:
-						if self.direction == "bottom" and self.turn_around_timer.get_elapsed_time() <= 0.9:
+						if self.direction == "bottom":
 							new_dir_vec = pg.math.Vector2(0, 1)
 						else:
 							self.direction = "bottom"
-							self.turn_around_timer.elapsed_time = 0.9
-			else:
-				self.turn_around_timer.restart()
 
 			if new_dir_vec != pg.math.Vector2(0, 0):
 				self.dirvec = new_dir_vec
@@ -247,7 +235,6 @@ class Player(pg.sprite.Sprite):
 					self.next_pos = self.last_pos
 					self.dirvec = pg.math.Vector2(0, 0)
 					self.between_tiles = False
-					self.rect.topleft = self.pos
 			else:
 				self.pos = self.next_pos
 				self.dirvec = pg.math.Vector2(0, 0)
