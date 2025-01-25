@@ -17,25 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Map tile placement
-  mapContainer.addEventListener("click", (event) => {
-    if (!selectedTile) return;
-
-    const cell = event.target.closest("td");
-    if (cell) {
-      const img = cell.querySelector("img");
-      const newTileSrc = selectedTile.src;
-
-      if (img) {
-        img.src = newTileSrc; // Update existing image
-      } else {
-        const newImg = document.createElement("img");
-        newImg.src = newTileSrc;
-        cell.appendChild(newImg); // Add new image
-      }
-    }
-  });
-
   let isDragging = false;
 
   mapContainer.addEventListener("mousedown", (event) => {
@@ -65,13 +46,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cell && selectedTile) {
       const img = cell.querySelector("img");
       const newTileSrc = selectedTile.src;
+      const newTileId = selectedTile.id;
 
       if (img) {
         img.src = newTileSrc; // Update existing image
+        img.id = newTileId;
       } else {
         const newImg = document.createElement("img");
         newImg.src = newTileSrc;
         newImg.draggable = false;
+        newImg.id = newTileId;
         cell.appendChild(newImg); // Add new image
       }
     }
@@ -125,6 +109,48 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+  function saveMapData() {
+    const mapData = [];
+    const layers = document.querySelectorAll(".map-layer");
+
+    layers.forEach((layer, index) => {
+      // Skip the last iteration
+      if (index === layers.length - 1) return;
+
+      const layerData = [];
+      layer.querySelectorAll("tr").forEach((row) => {
+        const rowData = [];
+        row.querySelectorAll("td").forEach((cell) => {
+          const img = cell.querySelector("img");
+          rowData.push(img ? img.id : ""); // Store id
+        });
+        layerData.push(rowData);
+      });
+      mapData.push(layerData);
+    });
+
+    fetch("save_map", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        map_name: document.querySelector("#map-select").value, // Map name
+        layers: mapData,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          alert("Map saved successfully!");
+        } else {
+          alert("Failed to save map!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error saving map:", error);
+      });
+  }
+  document.getElementById("save-button").addEventListener("click", saveMapData);
 
   // Prevent context menu on map container (useful for right-click functionality in future)
   mapContainer.addEventListener("contextmenu", (event) =>

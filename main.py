@@ -77,6 +77,7 @@ def index():
     table = []
     cell_table = []
     base64_images = {}
+    inv_map = {}
     start_map = {}
     maps = []
 
@@ -112,13 +113,13 @@ def index():
                 tile_id: encode_image_to_base64(os.path.join(project_folder, f"assets/img/tile/{image_name}.png"))
                 for tile_id, image_name in tile_mappings.get(selected_map['tileset'], {}).items()
             }
+            inv_map = {v: k for k, v in base64_images.items()}
 
             # Load player sprite
             base64_images['player'] = crop_sprite_from_sheet(player_image_path, 16, 24)
 
             # Read CSV layers into tables
             table = [render_csv_layer(path, base64_images) for path in tile_map_layer_paths]
-            cell_table = [get_cell_csv_layer(path, base64_images) for path in tile_map_layer_paths]
 
             # Add player position layer
             player_position = game_data.get("player_start_position", (0, 0))
@@ -137,10 +138,42 @@ def index():
         "maps": maps,
         "selected_map": map_name,
         "table": [(index, layer) for index, layer in enumerate(table)],
-        "cell_table": [(index, value) for index, value in enumerate(cell_table)],
         "tile_dict": base64_images,
+        "inv_map": inv_map,
     }
     return render_template('index.html', context=context)
+
+@app.route('/save_map', methods=['POST'])
+def save_map():
+    data = request.json
+    map_name = data.get('map_name')
+    layers = data.get('layers')
+
+    if not map_name or not layers:
+        return jsonify({"error": "Invalid data"}), 400
+
+    # Get the project folder path
+    config = json_loader(CONFIG_FILE)
+    current_project = config.get("current_project", {})
+    project_folder = current_project.get("project_folder", "")
+
+    if not project_folder:
+        return jsonify({"error": "Project folder not found"}), 400
+
+    try:
+        # Save each layer to its corresponding CSV file
+        for index, layer in enumerate(layers):
+            layer_file_path = os.path.join(
+                project_folder, f"game_data/data/maps/{map_name}layer{index + 1}.csv"
+            )
+            with open(layer_file_path, "w", newline="") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(layer)
+
+        return jsonify({"message": "Map saved successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def render_csv_layer(csv_path, base64_images):
     """Render a CSV layer into a table of base64 images."""
@@ -151,16 +184,6 @@ def render_csv_layer(csv_path, base64_images):
             for row in csv_reader:
                 table.append([base64_images.get(cell, "") for cell in row])
     return table
-
-def get_cell_csv_layer(csv_path, base64_images):
-    """Render a CSV layer into a table of base64 images."""
-    cell_table = []
-    if os.path.exists(csv_path):
-        with open(csv_path, "r") as csv_file:
-            csv_reader = csv.reader(csv_file)
-            for row in csv_reader:
-                cell_table.append([cell for cell in row])
-    return cell_table
 
 
 def render_player_layer(csv_path, player_position, player_image):

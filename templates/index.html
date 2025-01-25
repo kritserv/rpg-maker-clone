@@ -217,11 +217,16 @@ navbar %}
     <select class="form-select" id="layer-select" name="layer-select" required>
       <option value="default" selected>Nothing</option>
       {% for layer_index, _ in context.table %}
-      <option value="{{ layer_index + 1 }}">Layer {{ layer_index + 1 }}</option>
+        {%  if layer_index != 4 %}
+            <option value="{{ layer_index + 1 }}">Layer {{ layer_index + 1 }}</option>
+        {% endif %}
       {% endfor %}
     </select>
 
 </div>
+
+<button id="save-button" class="btn btn-primary">Save Map</button>
+
 
 <!-- Tile Dictionary -->
 <div class="tile-container">
@@ -233,7 +238,7 @@ navbar %}
     >
         {% for tile_id, tile_img in context.tile_dict.items() %}
         <tr>
-            <td><img class="tile" src="data:image/png;base64,{{ tile_img }}" /></td>
+            <td><img class="tile" id="{{ tile_id }}" src="data:image/png;base64,{{ tile_img }}" /></td>
             <td>{{ tile_id }}</td>
         </tr>
         {% endfor %}
@@ -256,7 +261,7 @@ navbar %}
                 {% if cell %} {% if layer_index == 4 %}
                 <img draggable="false" class="object" src="data:image/png;base64,{{ cell }}" />
                 {% else %}
-                <img draggable="false" src="data:image/png;base64,{{ cell }}" />
+                <img draggable="false" id="{{ context.inv_map[cell] }}" src="data:image/png;base64,{{ cell }}" />
                 {% endif %} {% endif %}
             </td>
             {% endfor %}
@@ -266,22 +271,6 @@ navbar %}
     {% endfor %}
 </div>
 {% endif %}
-
-<div style="margin-top: 600px;">
-    {% for layer_index, layer in context.cell_table %}
-    <table>
-        {% for row in layer %}
-        <tr>
-            {% for value in row %}
-            <td>
-                {{ value }}
-            </td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
-    {% endfor %}
-</div>
 
 <script src="{{url_for('static', filename='toggle_layer.js')}}"></script>
 <script src="{{url_for('static', filename='change_map.js')}}"></script>
