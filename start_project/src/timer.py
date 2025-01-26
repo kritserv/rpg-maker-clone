@@ -1,10 +1,11 @@
 import time
+from dataclasses import dataclass
 
+@dataclass(slots=True, kw_only=True)
 class Timer:
-	def __init__(self):
-		self.start_time = 0.0
-		self.elapsed_time = 0.0
-		self.is_paused = True
+	start_time: float = 0.0
+	elapsed_time: float = 0.0
+	is_paused: bool = True
 
 	def start_or_resume(self):
 		if self.is_paused:

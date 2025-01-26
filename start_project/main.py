@@ -64,145 +64,145 @@ async def main():
 
     debug_message = ''
 
-    if game_mode == 'pc':
-        """
-        OpenGL Stuff; for better FPS, resizable game windows and for steam achievement overlay
-        I don't know what any of these code do, I just copy it from dafluffypotato.
-        https://dafluffypotato.itch.io/hue-flowing
-        """
-        import moderngl
-        from array import array
+    match game_mode:
+        case 'pc':
+            """
+            OpenGL Stuff; for better FPS, resizable game windows and for steam achievement overlay
+            I don't know what any of these code do, I just copy it from dafluffypotato.
+            https://dafluffypotato.itch.io/hue-flowing
+            """
+            import moderngl
+            from array import array
 
-        class OpenGLStuff:
-            def __init__(self):
-                self.ctx = moderngl.create_context()
-                self.quad_buffer = self.ctx.buffer(data=array("f", [
-                    -1.0, 1.0, 0.0, 0.0,
-                    1.0, 1.0, 1.0, 0.0,
-                    -1.0, -1.0, 0.0, 1.0,
-                    1.0, -1.0, 1.0, 1.0
-                    ]))
+            class OpenGLStuff:
+                def __init__(self):
+                    self.ctx = moderngl.create_context()
+                    self.quad_buffer = self.ctx.buffer(data=array("f", [
+                        -1.0, 1.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0, 0.0,
+                        -1.0, -1.0, 0.0, 1.0,
+                        1.0, -1.0, 1.0, 1.0
+                        ]))
 
-                vert_shader = '''
-                #version 330 core
+                    vert_shader = '''
+                    #version 330 core
 
-                in vec2 vert;
-                in vec2 textcoord;
-                out vec2 uvs;
+                    in vec2 vert;
+                    in vec2 textcoord;
+                    out vec2 uvs;
 
-                void main() {
-                    uvs = textcoord;
-                    gl_Position = vec4(vert, 0.0, 1.0);
-                }
-                '''
+                    void main() {
+                        uvs = textcoord;
+                        gl_Position = vec4(vert, 0.0, 1.0);
+                    }
+                    '''
 
-                frag_shader = '''
-                #version 330 core
+                    frag_shader = '''
+                    #version 330 core
 
-                uniform sampler2D tex;
+                    uniform sampler2D tex;
 
-                in vec2 uvs;
-                out vec4 f_color;
+                    in vec2 uvs;
+                    out vec4 f_color;
 
-                void main() {
-                    f_color = vec4(texture(tex, uvs).rgb, 1.0);
-                }
-                '''
+                    void main() {
+                        f_color = vec4(texture(tex, uvs).rgb, 1.0);
+                    }
+                    '''
 
-                self.program = self.ctx.program(
-                    vertex_shader=vert_shader,
-                    fragment_shader=frag_shader
-                    )
+                    self.program = self.ctx.program(
+                        vertex_shader=vert_shader,
+                        fragment_shader=frag_shader
+                        )
 
-                self.render_object = self.ctx.vertex_array(
-                    self.program,
-                    [
-                        (
-                            self.quad_buffer,
-                             "2f 2f",
-                             "vert",
-                             "textcoord"
-                            )
-                    ]
-                    )
+                    self.render_object = self.ctx.vertex_array(
+                        self.program,
+                        [
+                            (
+                                self.quad_buffer,
+                                "2f 2f",
+                                "vert",
+                                "textcoord"
+                                )
+                        ]
+                        )
 
-            def surf_to_texture(self, surf) -> object:
-                tex = self.ctx.texture(surf.get_size(), 4)
-                tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
-                tex.swizzle = "BGRA"
-                tex.write(surf.get_view("1"))
-                return tex
+                def surf_to_texture(self, surf) -> object:
+                    tex = self.ctx.texture(surf.get_size(), 4)
+                    tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+                    tex.swizzle = "BGRA"
+                    tex.write(surf.get_view("1"))
+                    return tex
 
-            def draw(self, display) -> None:
-                frame_tex = self.surf_to_texture(display)
-                frame_tex.use(0)
-                self.program["tex"] = 0
-                self.render_object.render(
-                    mode=moderngl.TRIANGLE_STRIP
-                    )
+                def draw(self, display) -> None:
+                    frame_tex = self.surf_to_texture(display)
+                    frame_tex.use(0)
+                    self.program["tex"] = 0
+                    self.render_object.render(
+                        mode=moderngl.TRIANGLE_STRIP
+                        )
 
-                pg.display.flip()
+                    pg.display.flip()
 
-                frame_tex.release()
+                    frame_tex.release()
 
-        screen = pg.display.set_mode(
-            (game_size_native),
-            pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF)
-        )
+            screen = pg.display.set_mode(
+                (game_size_native),
+                pg.RESIZABLE | (pg.OPENGL | pg.DOUBLEBUF)
+            )
 
-        """
-        Use this if prefer game to open in maximize window instead of the default one.
-        """
-        # from pygame._sdl2 import Window
-        # Window.from_display_module().maximize()
+            """
+            Use this if prefer game to open in maximize window instead of the default one.
+            """
+            # from pygame._sdl2 import Window
+            # Window.from_display_module().maximize()
 
-        pg.display.set_icon(asset_loader('img', 'icon'))
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
+            pg.display.set_icon(asset_loader('img', 'icon'))
+            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
 
-        opengl = OpenGLStuff()
-        input = Input('pc')
-        game_state = 1
+            opengl = OpenGLStuff()
+            input = Input('pc')
+            game_state = 1
 
-        while pygame_event.running:
-            display = run_game_loop(game_mode, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
-            await asyncio.sleep(0)
+            while pygame_event.running:
+                display = run_game_loop('pc', delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
 
-    elif game_mode == 'android':
+        case 'android':
 
-        screen = pg.display.set_mode((game_size),
-            pg.SCALED)
-        try:
-            from android.storage import app_storage_path
-            from android.permissions import request_permissions, check_permission, Permission
-            request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
-            pg.display.toggle_fullscreen()
-        except:
-            def app_storage_path():
-                return full_path
+            screen = pg.display.set_mode((game_size),
+                pg.SCALED)
+            try:
+                from android.storage import app_storage_path
+                from android.permissions import request_permissions, check_permission, Permission
+                request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+                pg.display.toggle_fullscreen()
+            except:
+                def app_storage_path():
+                    return full_path
 
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, app_storage_path())
+            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, app_storage_path())
 
-        input = Input('android', game_size, full_path)
-        opengl = False
+            input = Input('android', game_size, full_path)
+            opengl = False
 
-        while pygame_event.running:
-            run_game_loop(game_mode, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
-            await asyncio.sleep(0)
-    else:
-        import sys, platform
-        if sys.platform == "emscripten":
-            platform.window.canvas.style.imageRendering = "pixelated"
-        screen = pg.display.set_mode(
-            (game_size_native),
-            pg.RESIZABLE)
-        player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
+            while pygame_event.running:
+                run_game_loop('android', delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
 
-        input = Input('web')
-        opengl = False
+        case 'web':
+            import sys, platform
+            if sys.platform == "emscripten":
+                platform.window.canvas.style.imageRendering = "pixelated"
+            screen = pg.display.set_mode(
+                (game_size_native),
+                pg.RESIZABLE)
+            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title = load_game(player_start_pos, start_map, db, screen, False)
 
-        while pygame_event.running:
-            run_game_loop(game_mode, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
-            await asyncio.sleep(0)
+            input = Input('web')
+            opengl = False
+
+            while pygame_event.running:
+                run_game_loop('web', delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen)
+                await asyncio.sleep(0)
 
     pg.quit()
     exit()

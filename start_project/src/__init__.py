@@ -17,5 +17,3 @@ from .top_ui import TopUI
 from .menu_ui import MenuUI, MenuUISave, MenuUILoad, MenuUITitle
 
 from .game_loop import run_game_loop
-from .android_game_loop import run_android_game_loop
-from .web_game_loop import run_web_game_loop
