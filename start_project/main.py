@@ -15,7 +15,7 @@ with open(f"{full_path}/game_data/game_mode.txt") as f:
     game_mode = f.readlines()[0].rstrip('\n') # pc / android / web
 
 game_size = [256, 137]
-native_res_multiplier = 3
+native_res_multiplier = 4
 game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
 
 if game_mode == 'android':
@@ -32,7 +32,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     rpgmap = RpgMap(full_path, start_map, game_size)
     rpgmap.load_map_data(db["maps"])
     camera_width, camera_height = screen.get_size()
-    camera = Camera(camera_width, camera_height, game_size[0])
+    camera = Camera(camera_width, camera_height, game_size[0], game_size[1])
     top_ui = TopUI(full_path)
     menu_ui = MenuUI(full_path)
     menu_ui_save = MenuUISave(full_path, save_file_path)
