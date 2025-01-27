@@ -12,9 +12,9 @@ class Camera:
 
 		multiply = display_height/game_size_height
 		if multiply % 2 == 0:
-			self.extra_offset_y = -floor(142+game_size_height/2*(multiply-1))-1
+			self.extra_offset_y = -floor(game_size_height+5+game_size_height/2*(multiply-1))-1
 		else:
-			self.extra_offset_y = -floor(142+game_size_height/2*(multiply-1))
+			self.extra_offset_y = -floor(game_size_height+5+game_size_height/2*(multiply-1))
 
 	def update(self, player):
 		self.offset_x = self.extra_offset_x + player.rect.centerx + self.display_width // 2
