@@ -33,11 +33,11 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     rpgmap.load_map_data(db["maps"])
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, game_size[0], game_size[1])
-    top_ui = TopUI(full_path)
-    menu_ui = MenuUI(full_path)
-    menu_ui_save = MenuUISave(full_path, save_file_path)
-    menu_ui_load = MenuUILoad(full_path, save_file_path)
-    menu_ui_title = MenuUITitle(full_path)
+    top_ui = TopUI(full_path, game_size)
+    menu_ui = MenuUI(full_path, game_size)
+    menu_ui_save = MenuUISave(full_path, save_file_path, game_size)
+    menu_ui_load = MenuUILoad(full_path, save_file_path, game_size)
+    menu_ui_title = MenuUITitle(full_path, game_size)
     return player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title
 
 async def main():

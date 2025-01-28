@@ -5,7 +5,7 @@ from .load_asset import asset_loader
 from datetime import datetime
 
 class BaseMenuUI:
-    def __init__(self, full_path, menu_items):
+    def __init__(self, full_path, menu_items, game_size):
         self.full_path = full_path
         self.menu_font = asset_loader('font', 'PixelatedElegance')
         self.cursor = 0
@@ -21,9 +21,10 @@ class BaseMenuUI:
 
         self.menu = menu_items
         self.menu_len = len(menu_items) - 1
+        self.game_size = game_size
 
         self.menu_x = 0
-        self.menu_y = 137
+        self.menu_y = game_size[1]
 
         # Cooldown settings for cursor movement
         self.cursor_cooldown_time = 150  # milliseconds
@@ -41,7 +42,7 @@ class BaseMenuUI:
 
         menu_y = 2
         menu_w = 110
-        menu_h = display.get_size()[1] - 49
+        menu_h = self.menu_len * 15
         pg.draw.rect(display, self.DARKBLUE, (self.menu_x, menu_y, menu_w, menu_h))
         menu_text_y = 6
         blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
@@ -180,9 +181,9 @@ class BaseMenuUI:
         return select_submenu
 
 class MenuUI(BaseMenuUI):
-    def __init__(self, full_path):
+    def __init__(self, full_path, game_size):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
-        super().__init__(full_path, menu_items)
+        super().__init__(full_path, menu_items, game_size)
         self.open_menu_sfx = asset_loader('sfx', 'open_menu')
         self.select_sfx = asset_loader('sfx', 'select')
 
@@ -190,13 +191,13 @@ class MenuUI(BaseMenuUI):
         self.play_sound = True
 
 class MenuUITitle(BaseMenuUI):
-    def __init__(self, full_path):
+    def __init__(self, full_path, game_size):
         menu_items = ('New Game', 'Continue', 'Option', 'Quit')
-        super().__init__(full_path, menu_items)
+        super().__init__(full_path, menu_items, game_size)
         self.speed = 20
 
     def draw(self, display, dt, current_time):
-        menu_y_finish = 60
+        menu_y_finish = self.game_size[1] - 77
         if self.menu_y > menu_y_finish:
             self.menu_y -= self.speed * dt
             self.speed += 800 * dt
@@ -226,7 +227,7 @@ class MenuUITitle(BaseMenuUI):
         return slide_in
 
 class MenuUISave(BaseMenuUI):
-    def __init__(self, full_path, save_file_path):
+    def __init__(self, full_path, save_file_path, game_size):
         self.save_path = f"{full_path}/user_data/save.json"
         if save_file_path:
             '''
@@ -255,7 +256,7 @@ class MenuUISave(BaseMenuUI):
                 menu_items.append(items.get('name'))
             else:
                 menu_items.append(key)
-        super().__init__(full_path, menu_items)
+        super().__init__(full_path, menu_items, game_size)
         self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
@@ -296,7 +297,7 @@ class MenuUISave(BaseMenuUI):
         return select_slot
 
 class MenuUILoad(BaseMenuUI):
-    def __init__(self, full_path, save_file_path):
+    def __init__(self, full_path, save_file_path, game_size):
         self.save_path = f"{full_path}/user_data/save.json"
         if save_file_path:
             '''
@@ -326,7 +327,7 @@ class MenuUILoad(BaseMenuUI):
                 menu_items.append(items.get('name'))
             else:
                 menu_items.append(key)
-        super().__init__(full_path, menu_items)
+        super().__init__(full_path, menu_items, game_size)
         self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
