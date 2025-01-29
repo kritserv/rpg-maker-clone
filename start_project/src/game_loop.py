@@ -7,7 +7,7 @@ def reset_menu(menu, display, cursor = 0):
     menu.speed = 450
     menu.animate_in = True
 
-def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, debug_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, screen):
+def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, debug_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen):
     dt = delta_time.get()
     clock.tick()
     current_time = pg.time.get_ticks()
@@ -46,6 +46,8 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                     case 'Continue':
                         reset_menu(menu_ui_load, display)
                         pygame_event.game_state = -3
+                    case 'Setting':
+                        pygame_event.game_state = -4
                     case 'Quit':
                         pygame_event.running = False
                     case _:
@@ -53,6 +55,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
             reset_menu(menu_ui, display)
             reset_menu(menu_ui_save, display)
             reset_menu(menu_ui_load, display)
+            reset_menu(menu_ui_settings, display)
 
         case -2:
             menu_ui_title.speed = 20
@@ -87,6 +90,24 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                         pygame_event.game_state = 0
                         pygame_event.is_save_state = False
                         pygame_event.is_load_state = False
+
+        case -4:
+            select_submenu = False
+            if new_size:
+                reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
+            slide_in = menu_ui_settings.draw(display, dt, current_time)
+            if not slide_in:
+                match platform:
+                    case 'pc':
+                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time)
+                    case 'android':
+                        select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time)
+                    case 'web':
+                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time)
+            if select_submenu:
+                match select_submenu:
+                    case 'Back':
+                        pygame_event.game_state = -1
 
         case _:
             if not platform == 'android':
@@ -133,6 +154,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                 reset_menu(menu_ui_save, display)
                 reset_menu(menu_ui_load, display)
                 reset_menu(menu_ui_title, display)
+                reset_menu(menu_ui_settings, display)
                 menu_ui.is_open = False
 
             match pygame_event.game_state:

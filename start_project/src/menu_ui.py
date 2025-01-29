@@ -42,7 +42,7 @@ class BaseMenuUI:
 
         menu_y = 2
         menu_w = 110
-        menu_h = self.menu_len * 15
+        menu_h = 90
         pg.draw.rect(display, self.DARKBLUE, (self.menu_x, menu_y, menu_w, menu_h))
         menu_text_y = 6
         blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
@@ -112,7 +112,7 @@ class BaseMenuUI:
         if action:
             select_submenu = self.menu[self.cursor]
             if select_submenu and self.play_sound:
-                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Option', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
+                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Setting', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
                     self.select_sfx.play()
 
         elif cancel:
@@ -170,7 +170,7 @@ class BaseMenuUI:
         if action:
             select_submenu = self.menu[self.cursor]
             if select_submenu and self.play_sound:
-                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Option', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
+                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Setting', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
                     self.select_sfx.play()
 
         elif cancel:
@@ -182,7 +182,7 @@ class BaseMenuUI:
 
 class MenuUI(BaseMenuUI):
     def __init__(self, full_path, game_size):
-        menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Option', 'Exit to title')
+        menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Setting', 'Exit to title')
         super().__init__(full_path, menu_items, game_size)
         self.open_menu_sfx = asset_loader('sfx', 'open_menu')
         self.select_sfx = asset_loader('sfx', 'select')
@@ -192,7 +192,7 @@ class MenuUI(BaseMenuUI):
 
 class MenuUITitle(BaseMenuUI):
     def __init__(self, full_path, game_size):
-        menu_items = ('New Game', 'Continue', 'Option', 'Quit')
+        menu_items = ('New Game', 'Continue', 'Setting', 'Quit')
         super().__init__(full_path, menu_items, game_size)
         self.speed = 20
 
@@ -372,3 +372,52 @@ class MenuUILoad(BaseMenuUI):
 
         return select_slot
         super().__init__(full_path, menu_items)
+
+class MenuUISettings(BaseMenuUI):
+    def __init__(self, full_path, settings_file_path, game_size, platform):
+        self.settings_path = f"{full_path}/user_data/settings.json"
+        if settings_file_path:
+            self.settings_path = f"{settings_file_path}/settings.json"
+
+        try:
+            settings = json_loader(self.settings_path)
+        except FileNotFoundError:
+            json_saver(self.settings_path, {
+                "fullscreen": False,
+                "sound": 0,
+                "music": 0,
+            })
+            settings = json_loader(self.settings_path)
+
+        menu_items = []
+        for key, items in settings.items():
+            menu_items.append(key)
+        if platform != 'pc':
+            menu_items.pop(0)
+
+        super().__init__(full_path, menu_items, game_size)
+        self.select_sfx = asset_loader('sfx', 'select')
+        self.play_sound = True
+
+    def save_settings(self, select_slot, value):
+        settings = json_loader(self.settings_path)
+        settings[select_slot] = value
+        json_saver(self.settings_path, settings)
+
+    def update_for_pc(self, key, joysticks, dt, current_time):
+        select_slot = super(MenuUISettings, self).update_for_pc(key, joysticks, dt, current_time)
+        value = False
+        if select_slot:
+            if select_slot != "Back":
+                self.save_settings(select_slot, value)
+
+        return select_slot
+
+    def update_for_android(self, mobile_key, joysticks, dt, current_time):
+        select_slot = super(MenuUISettings, self).update_for_android(mobile_key, joysticks, dt, current_time)
+        value = False
+        if select_slot:
+            if select_slot != "Back":
+                self.save_settings(select_slot, value)
+
+        return select_slot

@@ -14,6 +14,6 @@ from .timer import Timer
 from .blit_text import blit_text
 
 from .top_ui import TopUI
-from .menu_ui import MenuUI, MenuUISave, MenuUILoad, MenuUITitle
+from .menu_ui import MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings
 
 from .game_loop import run_game_loop
