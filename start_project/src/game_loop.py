@@ -99,11 +99,11 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
             if not slide_in:
                 match platform:
                     case 'pc':
-                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time)
+                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
                     case 'android':
                         select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time)
                     case 'web':
-                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time)
+                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
             if select_submenu:
                 match select_submenu:
                     case 'Back':
@@ -190,6 +190,11 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                                 reset_menu(menu_ui_save, display)
                                 reset_menu(menu_ui_load, display)
 
+                            case 'Setting':
+                                    pygame_event.game_state = 3
+                                    pygame_event.is_save_state = False
+                                    pygame_event.is_load_state = False
+
                             case 'Back':
                                 pygame_event.game_state -= 1
                                 pygame_event.is_save_state = False
@@ -243,6 +248,23 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                                 pygame_event.is_save_state = False
                                 pygame_event.is_load_state = False
 
+                case 3:
+                    select_submenu = False
+                    if new_size:
+                        reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
+                    slide_in = menu_ui_settings.draw(display, dt, current_time)
+                    if not slide_in:
+                        match platform:
+                            case 'pc':
+                                select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
+                            case 'android':
+                                select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time)
+                            case 'web':
+                                select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
+                    if select_submenu:
+                        match select_submenu:
+                            case 'Back':
+                                pygame_event.game_state = 1
 
             # Debug
             debug_message = f"rem {len(player.remembered_obstacle_pos)}"

@@ -396,28 +396,42 @@ class MenuUISettings(BaseMenuUI):
             menu_items.pop(0)
 
         super().__init__(full_path, menu_items, game_size)
-        self.select_sfx = asset_loader('sfx', 'select')
-        self.play_sound = True
 
-    def save_settings(self, select_slot, value):
+    def save_settings(self, select_slot, input):
         settings = json_loader(self.settings_path)
-        settings[select_slot] = value
+        match select_slot:
+            case 'fullscreen':
+                if input.fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
+                    pg.display.toggle_fullscreen()
+                    input.fullscreen_toggle_timer.restart()
+                    if settings['fullscreen'] == True:
+                        settings['fullscreen'] = False
+                    else:
+                        settings['fullscreen'] = True
+            case 'sound':
+                settings['sound'] += 1
+                if settings['sound'] > 100:
+                    settings['sound'] = 0
+            case 'music':
+                settings['music'] += 1
+                if settings['music'] > 100:
+                    settings['music'] = 0
+            case _:
+                pass
         json_saver(self.settings_path, settings)
 
-    def update_for_pc(self, key, joysticks, dt, current_time):
+    def update_for_pc(self, key, joysticks, dt, current_time, input):
         select_slot = super(MenuUISettings, self).update_for_pc(key, joysticks, dt, current_time)
-        value = False
         if select_slot:
             if select_slot != "Back":
-                self.save_settings(select_slot, value)
+                self.save_settings(select_slot, input)
 
         return select_slot
 
     def update_for_android(self, mobile_key, joysticks, dt, current_time):
         select_slot = super(MenuUISettings, self).update_for_android(mobile_key, joysticks, dt, current_time)
-        value = False
         if select_slot:
             if select_slot != "Back":
-                self.save_settings(select_slot, value)
+                self.save_settings(select_slot, False)
 
         return select_slot

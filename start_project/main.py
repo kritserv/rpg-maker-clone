@@ -158,6 +158,9 @@ async def main():
 
             pg.display.set_icon(asset_loader('img', 'icon'))
             player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings = load_game(player_start_pos, start_map, db, screen, False, game_mode)
+            load_settings = json_loader(menu_ui_settings.settings_path)
+            if load_settings['fullscreen']:
+                pg.display.toggle_fullscreen()
 
             opengl = OpenGLStuff()
             input = Input('pc')
