@@ -373,6 +373,36 @@ class MenuUILoad(BaseMenuUI):
         return select_slot
         super().__init__(full_path, menu_items)
 
+# Sliders tutorial from coding with sphere https://github.com/m1chaelwilliams/Pygame-Tutorials
+class Slider:
+    def __init__(self, pos, size, initial_val, min, max) -> None:
+        self.pos = pos
+        self.size = size
+
+        self.slider_left_pos = self.pos[0] - (size[0] // 2)
+        self.slider_right_pos = self.pos[0] + (size[0] // 2)
+        self.slider_top_pos = self.pos[1] - (size[1] // 2)
+
+        self.min = min
+        self.max = max
+        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val
+        print(self.initial_val)
+
+        self.container_rect = pg.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
+        self.button_rect = pg.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
+
+    def draw(self, display):
+        pg.draw.rect(display, "white", self.container_rect)
+        pg.draw.rect(display, "black", self.button_rect)
+
+    def move_slider(self, val, dt):
+        if val==1 and self.button_rect.x>77:
+            self.button_rect.x -= 0.00000000008 * dt
+        elif val==-1 and self.button_rect.x<169:
+            self.button_rect.x += 150*dt
+        # need fix; doesn't work with high framerate
+
+
 class MenuUISettings(BaseMenuUI):
     def __init__(self, full_path, settings_file_path, game_size, platform):
         self.settings_path = f"{full_path}/user_data/settings.json"
@@ -394,6 +424,8 @@ class MenuUISettings(BaseMenuUI):
             menu_items.append(key)
         if platform != 'pc':
             menu_items.pop(0)
+
+        self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (100,30), 0.5, 80, 100)
 
         super().__init__(full_path, menu_items, game_size)
 
@@ -420,11 +452,25 @@ class MenuUISettings(BaseMenuUI):
                 pass
         json_saver(self.settings_path, settings)
 
+
+    def draw(self, display, dt, current_time):
+        slide_in = super(MenuUISettings, self).draw(display, dt, current_time)
+        if self.cursor == 1:
+            self.sound_slider.draw(display)
+
+        return slide_in
+
     def update_for_pc(self, key, joysticks, dt, current_time, input):
         select_slot = super(MenuUISettings, self).update_for_pc(key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
                 self.save_settings(select_slot, input)
+
+        if self.cursor == 1:
+            if key[pg.K_LEFT] or key[pg.K_a]:
+                self.sound_slider.move_slider(1, dt)
+            if key[pg.K_RIGHT] or key[pg.K_d]:
+                self.sound_slider.move_slider(-1, dt)
 
         return select_slot
 
