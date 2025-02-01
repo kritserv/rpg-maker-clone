@@ -9,7 +9,11 @@ def reset_menu(menu, display, cursor = 0):
 
 def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, debug_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen):
     dt = delta_time.get()
-    clock.tick()
+
+    if pygame_event.game_state == 3 or pygame_event.game_state == -4:
+        clock.tick(60)
+    else:
+        clock.tick()
     current_time = pg.time.get_ticks()
     display.fill(GREY)
 
@@ -101,7 +105,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                     case 'pc':
                         select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
                     case 'android':
-                        select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time)
+                        select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time, input)
                     case 'web':
                         select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
             if select_submenu:
@@ -258,7 +262,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                             case 'pc':
                                 select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
                             case 'android':
-                                select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time)
+                                select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time, input)
                             case 'web':
                                 select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
                     if select_submenu:

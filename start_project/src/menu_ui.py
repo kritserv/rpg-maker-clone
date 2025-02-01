@@ -374,8 +374,9 @@ class MenuUILoad(BaseMenuUI):
         super().__init__(full_path, menu_items)
 
 # Sliders tutorial from coding with sphere https://github.com/m1chaelwilliams/Pygame-Tutorials
-class Slider:
-    def __init__(self, pos, size, initial_val, min, max) -> None:
+class Slider(pg.sprite.Sprite):
+    def __init__(self, pos, size, initial_val) -> None:
+        pg.sprite.Sprite.__init__(self)
         self.pos = pos
         self.size = size
 
@@ -383,25 +384,30 @@ class Slider:
         self.slider_right_pos = self.pos[0] + (size[0] // 2)
         self.slider_top_pos = self.pos[1] - (size[1] // 2)
 
-        self.min = min
-        self.max = max
         self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val
-        print(self.initial_val)
 
         self.container_rect = pg.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
         self.button_rect = pg.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
+        self.save_value = self.button_rect.x - self.slider_left_pos
 
     def draw(self, display):
         pg.draw.rect(display, "white", self.container_rect)
         pg.draw.rect(display, "black", self.button_rect)
 
     def move_slider(self, val, dt):
-        if val==1 and self.button_rect.x>77:
-            self.button_rect.x -= 0.00000000008 * dt
-        elif val==-1 and self.button_rect.x<169:
-            self.button_rect.x += 150*dt
-        # need fix; doesn't work with high framerate
+        if val == 1:
+            new_x = self.button_rect.x - 10 * dt
+            if new_x < self.slider_left_pos:
+                new_x = self.slider_left_pos
+            self.button_rect.x = new_x
 
+        elif val == -1:
+            new_x = self.button_rect.x + 100 * dt
+            if new_x > self.slider_right_pos - self.button_rect.width:
+                new_x = self.slider_right_pos - self.button_rect.width
+            self.button_rect.x = new_x
+
+        self.save_value = self.button_rect.x - self.slider_left_pos
 
 class MenuUISettings(BaseMenuUI):
     def __init__(self, full_path, settings_file_path, game_size, platform):
@@ -413,9 +419,9 @@ class MenuUISettings(BaseMenuUI):
             settings = json_loader(self.settings_path)
         except FileNotFoundError:
             json_saver(self.settings_path, {
-                "fullscreen": False,
-                "sound": 0,
-                "music": 0,
+                "Fullscreen": False,
+                "Sound": 50,
+                "Music": 50,
             })
             settings = json_loader(self.settings_path)
 
@@ -424,30 +430,25 @@ class MenuUISettings(BaseMenuUI):
             menu_items.append(key)
         if platform != 'pc':
             menu_items.pop(0)
+        menu_items.append('Apply')
 
-        self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (100,30), 0.5, 80, 100)
+        self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Sound']/100)
 
         super().__init__(full_path, menu_items, game_size)
 
     def save_settings(self, select_slot, input):
         settings = json_loader(self.settings_path)
         match select_slot:
-            case 'fullscreen':
+            case 'Fullscreen':
                 if input.fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
                     pg.display.toggle_fullscreen()
                     input.fullscreen_toggle_timer.restart()
-                    if settings['fullscreen'] == True:
-                        settings['fullscreen'] = False
+                    if settings['Fullscreen'] == True:
+                        settings['Fullscreen'] = False
                     else:
-                        settings['fullscreen'] = True
-            case 'sound':
-                settings['sound'] += 1
-                if settings['sound'] > 100:
-                    settings['sound'] = 0
-            case 'music':
-                settings['music'] += 1
-                if settings['music'] > 100:
-                    settings['music'] = 0
+                        settings['Fullscreen'] = True
+            case 'Apply':
+                settings['Sound'] = self.sound_slider.save_value
             case _:
                 pass
         json_saver(self.settings_path, settings)
@@ -469,15 +470,21 @@ class MenuUISettings(BaseMenuUI):
         if self.cursor == 1:
             if key[pg.K_LEFT] or key[pg.K_a]:
                 self.sound_slider.move_slider(1, dt)
-            if key[pg.K_RIGHT] or key[pg.K_d]:
+            elif key[pg.K_RIGHT] or key[pg.K_d]:
                 self.sound_slider.move_slider(-1, dt)
 
         return select_slot
 
-    def update_for_android(self, mobile_key, joysticks, dt, current_time):
+    def update_for_android(self, mobile_key, joysticks, dt, current_time, input):
         select_slot = super(MenuUISettings, self).update_for_android(mobile_key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                self.save_settings(select_slot, False)
+                self.save_settings(select_slot, input)
+
+        if self.cursor == 1:
+            if mobile_key["K_LEFT"]:
+                self.sound_slider.move_slider(1, dt)
+            elif mobile_key["K_RIGHT"]:
+                self.sound_slider.move_slider(-1, dt)
 
         return select_slot
