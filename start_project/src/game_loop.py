@@ -124,24 +124,11 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
             player.collision = pg.Rect(center_x-16, center_y-2, 16, 16)
 
             # Graphic
-            match platform:
-                case 'pc':
-                    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
-                    collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
-                    # pg.draw.rect(display, pg.Color('green'), player.collision) # player collision box
-                    display.blit(player.img, [center_x-16, center_y-18])
-                    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
-
-                case 'android':
-                    draw_count = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
-                    collision_rects = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer3'], get_collision=True)
-                    display.blit(player.img, [center_x-16, center_y-18])
-                    draw_count = rpgmap.draw_scaled_screen(display, camera, player.rect, layers=['layer4'], get_collision=False)
-                case 'web':
-                    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
-                    collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
-                    display.blit(player.img, [center_x-16, center_y-18])
-                    draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
+            draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
+            collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
+            # pg.draw.rect(display, pg.Color('green'), player.collision) # player collision box
+            display.blit(player.img, [center_x-16, center_y-18])
+            draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
 
             # Logic
             if pygame_event.game_state == 0:

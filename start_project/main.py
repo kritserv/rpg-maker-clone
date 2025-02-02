@@ -1,5 +1,4 @@
 import asyncio
-from numpy.core.numeric import full
 import pygame as pg
 from sys import exit
 

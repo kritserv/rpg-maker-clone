@@ -400,14 +400,14 @@ class Slider(pg.sprite.Sprite):
         pg.draw.rect(display, self.left_fill_rect_color, self.left_fill_rect)
         pg.draw.rect(display, self.button_rect_color, self.button_rect)
 
-    def move_slider(self, val, dt):
-        if val == 1:
+    def move_slider(self, left, right, dt):
+        if left:
             new_x = self.button_rect.x - 200 * dt
             if new_x < self.slider_left_pos:
                 new_x = self.slider_left_pos
             self.button_rect.x = new_x
 
-        elif val == -1:
+        elif right:
             new_x = self.button_rect.x + 200 * dt
             if new_x > self.slider_right_pos - self.button_rect.width:
                 new_x = self.slider_right_pos - self.button_rect.width
@@ -471,9 +471,9 @@ class MenuUISettings(BaseMenuUI):
 
     def draw(self, display, dt, current_time):
         slide_in = super(MenuUISettings, self).draw(display, dt, current_time)
-        if self.cursor == 1:
+        if self.menu[self.cursor] == 'Sound':
             self.sound_slider.draw(display)
-        if self.cursor == 2:
+        if self.menu[self.cursor] == 'Music':
             self.music_slider.draw(display)
 
         return slide_in
@@ -484,17 +484,11 @@ class MenuUISettings(BaseMenuUI):
             if select_slot != "Back":
                 select_slot = self.save_settings(select_slot, input)
 
-        if self.cursor == 1:
-            if key[pg.K_LEFT] or key[pg.K_a]:
-                self.sound_slider.move_slider(1, dt)
-            elif key[pg.K_RIGHT] or key[pg.K_d]:
-                self.sound_slider.move_slider(-1, dt)
+        if self.menu[self.cursor] == 'Sound':
+            self.sound_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a], key[pg.K_RIGHT] or key[pg.K_d], dt)
 
-        elif self.cursor == 2:
-            if key[pg.K_LEFT] or key[pg.K_a]:
-                self.music_slider.move_slider(1, dt)
-            elif key[pg.K_RIGHT] or key[pg.K_d]:
-                self.music_slider.move_slider(-1, dt)
+        elif self.menu[self.cursor] == 'Music':
+            self.music_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a], key[pg.K_RIGHT] or key[pg.K_d], dt)
 
         return select_slot
 
@@ -504,16 +498,10 @@ class MenuUISettings(BaseMenuUI):
             if select_slot != "Back":
                 select_slot = self.save_settings(select_slot, input)
 
-        if self.cursor == 1:
-            if mobile_key["K_LEFT"]:
-                self.sound_slider.move_slider(1, dt)
-            elif mobile_key["K_RIGHT"]:
-                self.sound_slider.move_slider(-1, dt)
+        if self.menu[self.cursor] == 'Sound':
+            self.sound_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
 
-        elif self.cursor == 2:
-            if mobile_key["K_LEFT"]:
-                self.music_slider.move_slider(1, dt)
-            elif mobile_key["K_RIGHT"]:
-                self.music_slider.move_slider(-1, dt)
+        elif self.menu[self.cursor] == 'Music':
+            self.music_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
 
         return select_slot
