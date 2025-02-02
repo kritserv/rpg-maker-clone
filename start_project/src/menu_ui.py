@@ -387,27 +387,35 @@ class Slider(pg.sprite.Sprite):
         self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val
 
         self.container_rect = pg.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
+        self.container_color = pg.Color("black")
         self.button_rect = pg.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
+        self.button_rect_color = pg.Color("white")
+        self.left_fill_rect = pg.Rect(self.slider_left_pos, self.slider_top_pos, self.button_rect.x - self.slider_left_pos, self.size[1])
+        self.left_fill_rect_color = pg.Color("skyblue")
+
         self.save_value = self.button_rect.x - self.slider_left_pos
 
     def draw(self, display):
-        pg.draw.rect(display, "white", self.container_rect)
-        pg.draw.rect(display, "black", self.button_rect)
+        pg.draw.rect(display, self.container_color, self.container_rect)
+        pg.draw.rect(display, self.left_fill_rect_color, self.left_fill_rect)
+        pg.draw.rect(display, self.button_rect_color, self.button_rect)
 
     def move_slider(self, val, dt):
         if val == 1:
-            new_x = self.button_rect.x - 10 * dt
+            new_x = self.button_rect.x - 200 * dt
             if new_x < self.slider_left_pos:
                 new_x = self.slider_left_pos
             self.button_rect.x = new_x
 
         elif val == -1:
-            new_x = self.button_rect.x + 100 * dt
+            new_x = self.button_rect.x + 200 * dt
             if new_x > self.slider_right_pos - self.button_rect.width:
                 new_x = self.slider_right_pos - self.button_rect.width
             self.button_rect.x = new_x
 
-        self.save_value = self.button_rect.x - self.slider_left_pos
+        x = self.button_rect.x - self.slider_left_pos
+        self.save_value = x
+        self.left_fill_rect.width = x
 
 class MenuUISettings(BaseMenuUI):
     def __init__(self, full_path, settings_file_path, game_size, platform):
@@ -433,6 +441,9 @@ class MenuUISettings(BaseMenuUI):
         menu_items.append('Apply')
 
         self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Sound']/100)
+        self.sound_slider.left_fill_rect_color = pg.Color("skyblue")
+        self.music_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Music']/100)
+        self.music_slider.left_fill_rect_color = pg.Color("hotpink")
 
         super().__init__(full_path, menu_items, game_size)
 
@@ -449,15 +460,21 @@ class MenuUISettings(BaseMenuUI):
                         settings['Fullscreen'] = True
             case 'Apply':
                 settings['Sound'] = self.sound_slider.save_value
+                settings['Music'] = self.music_slider.save_value
+                json_saver(self.settings_path, settings)
+                return 'Back'
             case _:
                 pass
         json_saver(self.settings_path, settings)
+        return ''
 
 
     def draw(self, display, dt, current_time):
         slide_in = super(MenuUISettings, self).draw(display, dt, current_time)
         if self.cursor == 1:
             self.sound_slider.draw(display)
+        if self.cursor == 2:
+            self.music_slider.draw(display)
 
         return slide_in
 
@@ -465,7 +482,7 @@ class MenuUISettings(BaseMenuUI):
         select_slot = super(MenuUISettings, self).update_for_pc(key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                self.save_settings(select_slot, input)
+                select_slot = self.save_settings(select_slot, input)
 
         if self.cursor == 1:
             if key[pg.K_LEFT] or key[pg.K_a]:
@@ -473,18 +490,30 @@ class MenuUISettings(BaseMenuUI):
             elif key[pg.K_RIGHT] or key[pg.K_d]:
                 self.sound_slider.move_slider(-1, dt)
 
+        elif self.cursor == 2:
+            if key[pg.K_LEFT] or key[pg.K_a]:
+                self.music_slider.move_slider(1, dt)
+            elif key[pg.K_RIGHT] or key[pg.K_d]:
+                self.music_slider.move_slider(-1, dt)
+
         return select_slot
 
     def update_for_android(self, mobile_key, joysticks, dt, current_time, input):
         select_slot = super(MenuUISettings, self).update_for_android(mobile_key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                self.save_settings(select_slot, input)
+                select_slot = self.save_settings(select_slot, input)
 
         if self.cursor == 1:
             if mobile_key["K_LEFT"]:
                 self.sound_slider.move_slider(1, dt)
             elif mobile_key["K_RIGHT"]:
                 self.sound_slider.move_slider(-1, dt)
+
+        elif self.cursor == 2:
+            if mobile_key["K_LEFT"]:
+                self.music_slider.move_slider(1, dt)
+            elif mobile_key["K_RIGHT"]:
+                self.music_slider.move_slider(-1, dt)
 
         return select_slot

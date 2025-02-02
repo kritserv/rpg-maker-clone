@@ -111,7 +111,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
             if select_submenu:
                 match select_submenu:
                     case 'Back':
-                        pygame_event.game_state = -1
+                        pygame_event.game_state = -2
 
         case _:
             if not platform == 'android':
@@ -268,6 +268,8 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                     if select_submenu:
                         match select_submenu:
                             case 'Back':
+                                reset_menu(menu_ui_settings, display)
+                                reset_menu(menu_ui, display, 5)
                                 pygame_event.game_state = 1
 
             # Debug
