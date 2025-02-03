@@ -126,18 +126,6 @@ class BaseMenuUI:
 
         up, left, right, down, cancel, action = False, False, False, False, False, False
 
-        for joystick in joysticks:
-            if joystick.get_axis(1) < -0.6:
-                up = True
-            elif joystick.get_axis(1) > 0.6:
-                down = True
-            if joystick.get_button(0):
-                action = True
-            if joystick.get_button(1):
-                cancel = True
-            if joystick.get_button(10):
-                cancel = True
-
         if not up:
             up = mobile_key["K_UP"]
         if not down:
@@ -484,11 +472,18 @@ class MenuUISettings(BaseMenuUI):
             if select_slot != "Back":
                 select_slot = self.save_settings(select_slot, input)
 
+        joystick_left, joystick_right = False, False
+        for joystick in joysticks:
+            if joystick.get_axis(0) < -0.6:
+                joystick_left = True
+            elif joystick.get_axis(0) > 0.6:
+                joystick_right = True
+
         if self.menu[self.cursor] == 'Sound':
-            self.sound_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a], key[pg.K_RIGHT] or key[pg.K_d], dt)
+            self.sound_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
 
         elif self.menu[self.cursor] == 'Music':
-            self.music_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a], key[pg.K_RIGHT] or key[pg.K_d], dt)
+            self.music_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
 
         return select_slot
 
