@@ -1,8 +1,9 @@
 import pygame as pg
+from pygame.key import ScancodeWrapper
 from .timer import Timer
 
 class Input:
-    def __init__(self, platform, game_size = [], full_path='') -> None:
+    def __init__(self, platform, game_size = [], full_path=''):
         try:
             self.joysticks = [pg.joystick.Joystick(0)]
         except pg.error:
@@ -62,9 +63,7 @@ class Input:
         return new_size, key, display
 
     def update_for_android(self, pygame_event):
-        mobile_key, joystick = pygame_event.check_android(self.active_touches, self.image_controls)
-        if joystick:
-            self.joysticks.append(joystick)
+        mobile_key, _ = pygame_event.check_android(self.active_touches, self.image_controls)
         return mobile_key
 
     def draw_for_android(self, display):

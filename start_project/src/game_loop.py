@@ -260,10 +260,8 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                                 pygame_event.game_state = 1
 
             # Debug
-            debug_message = f"rem {len(player.remembered_obstacle_pos)}"
-            blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 5))
             debug_message = f"pos {player.pos}"
-            blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 17))
+            blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 5))
             pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 

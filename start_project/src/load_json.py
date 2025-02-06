@@ -1,6 +1,6 @@
 from json import load, dump
 
-def json_loader(path):
+def json_loader(path) -> dict:
 	with open(path) as f:
 		return load(f)
 
