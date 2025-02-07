@@ -5,14 +5,14 @@ from .load_asset import asset_loader
 from psutil import cpu_percent, virtual_memory
 
 class TopUI:
-    def __init__(self, full_path, game_size):
-        self.fps_font = asset_loader('font', 'PixelatedElegance')
+    def __init__(self, g):
+        self.fps_font = g['font']['font_9']
         self.fps = 0
         self.cpu = 0
         self.ram = 0
         self.fps_update_timer = Timer()
         self.fps_update_timer.start()
-        self.game_size = game_size
+        self.game_size = g['game_size']
 
     def draw_fps(self, display, clock):
         if self.fps_update_timer.get_elapsed_time() >= 0.5:

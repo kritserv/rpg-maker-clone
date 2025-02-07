@@ -1,67 +1,19 @@
 from .load_json import json_loader
 from .load_asset import asset_loader
-from csv import reader
 import pygame as pg
 import os
 
-class Tile(pg.sprite.Sprite):
-    """Represents a single tile in the game."""
-    def __init__(self, img_name, pos):
-        super().__init__()
-        self.img = asset_loader('tile', img_name)
-        self.rect = self.img.get_rect(topleft=pos)
-
-
 class RpgMap(pg.sprite.Sprite):
     """Handles loading and rendering of RPG map layers."""
-    def __init__(self, full_path, start_map, game_size):
+    def __init__(self, start_map, g, map_data):
         super().__init__()
         self.tile_size = 16  # Standard tile size
-        self.map_data = {}   # Stores map layers for each map
+        self.map_data = map_data   # Stores map layers for each map
         self.curr_map = start_map
-        self.full_path = full_path
 
-        self.game_size = game_size
-        self.view_height = game_size[1]//2+self.tile_size
-        self.view_width = game_size[0]//2+self.tile_size
-
-    def load_map_data(self, map_json) -> None:
-        """
-        Load all maps and their layers into memory from the given JSON.
-        Each map will have multiple layers stored in a dictionary.
-        """
-        tilesets = json_loader(f"{self.full_path}game_data/data/maps/tilesets.json")
-
-        for map_entry in map_json:
-            map_name = map_entry["name"]
-            tileset = map_entry["tileset"]
-
-            # Prepare layers for the current map
-            map_layers = {}
-
-            for layer_index in range(1, 5):  # Adjust range as needed for more layers
-                layer_name = f"layer{layer_index}"
-                csv_path = f"{self.full_path}game_data/data/maps/{map_name}{layer_name}.csv"
-
-                if os.path.exists(csv_path):
-                    map_layers[layer_name] = self._load_layer(csv_path, tilesets[tileset])
-
-            # Store the map's layers
-            self.map_data[map_name] = map_layers
-
-    def _load_layer(self, csv_path, tileset) -> list:
-        """
-        Load a single layer of tiles from a CSV file.
-        """
-        layer_tiles = []
-        with open(csv_path) as f:
-            csv_reader = reader(f, delimiter=",")
-            for y, row in enumerate(csv_reader):
-                for x, tile_id in enumerate(row):
-                    if tile_id.strip():  # Ignore empty tiles
-                        img_name = tileset[tile_id]
-                        layer_tiles.append(Tile(img_name, (x * self.tile_size, y * self.tile_size)))
-        return layer_tiles
+        self.game_size = g['game_size']
+        self.view_height = self.game_size[1]//2+self.tile_size
+        self.view_width = self.game_size[0]//2+self.tile_size
 
     def resize_view(self, new_size):
         """

@@ -7,7 +7,8 @@ def reset_menu(menu, display, cursor = 0):
     menu.speed = 450
     menu.animate_in = True
 
-def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, debug_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen):
+def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, top_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen):
+    platform = g['game_mode']
     dt = delta_time.get()
 
     if pygame_event.game_state == 3 or pygame_event.game_state == -4:
@@ -15,7 +16,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
     else:
         clock.tick()
     current_time = pg.time.get_ticks()
-    display.fill(GREY)
+    display.fill(g['colors']['grey'])
 
     # Input
     new_size = False
@@ -96,6 +97,11 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                         pygame_event.is_load_state = False
 
         case -4:
+            new_sound_volume = menu_ui_settings.sound_slider.save_value/100
+            menu_ui.select_sfx.set_volume(new_sound_volume)
+            menu_ui.open_menu_sfx.set_volume(new_sound_volume)
+            menu_ui_save.select_sfx.set_volume(new_sound_volume)
+            menu_ui_load.select_sfx.set_volume(new_sound_volume)
             select_submenu = False
             if new_size:
                 reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
@@ -126,7 +132,7 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
             # Graphic
             draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
             collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
-            # pg.draw.rect(display, pg.Color('green'), player.collision) # player collision box
+            # pg.draw.rect(display, g['colors']['green'], player.collision) # player collision box
             display.blit(player.img, [center_x-16, center_y-18])
             draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
 
@@ -182,9 +188,9 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                                 reset_menu(menu_ui_load, display)
 
                             case 'Setting':
-                                    pygame_event.game_state = 3
-                                    pygame_event.is_save_state = False
-                                    pygame_event.is_load_state = False
+                                pygame_event.game_state = 3
+                                pygame_event.is_save_state = False
+                                pygame_event.is_load_state = False
 
                             case 'Back':
                                 pygame_event.game_state -= 1
@@ -240,6 +246,11 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                                 pygame_event.is_load_state = False
 
                 case 3:
+                    new_sound_volume = menu_ui_settings.sound_slider.save_value/100
+                    menu_ui.select_sfx.set_volume(new_sound_volume)
+                    menu_ui.open_menu_sfx.set_volume(new_sound_volume)
+                    menu_ui_save.select_sfx.set_volume(new_sound_volume)
+                    menu_ui_load.select_sfx.set_volume(new_sound_volume)
                     select_submenu = False
                     if new_size:
                         reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
@@ -260,10 +271,10 @@ def run_game_loop(platform, delta_time, clock, pygame_event, input, display, rpg
                                 pygame_event.game_state = 1
 
             # Debug
-            debug_message = f"pos {player.pos}"
-            blit_text(display, f"{debug_message}", debug_font, BLACK, (5, 5))
-            pg.draw.line(display, BLACK, (0,0), (0,display.get_size()[1]))
-            pg.draw.line(display, BLACK, (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
+            debug_message = f"{menu_ui.select_sfx.get_volume()}"
+            blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
+            pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
+            pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
     top_ui.draw_fps(display, clock)
 

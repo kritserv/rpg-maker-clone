@@ -14,36 +14,84 @@ full_path = f"{os.path.abspath('.')}/"
 with open(f"{full_path}/game_data/game_mode.txt") as f:
     game_mode = f.readlines()[0].rstrip('\n') # pc / android / web
 
-game_size = [256, 137]
-native_res_multiplier = 4
-game_size_native = (game_size[0]*native_res_multiplier, game_size[1]*native_res_multiplier)
+g = {
+    'game_mode': game_mode,
+    'game_size': [256, 137],
+    'font': {},
+    'full_path': full_path,
+    'colors': {
+        'black': pg.Color('black'),
+        'grey': pg.Color('grey20'),
+        'lightgrey': pg.Color('grey90'),
+        'green': pg.Color('green'),
+        'darkblue': pg.Color('darkblue'),
+        'blue': pg.Color('blue'),
+        'lightblue': pg.Color('skyblue'),
+        'yellow': pg.Color('yellow'),
+        'white': pg.Color('white'),
+        'pink': pg.Color('hotpink')
+    }
+}
 
-if game_mode == 'android':
+native_res_multiplier = 4
+game_size_native = (
+    g['game_size'][0]*native_res_multiplier,
+    g['game_size'][1]*native_res_multiplier
+)
+
+if g['game_mode'] == 'android':
     phone_width, phone_height = pg.display.get_desktop_sizes()[0]
     # scale game_width to match phone_width
     phone_ratio = phone_width / phone_height
-    while game_size[0] / game_size[1] < phone_ratio:
-        game_size[0] += 1
+    while g['game_size'][0] / g['game_size'][1] < phone_ratio:
+        g['game_size'][0] += 1
 
-from src import json_loader, run_game_loop, Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, blit_text, TopUI, MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, asset_loader
+from src import json_loader, run_game_loop, \
+    Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, \
+    blit_text, TopUI, \
+    MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
+    asset_loader, load_player_sprite, load_map_data
 
-def load_game(player_start_pos, start_map, db, screen, save_file_path, game_mode):
-    player = Player(full_path, player_start_pos)
-    rpgmap = RpgMap(full_path, start_map, game_size)
-    rpgmap.load_map_data(db["maps"])
+def load_asset(db):
+    player_img = load_player_sprite()
+    all_tile_imgs = {}
+    tile_data = json_loader(f'{full_path}game_data/data/maps/tilesets.json')
+    for map_name in tile_data:
+        for tile_id in tile_data[map_name]:
+            all_tile_imgs[tile_data[map_name][tile_id]] = asset_loader(
+                'tile', tile_data[map_name][tile_id]
+            )
+    font_9 = asset_loader('font', 'PixelatedElegance')
+    return player_img, all_tile_imgs, font_9
+
+def load_game(player_start_pos, start_map, db, screen, save_file_path):
+    player_img, all_tile_imgs, font_9 = load_asset(db)
+    g['font']['font_9'] = font_9
+    player = Player(player_start_pos, player_img)
+    rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
     camera_width, camera_height = screen.get_size()
-    camera = Camera(camera_width, camera_height, game_size[0], game_size[1])
-    top_ui = TopUI(full_path, game_size)
-    menu_ui = MenuUI(full_path, game_size)
-    menu_ui_save = MenuUISave(full_path, save_file_path, game_size)
-    menu_ui_load = MenuUILoad(full_path, save_file_path, game_size)
-    menu_ui_title = MenuUITitle(full_path, game_size)
-    menu_ui_settings = MenuUISettings(full_path, save_file_path, game_size, game_mode)
-    return player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings
+    camera = Camera(camera_width, camera_height, g)
+    top_ui = TopUI(g)
+    menu_ui = MenuUI(g)
+    menu_ui_save = MenuUISave(save_file_path, g)
+    menu_ui_load = MenuUILoad(save_file_path, g)
+    menu_ui_title = MenuUITitle(g)
+    menu_ui_settings = MenuUISettings(save_file_path, g)
+    first_sound_volume = menu_ui_settings.sound_slider.save_value/100
+    first_music_volume = menu_ui_settings.music_slider.save_value/100
+    if first_sound_volume<0:
+        first_sound_volume=0
+    menu_ui.select_sfx.set_volume(first_sound_volume)
+    menu_ui.open_menu_sfx.set_volume(first_sound_volume)
+    menu_ui_save.select_sfx.set_volume(first_sound_volume)
+    menu_ui_load.select_sfx.set_volume(first_sound_volume)
+    return player, rpgmap, camera, top_ui, \
+        menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
+        menu_ui_settings
 
 async def main():
     delta_time = DeltaTime()
-    display = pg.Surface((game_size))
+    display = pg.Surface((g['game_size']))
 
     # load data
     db = json_loader(f"{full_path}game_data/db.json")
@@ -53,20 +101,17 @@ async def main():
 
     clock = pg.time.Clock()
 
-    GREY = pg.Color("grey20")
-    BLACK = pg.Color("black")
-
-    fps_font = asset_loader('font', 'PixelatedElegance')
-
-    pygame_event = PygameEvent(game_size=game_size)
+    pygame_event = PygameEvent(game_size=g['game_size'])
 
     debug_message = ''
 
-    match game_mode:
+    match g['game_mode']:
         case 'pc':
             """
-            OpenGL Stuff; for better FPS, resizable game windows and for steam achievement overlay
-            I don't know what any of these code do, I just copy it from dafluffypotato.
+            OpenGL Stuff; for better FPS, resizable game windows and
+            for steam achievement overlay
+            I don't know what any of these code do,
+            I just copy it from dafluffypotato.
             https://dafluffypotato.itch.io/hue-flowing
             """
             import moderngl
@@ -156,7 +201,9 @@ async def main():
             # Window.from_display_module().maximize()
 
             pg.display.set_icon(asset_loader('img', 'icon'))
-            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings = load_game(player_start_pos, start_map, db, screen, False, game_mode)
+            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
+            menu_ui_title, menu_ui_settings = load_game(
+                player_start_pos, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
                 pg.display.toggle_fullscreen()
@@ -166,28 +213,42 @@ async def main():
             game_state = 1
 
             while pygame_event.running:
-                display = run_game_loop('pc', delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen)
+                display = run_game_loop(g, delta_time, clock, pygame_event, \
+                    input, display, rpgmap, player, camera, top_ui, \
+                    debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
+                    menu_ui_title, menu_ui_settings, screen)
 
         case 'android':
 
-            screen = pg.display.set_mode((game_size),
+            screen = pg.display.set_mode((g['game_size']),
                 pg.SCALED)
             try:
                 from android.storage import app_storage_path
                 from android.permissions import request_permissions, check_permission, Permission
-                request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+                request_permissions(
+                    [
+                        Permission.READ_EXTERNAL_STORAGE,
+                        Permission.WRITE_EXTERNAL_STORAGE
+                    ]
+                )
                 pg.display.toggle_fullscreen()
             except:
                 def app_storage_path():
                     return full_path
 
-            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings = load_game(player_start_pos, start_map, db, screen, app_storage_path(), game_mode)
+            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
+            menu_ui_title, menu_ui_settings = load_game(
+                player_start_pos, start_map, db, screen, app_storage_path())
 
-            input = Input('android', game_size, full_path)
+            input = Input('android', g['game_size'], full_path)
             opengl = False
 
             while pygame_event.running:
-                run_game_loop('android', delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen)
+                run_game_loop(
+                    g, delta_time, clock, pygame_event, input, display,
+                    rpgmap, player, camera, top_ui, debug_message, opengl,
+                    menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
+                    menu_ui_settings, screen)
 
         case 'web':
             import sys, platform
@@ -196,13 +257,18 @@ async def main():
             screen = pg.display.set_mode(
                 (game_size_native),
                 pg.RESIZABLE)
-            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings = load_game(player_start_pos, start_map, db, screen, False, game_mode)
+            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
+            menu_ui_title, menu_ui_settings = load_game(
+                player_start_pos, start_map, db, screen, False)
 
             input = Input('web')
             opengl = False
 
             while pygame_event.running:
-                run_game_loop('web', delta_time, clock, pygame_event, input, display, rpgmap, player, camera, GREY, BLACK, top_ui, debug_message, fps_font, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen)
+                run_game_loop(g, delta_time, clock, pygame_event, input, display,
+                    rpgmap, player, camera, top_ui, debug_message, opengl,
+                    menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
+                    menu_ui_settings, screen)
                 await asyncio.sleep(0)
 
     pg.quit()

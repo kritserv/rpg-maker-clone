@@ -5,26 +5,25 @@ from .load_asset import asset_loader
 from datetime import datetime
 
 class BaseMenuUI:
-    def __init__(self, full_path, menu_items, game_size):
-        self.full_path = full_path
-        self.menu_font = asset_loader('font', 'PixelatedElegance')
+    def __init__(self, menu_items, g):
+        self.menu_font = g['font']['font_9']
         self.cursor = 0
         self.cursor_blink_interval = 200
 
         self.play_sound = False
 
-        self.DARKBLUE = pg.Color('darkblue')
-        self.BLUE = pg.Color('blue')
-        self.GREY = pg.Color('grey90')
-        self.YELLOW = pg.Color('yellow')
-        self.WHITE = pg.Color('white')
+        self.DARKBLUE = g['colors']['darkblue']
+        self.BLUE = g['colors']['blue']
+        self.GREY = g['colors']['lightgrey']
+        self.YELLOW = g['colors']['yellow']
+        self.WHITE = g['colors']['white']
 
         self.menu = menu_items
         self.menu_len = len(menu_items) - 1
-        self.game_size = game_size
+        self.game_size = g['game_size']
 
         self.menu_x = 0
-        self.menu_y = game_size[1]
+        self.menu_y = self.game_size[1]
 
         # Cooldown settings for cursor movement
         self.cursor_cooldown_time = 150  # milliseconds
@@ -169,19 +168,18 @@ class BaseMenuUI:
         return select_submenu
 
 class MenuUI(BaseMenuUI):
-    def __init__(self, full_path, game_size):
+    def __init__(self, g):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Setting', 'Exit to title')
-        super().__init__(full_path, menu_items, game_size)
+        super().__init__(menu_items, g)
         self.open_menu_sfx = asset_loader('sfx', 'open_menu')
         self.select_sfx = asset_loader('sfx', 'select')
 
-        self.is_open = False
         self.play_sound = True
 
 class MenuUITitle(BaseMenuUI):
-    def __init__(self, full_path, game_size):
+    def __init__(self, g):
         menu_items = ('New Game', 'Continue', 'Setting', 'Quit')
-        super().__init__(full_path, menu_items, game_size)
+        super().__init__(menu_items, g)
         self.speed = 20
 
     def draw(self, display, dt, current_time):
@@ -215,7 +213,8 @@ class MenuUITitle(BaseMenuUI):
         return slide_in
 
 class MenuUISave(BaseMenuUI):
-    def __init__(self, full_path, save_file_path, game_size):
+    def __init__(self, save_file_path, g):
+        full_path = g['full_path']
         self.save_path = f"{full_path}/user_data/save.json"
         if save_file_path:
             '''
@@ -244,7 +243,7 @@ class MenuUISave(BaseMenuUI):
                 menu_items.append(items.get('name'))
             else:
                 menu_items.append(key)
-        super().__init__(full_path, menu_items, game_size)
+        super().__init__(menu_items, g)
         self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
@@ -285,7 +284,8 @@ class MenuUISave(BaseMenuUI):
         return select_slot
 
 class MenuUILoad(BaseMenuUI):
-    def __init__(self, full_path, save_file_path, game_size):
+    def __init__(self, save_file_path, g):
+        full_path = g['full_path']
         self.save_path = f"{full_path}/user_data/save.json"
         if save_file_path:
             '''
@@ -315,7 +315,7 @@ class MenuUILoad(BaseMenuUI):
                 menu_items.append(items.get('name'))
             else:
                 menu_items.append(key)
-        super().__init__(full_path, menu_items, game_size)
+        super().__init__(menu_items, g)
         self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
@@ -406,7 +406,9 @@ class Slider(pg.sprite.Sprite):
         self.left_fill_rect.width = x
 
 class MenuUISettings(BaseMenuUI):
-    def __init__(self, full_path, settings_file_path, game_size, platform):
+    def __init__(self, settings_file_path, g):
+        game_size = g['game_size']
+        full_path = g['full_path']
         self.settings_path = f"{full_path}/user_data/settings.json"
         if settings_file_path:
             self.settings_path = f"{settings_file_path}/settings.json"
@@ -424,16 +426,17 @@ class MenuUISettings(BaseMenuUI):
         menu_items = []
         for key, items in settings.items():
             menu_items.append(key)
-        if platform != 'pc':
+        if g['game_mode'] != 'pc':
             menu_items.pop(0)
         menu_items.append('Apply')
 
+        self.sound_controller = None
         self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Sound']/100)
-        self.sound_slider.left_fill_rect_color = pg.Color("skyblue")
+        self.sound_slider.left_fill_rect_color = g['colors']['lightblue']
         self.music_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Music']/100)
-        self.music_slider.left_fill_rect_color = pg.Color("hotpink")
+        self.music_slider.left_fill_rect_color = g['colors']['pink']
 
-        super().__init__(full_path, menu_items, game_size)
+        super().__init__(menu_items, g)
 
     def save_settings(self, select_slot, input):
         settings = json_loader(self.settings_path)

@@ -5,9 +5,8 @@ from math import floor, ceil
 import os
 
 class Player(pg.sprite.Sprite):
-	def __init__(self, full_path, xy):
+	def __init__(self, xy, player_img):
 		pg.sprite.Sprite.__init__(self)
-		self.full_path = full_path
 		self.start_position = xy
 
 		self.levels = 0
@@ -15,18 +14,7 @@ class Player(pg.sprite.Sprite):
 
 		self.speed = 50
 		self.is_running = False
-
-		self.imgs = {
-			"bottom": [],
-			"top": [],
-			"left": [],
-			"right": [],
-			"running_bottom": [],
-			"running_top": [],
-			"running_left": [],
-			"running_right": [],
-			}
-		self.load_sprites()
+		self.imgs = player_img
 
 		self.current_img = 0
 		self.img = self.imgs["bottom"][self.current_img]
@@ -66,49 +54,6 @@ class Player(pg.sprite.Sprite):
 
 		self.speed = 50
 		self.is_running = False
-
-	def load_sprites(self) -> None:
-		load_spritesheet = asset_loader('sprite', 'player')
-		sprite_width = 16
-		sprite_height = 24
-		directions = [
-		    "bottom",
-			"top",
-			"left",
-			"right",
-			"running_bottom",
-			"running_top",
-			"running_left",
-			"running_right"
-			]
-		frames = [
-			"stand_still",
-			"left_leg_forward",
-			"right_leg_forward"
-			]
-		for row, direction in enumerate(directions):
-			for i, frame in enumerate(frames):
-				img = pg.Surface(
-					(sprite_width, sprite_height)
-					)
-				img.fill((255, 0, 255))
-				img.blit(
-					load_spritesheet,
-					(0, 0),
-					(
-						i*sprite_width,
-						row*sprite_height,
-						sprite_width,
-						sprite_height
-					)
-				)
-				img.set_colorkey((255, 0, 255))
-				img = img.convert_alpha()
-				self.imgs[direction].append(img)
-				if frame == "left_leg_forward":
-					self.imgs[direction].append(
-						self.imgs[direction][0]
-						)
 
 	def calculate_val_from_key(self, key, mobile_key={}, joysticks=[], dt=0.016):
 		now = pg.time.get_ticks()
