@@ -1,6 +1,7 @@
 import pygame as pg
 from pygame.key import ScancodeWrapper
 from .timer import Timer
+from .load_asset import asset_loader
 
 class Input:
     def __init__(self, platform, game_size = [], full_path=''):
@@ -13,23 +14,14 @@ class Input:
             self.fullscreen_toggle_timer.start()
         elif platform == 'android':
                 self.game_size = game_size
-                sprite_path = f"{full_path}assets/img/sprite/"
-                self.dpad_up = pg.image.load(
-                    f"{sprite_path}dpad.png"
-                    ).convert_alpha()
+                self.dpad_up = asset_loader('sprite','dpad')
                 self.dpad_up.set_alpha(155)
                 self.dpad_left = pg.transform.rotate(self.dpad_up, 90)
                 self.dpad_down = pg.transform.rotate(self.dpad_up, 180)
                 self.dpad_right = pg.transform.rotate(self.dpad_up, 270)
-                self.a = pg.image.load(
-                    f"{sprite_path}a.png"
-                    ).convert_alpha()
-                self.b = pg.image.load(
-                    f"{sprite_path}b.png"
-                    ).convert_alpha()
-                self.select = pg.image.load(
-                    f"{sprite_path}select.png"
-                    ).convert_alpha()
+                self.a = asset_loader('sprite','a')
+                self.b = asset_loader('sprite','b')
+                self.select = asset_loader('sprite','select')
                 self.a.set_alpha(155)
                 self.b.set_alpha(155)
                 self.select.set_alpha(155)
@@ -39,8 +31,8 @@ class Input:
                     "LEFT": (self.dpad_left, (10, 66)),
                     "RIGHT": (self.dpad_right, (70, 66)),
                     "DOWN": (self.dpad_down, (40, 94)),
-                    "A": (self.a, (game_size[0] - 85, 77)),
-                    "B": (self.b, (game_size[0] - 50, 77)),
+                    "A": (self.a, (game_size[0] - 50, 77)),
+                    "B": (self.b, (game_size[0] - 85, 77)),
                     "SELECT": (self.select, (game_size[0]//2-16, 100)),
                 }
                 self.active_touches = {}
