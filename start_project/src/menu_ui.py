@@ -420,6 +420,8 @@ class MenuUISettings(BaseMenuUI):
                 "Fullscreen": False,
                 "Sound": 50,
                 "Music": 50,
+                "Fps": 0,
+                "Debug": False
             })
             settings = json_loader(self.settings_path)
 
@@ -431,10 +433,13 @@ class MenuUISettings(BaseMenuUI):
         menu_items.append('Apply')
 
         self.sound_controller = None
-        self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Sound']/100)
+        self.sound_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings.get('Sound', 50)/100)
         self.sound_slider.left_fill_rect_color = g['colors']['lightblue']
-        self.music_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings['Music']/100)
+        self.music_slider = Slider((game_size[0]//2, game_size[1]//2), (110,30), settings.get('Music', 50)/100)
         self.music_slider.left_fill_rect_color = g['colors']['pink']
+
+        self.cap_fps = settings.get('Fps', 0)
+        self.debug = settings.get('Debug', False)
 
         super().__init__(menu_items, g)
 
@@ -449,9 +454,36 @@ class MenuUISettings(BaseMenuUI):
                         settings['Fullscreen'] = False
                     else:
                         settings['Fullscreen'] = True
+            case 'Fps':
+                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    input.fps_toggle_timer.restart()
+                    match self.cap_fps:
+                        case 0:
+                            self.cap_fps = 30
+                        case 30:
+                            self.cap_fps = 60
+                        case 60:
+                            self.cap_fps = 90
+                        case 90:
+                            self.cap_fps = 120
+                        case 120:
+                            self.cap_fps = 240
+                        case 240:
+                            self.cap_fps = 480
+                        case 480:
+                            self.cap_fps = 0
+            case 'Debug':
+                if input.debug_toggle_timer.get_elapsed_time() >= 0.3:
+                    input.debug_toggle_timer.restart()
+                    if self.debug == True:
+                        self.debug = False
+                    else:
+                        self.debug = True
             case 'Apply':
                 settings['Sound'] = self.sound_slider.save_value
                 settings['Music'] = self.music_slider.save_value
+                settings['Fps'] = self.cap_fps
+                settings['Debug'] = self.debug
                 json_saver(self.settings_path, settings)
                 return 'Back'
             case _:
@@ -462,10 +494,21 @@ class MenuUISettings(BaseMenuUI):
 
     def draw(self, display, dt, current_time):
         slide_in = super(MenuUISettings, self).draw(display, dt, current_time)
-        if self.menu[self.cursor] == 'Sound':
-            self.sound_slider.draw(display)
-        if self.menu[self.cursor] == 'Music':
-            self.music_slider.draw(display)
+        match self.menu[self.cursor]:
+            case 'Sound':
+                self.sound_slider.draw(display)
+            case 'Music':
+                self.music_slider.draw(display)
+            case 'Fps':
+                text = f"Cap at {self.cap_fps}"
+                if self.cap_fps == 0:
+                    text = 'No limit'
+                blit_text(display, text, self.menu_font, self.WHITE, (183, 42))
+            case 'Debug':
+                text = "On"
+                if self.debug == False:
+                    text = 'Off'
+                blit_text(display, text, self.menu_font, self.WHITE, (201, 54))
 
         return slide_in
 
@@ -482,11 +525,58 @@ class MenuUISettings(BaseMenuUI):
             elif joystick.get_axis(0) > 0.6:
                 joystick_right = True
 
-        if self.menu[self.cursor] == 'Sound':
-            self.sound_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
+        match self.menu[self.cursor]:
+            case 'Sound':
+                self.sound_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
 
-        elif self.menu[self.cursor] == 'Music':
-            self.music_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
+            case 'Music':
+                self.music_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
+
+            case 'Fps':
+                left, right = False, False
+                if key[pg.K_LEFT] or key[pg.K_a] or joystick_left:
+                    left = True
+                if key[pg.K_RIGHT] or key[pg.K_d] or joystick_right:
+                    right = True
+
+                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    input.fps_toggle_timer.restart()
+                    match self.cap_fps:
+                        case 0:
+                            if left:
+                                self.cap_fps = 240
+                            if right:
+                                self.cap_fps = 30
+                        case 30:
+                            if left:
+                                self.cap_fps = 0
+                            if right:
+                                self.cap_fps = 60
+                        case 60:
+                            if left:
+                                self.cap_fps = 30
+                            if right:
+                                self.cap_fps = 90
+                        case 90:
+                            if left:
+                                self.cap_fps = 60
+                            if right:
+                                self.cap_fps = 120
+                        case 120:
+                            if left:
+                                self.cap_fps = 90
+                            if right:
+                                self.cap_fps = 240
+                        case 240:
+                            if left:
+                                self.cap_fps = 120
+                            if right:
+                                self.cap_fps = 480
+                        case 480:
+                            if left:
+                                self.cap_fps = 240
+                            if right:
+                                self.cap_fps = 0
 
         return select_slot
 
@@ -496,10 +586,57 @@ class MenuUISettings(BaseMenuUI):
             if select_slot != "Back":
                 select_slot = self.save_settings(select_slot, input)
 
-        if self.menu[self.cursor] == 'Sound':
-            self.sound_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
+        match self.menu[self.cursor]:
+            case 'Sound':
+                self.sound_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
 
-        elif self.menu[self.cursor] == 'Music':
-            self.music_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
+            case 'Music':
+                self.music_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
+
+            case 'Fps':
+                left, right = False, False
+                if mobile_key["K_LEFT"]:
+                    left = True
+                if mobile_key["K_RIGHT"]:
+                    right = True
+
+                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    input.fps_toggle_timer.restart()
+                    match self.cap_fps:
+                        case 0:
+                            if left:
+                                self.cap_fps = 240
+                            if right:
+                                self.cap_fps = 30
+                        case 30:
+                            if left:
+                                self.cap_fps = 0
+                            if right:
+                                self.cap_fps = 60
+                        case 60:
+                            if left:
+                                self.cap_fps = 30
+                            if right:
+                                self.cap_fps = 90
+                        case 90:
+                            if left:
+                                self.cap_fps = 60
+                            if right:
+                                self.cap_fps = 120
+                        case 120:
+                            if left:
+                                self.cap_fps = 90
+                            if right:
+                                self.cap_fps = 240
+                        case 240:
+                            if left:
+                                self.cap_fps = 120
+                            if right:
+                                self.cap_fps = 480
+                        case 480:
+                            if left:
+                                self.cap_fps = 240
+                            if right:
+                                self.cap_fps = 0
 
         return select_slot

@@ -14,7 +14,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
     if pygame_event.game_state == 3 or pygame_event.game_state == -4:
         clock.tick(60)
     else:
-        clock.tick()
+        clock.tick(menu_ui_settings.cap_fps)
     current_time = pg.time.get_ticks()
     display.fill(g['colors']['grey'])
 
@@ -134,7 +134,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
             collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
             # pg.draw.rect(display, g['colors']['green'], player.collision) # player collision box
             display.blit(player.img, [center_x-16, center_y-18])
-            draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
+            draw_count += rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
 
             # Logic
             if pygame_event.game_state == 0:
@@ -269,14 +269,18 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
                                 reset_menu(menu_ui_settings, display)
                                 reset_menu(menu_ui, display, 5)
                                 pygame_event.game_state = 1
-
-            # Debug
-            debug_message = f"{menu_ui.select_sfx.get_volume()}"
-            blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
             pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
-    top_ui.draw_fps(display, clock)
+    if menu_ui_settings.debug:
+        # Debug
+        debug_message = ""
+        try:
+            debug_message = f"draw_count: {draw_count}"
+        except:
+            pass
+        blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
+        top_ui.draw_fps(display, clock)
 
     match platform:
         case 'pc':
