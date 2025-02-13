@@ -50,6 +50,7 @@ from src import json_loader, run_game_loop, \
     Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, \
     blit_text, TopUI, \
     MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
+    MenuUIInventory, MenuUISkills, MenuUIAchievement, \
     asset_loader, load_player_sprite, load_map_data
 
 def load_asset(db):
@@ -61,11 +62,13 @@ def load_asset(db):
             all_tile_imgs[tile_data[map_name][tile_id]] = asset_loader(
                 'tile', tile_data[map_name][tile_id]
             )
+    open_menu_sfx = asset_loader('sfx', 'open_menu')
+    select_sfx = asset_loader('sfx', 'select')
     font_9 = asset_loader('font', 'PixelatedElegance')
-    return player_img, all_tile_imgs, font_9
+    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, font_9
 
 def load_game(player_start_pos, start_map, db, screen, save_file_path):
-    player_img, all_tile_imgs, font_9 = load_asset(db)
+    player_img, all_tile_imgs, open_menu_sfx, select_sfx, font_9 = load_asset(db)
     g['font']['font_9'] = font_9
     player = Player(player_start_pos, player_img)
     rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
@@ -73,10 +76,20 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     camera = Camera(camera_width, camera_height, g)
     top_ui = TopUI(g)
     menu_ui = MenuUI(g)
+    menu_ui.open_menu_sfx = open_menu_sfx
+    menu_ui.select_sfx = select_sfx
     menu_ui_save = MenuUISave(save_file_path, g)
+    menu_ui_save.select_sfx = select_sfx
     menu_ui_load = MenuUILoad(save_file_path, g)
+    menu_ui_load.select_sfx = select_sfx
     menu_ui_title = MenuUITitle(g)
     menu_ui_settings = MenuUISettings(save_file_path, g)
+    menu_ui_inventory = MenuUIInventory(save_file_path, g)
+    menu_ui_inventory.select_sfx = select_sfx
+    menu_ui_skills = MenuUISkills(save_file_path, g)
+    menu_ui_skills.select_sfx = select_sfx
+    menu_ui_achievement = MenuUIAchievement(save_file_path, g)
+    menu_ui_achievement.select_sfx = asset_loader('sfx', 'select')
     first_sound_volume = menu_ui_settings.sound_slider.save_value/100
     first_music_volume = menu_ui_settings.music_slider.save_value/100
     if first_sound_volume<0:
@@ -85,9 +98,13 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     menu_ui.open_menu_sfx.set_volume(first_sound_volume)
     menu_ui_save.select_sfx.set_volume(first_sound_volume)
     menu_ui_load.select_sfx.set_volume(first_sound_volume)
+    menu_ui_inventory.select_sfx.set_volume(first_sound_volume)
+    menu_ui_skills.select_sfx.set_volume(first_sound_volume)
+    menu_ui_achievement.select_sfx.set_volume(first_sound_volume)
     return player, rpgmap, camera, top_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
-        menu_ui_settings
+        menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
+        menu_ui_achievement
 
 async def main():
     delta_time = DeltaTime()
@@ -202,7 +219,8 @@ async def main():
 
             pg.display.set_icon(asset_loader('img', 'icon'))
             player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
-            menu_ui_title, menu_ui_settings = load_game(
+            menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
+           menu_ui_achievement = load_game(
                 player_start_pos, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
@@ -216,7 +234,8 @@ async def main():
                 display = run_game_loop(g, delta_time, clock, pygame_event, \
                     input, display, rpgmap, player, camera, top_ui, \
                     debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
-                    menu_ui_title, menu_ui_settings, screen)
+                    menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
+                    menu_ui_achievement, screen)
 
         case 'android':
 
@@ -237,7 +256,8 @@ async def main():
                     return full_path
 
             player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
-            menu_ui_title, menu_ui_settings = load_game(
+            menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
+           menu_ui_achievement = load_game(
                 player_start_pos, start_map, db, screen, app_storage_path())
 
             input = Input('android', g['game_size'], full_path)
@@ -248,7 +268,8 @@ async def main():
                     g, delta_time, clock, pygame_event, input, display,
                     rpgmap, player, camera, top_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
-                    menu_ui_settings, screen)
+                    menu_ui_settings, menu_ui_inventory, menu_ui_skills,
+                    menu_ui_achievement, screen)
 
         case 'web':
             import sys, platform
@@ -258,7 +279,8 @@ async def main():
                 (game_size_native),
                 pg.RESIZABLE)
             player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
-            menu_ui_title, menu_ui_settings = load_game(
+            menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
+           menu_ui_achievement = load_game(
                 player_start_pos, start_map, db, screen, False)
 
             input = Input('web')
@@ -268,7 +290,8 @@ async def main():
                 run_game_loop(g, delta_time, clock, pygame_event, input, display,
                     rpgmap, player, camera, top_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
-                    menu_ui_settings, screen)
+                    menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement,
+                    screen)
                 await asyncio.sleep(0)
 
     pg.quit()

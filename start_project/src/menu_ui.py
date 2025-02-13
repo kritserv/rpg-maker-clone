@@ -1,7 +1,6 @@
 import pygame as pg
 from .blit_text import blit_text
 from .load_json import json_loader, json_saver
-from .load_asset import asset_loader
 from datetime import datetime
 
 class BaseMenuUI:
@@ -38,6 +37,7 @@ class BaseMenuUI:
             slide_in = True
         else:
             slide_in = False
+            self.menu_x = menu_x_finish
 
         menu_y = 2
         menu_w = 110
@@ -110,9 +110,6 @@ class BaseMenuUI:
 
         if action:
             select_submenu = self.menu[self.cursor]
-            if select_submenu and self.play_sound:
-                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Setting', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
-                    self.select_sfx.play()
 
         elif cancel:
             select_submenu = 'Back'
@@ -156,9 +153,6 @@ class BaseMenuUI:
 
         if action:
             select_submenu = self.menu[self.cursor]
-            if select_submenu and self.play_sound:
-                if select_submenu not in ('Inventory', 'Skills', 'Achievement', 'Setting', 'Slot 0', 'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6'):
-                    self.select_sfx.play()
 
         elif cancel:
             select_submenu = 'Back'
@@ -171,8 +165,6 @@ class MenuUI(BaseMenuUI):
     def __init__(self, g):
         menu_items = ('Inventory', 'Skills', 'Achievement', 'Save', 'Load', 'Setting', 'Exit to title')
         super().__init__(menu_items, g)
-        self.open_menu_sfx = asset_loader('sfx', 'open_menu')
-        self.select_sfx = asset_loader('sfx', 'select')
 
         self.play_sound = True
 
@@ -190,6 +182,7 @@ class MenuUITitle(BaseMenuUI):
             slide_in = True
         else:
             slide_in = False
+            self.menu_y = menu_y_finish
 
         menu_x = 2
         menu_w = 110
@@ -244,7 +237,6 @@ class MenuUISave(BaseMenuUI):
             else:
                 menu_items.append(key)
         super().__init__(menu_items, g)
-        self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
     def save_game(self, select_slot, player, rpgmap):
@@ -316,7 +308,6 @@ class MenuUILoad(BaseMenuUI):
             else:
                 menu_items.append(key)
         super().__init__(menu_items, g)
-        self.select_sfx = asset_loader('sfx', 'select')
         self.play_sound = True
 
     def load_game(self, select_slot, player, rpgmap):
@@ -455,23 +446,12 @@ class MenuUISettings(BaseMenuUI):
                     else:
                         settings['Fullscreen'] = True
             case 'Fps':
+                FPS_VALUES = [0, 30, 60, 90, 120, 240, 480]
                 if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
                     input.fps_toggle_timer.restart()
-                    match self.cap_fps:
-                        case 0:
-                            self.cap_fps = 30
-                        case 30:
-                            self.cap_fps = 60
-                        case 60:
-                            self.cap_fps = 90
-                        case 90:
-                            self.cap_fps = 120
-                        case 120:
-                            self.cap_fps = 240
-                        case 240:
-                            self.cap_fps = 480
-                        case 480:
-                            self.cap_fps = 0
+                    current_index = FPS_VALUES.index(self.cap_fps)
+                    new_index = (current_index + 1) % len(FPS_VALUES)
+                    self.cap_fps = FPS_VALUES[new_index]
             case 'Debug':
                 if input.debug_toggle_timer.get_elapsed_time() >= 0.3:
                     input.debug_toggle_timer.restart()
@@ -503,12 +483,12 @@ class MenuUISettings(BaseMenuUI):
                 text = f"Cap at {self.cap_fps}"
                 if self.cap_fps == 0:
                     text = 'No limit'
-                blit_text(display, text, self.menu_font, self.WHITE, (183, 42))
+                blit_text(display, text, self.menu_font, self.WHITE, (185, 42))
             case 'Debug':
                 text = "On"
                 if self.debug == False:
                     text = 'Off'
-                blit_text(display, text, self.menu_font, self.WHITE, (201, 54))
+                blit_text(display, text, self.menu_font, self.WHITE, (203, 54))
 
         return slide_in
 
@@ -533,6 +513,8 @@ class MenuUISettings(BaseMenuUI):
                 self.music_slider.move_slider(key[pg.K_LEFT] or key[pg.K_a] or joystick_left, key[pg.K_RIGHT] or key[pg.K_d] or joystick_right, dt)
 
             case 'Fps':
+                FPS_VALUES = [0, 30, 60, 90, 120, 240, 480]
+
                 left, right = False, False
                 if key[pg.K_LEFT] or key[pg.K_a] or joystick_left:
                     left = True
@@ -541,43 +523,14 @@ class MenuUISettings(BaseMenuUI):
 
                 if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
                     input.fps_toggle_timer.restart()
-                    match self.cap_fps:
-                        case 0:
-                            if left:
-                                self.cap_fps = 240
-                            if right:
-                                self.cap_fps = 30
-                        case 30:
-                            if left:
-                                self.cap_fps = 0
-                            if right:
-                                self.cap_fps = 60
-                        case 60:
-                            if left:
-                                self.cap_fps = 30
-                            if right:
-                                self.cap_fps = 90
-                        case 90:
-                            if left:
-                                self.cap_fps = 60
-                            if right:
-                                self.cap_fps = 120
-                        case 120:
-                            if left:
-                                self.cap_fps = 90
-                            if right:
-                                self.cap_fps = 240
-                        case 240:
-                            if left:
-                                self.cap_fps = 120
-                            if right:
-                                self.cap_fps = 480
-                        case 480:
-                            if left:
-                                self.cap_fps = 240
-                            if right:
-                                self.cap_fps = 0
-
+                    current_index = FPS_VALUES.index(self.cap_fps)
+                    if left:
+                        new_index = (current_index - 1) % len(FPS_VALUES)
+                    elif right:
+                        new_index = (current_index + 1) % len(FPS_VALUES)
+                    else:
+                        new_index = current_index
+                    self.cap_fps = FPS_VALUES[new_index]
         return select_slot
 
     def update_for_android(self, mobile_key, joysticks, dt, current_time, input):
@@ -594,6 +547,8 @@ class MenuUISettings(BaseMenuUI):
                 self.music_slider.move_slider(mobile_key["K_LEFT"], mobile_key["K_RIGHT"], dt)
 
             case 'Fps':
+                FPS_VALUES = [0, 30, 60, 90, 120, 240, 480]
+
                 left, right = False, False
                 if mobile_key["K_LEFT"]:
                     left = True
@@ -602,41 +557,151 @@ class MenuUISettings(BaseMenuUI):
 
                 if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
                     input.fps_toggle_timer.restart()
-                    match self.cap_fps:
-                        case 0:
-                            if left:
-                                self.cap_fps = 240
-                            if right:
-                                self.cap_fps = 30
-                        case 30:
-                            if left:
-                                self.cap_fps = 0
-                            if right:
-                                self.cap_fps = 60
-                        case 60:
-                            if left:
-                                self.cap_fps = 30
-                            if right:
-                                self.cap_fps = 90
-                        case 90:
-                            if left:
-                                self.cap_fps = 60
-                            if right:
-                                self.cap_fps = 120
-                        case 120:
-                            if left:
-                                self.cap_fps = 90
-                            if right:
-                                self.cap_fps = 240
-                        case 240:
-                            if left:
-                                self.cap_fps = 120
-                            if right:
-                                self.cap_fps = 480
-                        case 480:
-                            if left:
-                                self.cap_fps = 240
-                            if right:
-                                self.cap_fps = 0
+                    current_index = FPS_VALUES.index(self.cap_fps)
+                    if left:
+                        new_index = (current_index - 1) % len(FPS_VALUES)
+                    elif right:
+                        new_index = (current_index + 1) % len(FPS_VALUES)
+                    else:
+                        new_index = current_index
+                    self.cap_fps = FPS_VALUES[new_index]
 
         return select_slot
+
+class MenuUIInventory(BaseMenuUI):
+    def __init__(self, saves_file_path, g):
+        menu_items = (
+            'Iron Sword: 1',
+            'Iron Chestplate: 1',
+            'Iron Helmet: 1',
+            'Iron Leggings: 1',
+            'Iron Boots: 1',
+            'HP Potion: 5',
+            'SP Potion: 5',
+            'Quest Notebook: 2',
+            'Bread: 10',
+            'Water: 10',
+            'Wine: 5',
+            'Antidote: 1',
+            'HP Full Restore: 5',
+            'SP Full Restore: 5',
+        )
+        super().__init__(menu_items, g)
+        self.speed = 20
+        self.play_sound = True
+
+    def draw(self, display, dt, current_time):
+        menu_y_finish = 5
+        if self.cursor >= 10:
+            menu_y_finish = self.cursor * -8
+        else:
+            menu_y_finish = 5
+
+        if self.menu_y > menu_y_finish:
+            self.menu_y -= self.speed * dt
+            self.speed += 800 * dt
+            slide_in = True
+        else:
+            slide_in = False
+            self.menu_y = menu_y_finish
+
+        menu_x = 2
+        menu_w = 150
+        if len(self.menu) <= 10:
+            menu_h = 127
+        else:
+            menu_h = len(self.menu)*13
+
+        pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
+        menu_text_y = self.menu_y + 6
+        blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
+        for i, menu_text in enumerate(self.menu):
+            if i == self.cursor:
+                pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
+                if blink_on:
+                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                else:
+                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+            else:
+                blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
+            menu_text_y += 12
+        for i in range(4):
+            pg.draw.rect(display, self.GREY, (menu_x - i, self.menu_y - i, menu_w + 1, menu_h + 1), 1)
+
+        return slide_in
+
+class MenuUISkills(BaseMenuUI):
+    def __init__(self, saves_file_path, g):
+        menu_items = ('Fire ball: LVL 1', '', '', '', '', '', '', '', '', '')
+        super().__init__(menu_items, g)
+        self.speed = 20
+        self.play_sound = True
+
+    def draw(self, display, dt, current_time):
+        menu_y_finish = 5
+        if self.menu_y > menu_y_finish:
+            self.menu_y -= self.speed * dt
+            self.speed += 800 * dt
+            slide_in = True
+        else:
+            slide_in = False
+            self.menu_y = menu_y_finish
+
+        menu_x = 2
+        menu_w = 150
+        menu_h = 127
+        pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
+        menu_text_y = self.menu_y + 6
+        blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
+        for i, menu_text in enumerate(self.menu):
+            if i == self.cursor:
+                pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
+                if blink_on:
+                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                else:
+                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+            else:
+                blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
+            menu_text_y += 12
+        for i in range(4):
+            pg.draw.rect(display, self.GREY, (menu_x - i, self.menu_y - i, menu_w + 1, menu_h + 1), 1)
+
+        return slide_in
+
+class MenuUIAchievement(BaseMenuUI):
+    def __init__(self, saves_file_path, g):
+        menu_items = ('1st time Open inventory', 'Clear 5 Quests', 'Reach LVL 5', 'Reach LVL 10', 'Defeat Kraken', 'Finish the Game', 'Collect every CG')
+        super().__init__(menu_items, g)
+        self.speed = 20
+        self.play_sound = True
+
+    def draw(self, display, dt, current_time):
+        menu_y_finish = 5
+        if self.menu_y > menu_y_finish:
+            self.menu_y -= self.speed * dt
+            self.speed += 800 * dt
+            slide_in = True
+        else:
+            slide_in = False
+            self.menu_y = menu_y_finish
+
+        menu_x = 2
+        menu_w = display.get_size()[0]-5
+        menu_h = 127
+        pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
+        menu_text_y = self.menu_y + 6
+        blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
+        for i, menu_text in enumerate(self.menu):
+            if i == self.cursor:
+                pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
+                if blink_on:
+                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                else:
+                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+            else:
+                blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
+            menu_text_y += 12
+        for i in range(4):
+            pg.draw.rect(display, self.GREY, (menu_x - i, self.menu_y - i, menu_w + 1, menu_h + 1), 1)
+
+        return slide_in

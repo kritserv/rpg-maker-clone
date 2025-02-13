@@ -1,3 +1,4 @@
+from moderngl import Error
 from .blit_text import blit_text
 import pygame as pg
 
@@ -7,7 +8,7 @@ def reset_menu(menu, display, cursor = 0):
     menu.speed = 450
     menu.animate_in = True
 
-def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, top_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, screen):
+def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, top_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -102,6 +103,9 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
             menu_ui.open_menu_sfx.set_volume(new_sound_volume)
             menu_ui_save.select_sfx.set_volume(new_sound_volume)
             menu_ui_load.select_sfx.set_volume(new_sound_volume)
+            menu_ui_inventory.select_sfx.set_volume(new_sound_volume)
+            menu_ui_skills.select_sfx.set_volume(new_sound_volume)
+            menu_ui_achievement.select_sfx.set_volume(new_sound_volume)
             select_submenu = False
             if new_size:
                 reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
@@ -152,10 +156,17 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
                 reset_menu(menu_ui_load, display)
                 reset_menu(menu_ui_title, display)
                 reset_menu(menu_ui_settings, display)
+                reset_menu(menu_ui_inventory, display)
+                reset_menu(menu_ui_skills, display)
+                reset_menu(menu_ui_achievement, display)
                 menu_ui.is_open = False
 
             match pygame_event.game_state:
                 case 1:
+                    reset_meny_y_pos = display.get_size()[1]
+                    menu_ui_inventory.menu_y = reset_meny_y_pos
+                    menu_ui_skills.menu_y = reset_meny_y_pos
+                    menu_ui_achievement.menu_y = reset_meny_y_pos
                     if menu_ui.is_open == False:
                         menu_ui.is_open = True
                         menu_ui.open_menu_sfx.play()
@@ -173,6 +184,19 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
                                 select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
                     if select_submenu:
                         match select_submenu:
+
+                            case 'Inventory':
+                                pygame_event.game_state = 4
+                                reset_menu(menu_ui_inventory, display)
+
+                            case 'Skills':
+                                pygame_event.game_state = 5
+                                reset_menu(menu_ui_skills, display)
+
+                            case 'Achievement':
+                                pygame_event.game_state = 6
+                                reset_menu(menu_ui_skills, display)
+
                             case 'Save':
                                 pygame_event.game_state = 2
                                 pygame_event.is_save_state = True
@@ -251,6 +275,9 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
                     menu_ui.open_menu_sfx.set_volume(new_sound_volume)
                     menu_ui_save.select_sfx.set_volume(new_sound_volume)
                     menu_ui_load.select_sfx.set_volume(new_sound_volume)
+                    menu_ui_inventory.select_sfx.set_volume(new_sound_volume)
+                    menu_ui_skills.select_sfx.set_volume(new_sound_volume)
+                    menu_ui_achievement.select_sfx.set_volume(new_sound_volume)
                     select_submenu = False
                     if new_size:
                         reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
@@ -269,6 +296,65 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
                                 reset_menu(menu_ui_settings, display)
                                 reset_menu(menu_ui, display, 5)
                                 pygame_event.game_state = 1
+
+                case 4:
+                    select_submenu = False
+                    if new_size:
+                        reset_menu(menu_ui_inventory, display, cursor = menu_ui_inventory.cursor)
+                    slide_in = menu_ui_inventory.draw(display, dt, current_time)
+                    if not slide_in:
+                        match platform:
+                            case 'pc':
+                                select_submenu = menu_ui_inventory.update_for_pc(key, input.joysticks, dt, current_time, input)
+                            case 'android':
+                                select_submenu = menu_ui_inventory.update_for_android(mobile_key, [], dt, current_time, input)
+                            case 'web':
+                                select_submenu = menu_ui_inventory.update_for_pc(key, input.joysticks, dt, current_time, input)
+                    if select_submenu:
+                        match select_submenu:
+                            case 'Back':
+                                reset_menu(menu_ui_inventory, display)
+                                reset_menu(menu_ui, display, 0)
+                                pygame_event.game_state = 1
+                case 5:
+                    select_submenu = False
+                    if new_size:
+                        reset_menu(menu_ui_skills, display, cursor = menu_ui_skills.cursor)
+                    slide_in = menu_ui_skills.draw(display, dt, current_time)
+                    if not slide_in:
+                        match platform:
+                            case 'pc':
+                                select_submenu = menu_ui_skills.update_for_pc(key, input.joysticks, dt, current_time, input)
+                            case 'android':
+                                select_submenu = menu_ui_skills.update_for_android(mobile_key, [], dt, current_time, input)
+                            case 'web':
+                                select_submenu = menu_ui_skills.update_for_pc(key, input.joysticks, dt, current_time, input)
+                    if select_submenu:
+                        match select_submenu:
+                            case 'Back':
+                                reset_menu(menu_ui_skills, display)
+                                reset_menu(menu_ui, display, 1)
+                                pygame_event.game_state = 1
+                case 6:
+                    select_submenu = False
+                    if new_size:
+                        reset_menu(menu_ui_achievement, display, cursor = menu_ui_achievement.cursor)
+                    slide_in = menu_ui_achievement.draw(display, dt, current_time)
+                    if not slide_in:
+                        match platform:
+                            case 'pc':
+                                select_submenu = menu_ui_achievement.update_for_pc(key, input.joysticks, dt, current_time, input)
+                            case 'android':
+                                select_submenu = menu_ui_achievement.update_for_android(mobile_key, [], dt, current_time, input)
+                            case 'web':
+                                select_submenu = menu_ui_achievement.update_for_pc(key, input.joysticks, dt, current_time, input)
+                    if select_submenu:
+                        match select_submenu:
+                            case 'Back':
+                                reset_menu(menu_ui_achievement, display)
+                                reset_menu(menu_ui, display, 2)
+                                pygame_event.game_state = 1
+
             pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
@@ -276,9 +362,9 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
         # Debug
         debug_message = ""
         try:
-            debug_message = f"draw_count: {draw_count}"
-        except:
-            pass
+            debug_message = f"inven: {player.items}"
+        except Exception as e:
+            debug_message = f"{e}"
         blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
         top_ui.draw_fps(display, clock)
 
