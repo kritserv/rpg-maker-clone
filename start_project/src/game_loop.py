@@ -1,14 +1,8 @@
-from moderngl import Error
-from .blit_text import blit_text
+from .ui import blit_text
 import pygame as pg
+from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, reset_menu
 
-def reset_menu(menu, display, cursor = 0):
-    menu.cursor = cursor
-    menu.menu_x = display.get_size()[0]
-    menu.speed = 450
-    menu.animate_in = True
-
-def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, top_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen):
+def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -21,6 +15,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     # Input
     new_size = False
+    mobile_key, key = False, False
     match platform:
         case 'pc':
             new_size, key, display = input.update_for_pc(pygame_event, display)
@@ -34,94 +29,16 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
 
     match pygame_event.game_state:
         case -1:
-            slide_in = menu_ui_title.draw(display, dt, current_time)
-            select_submenu = False
-            if not slide_in:
-                match platform:
-                    case 'pc':
-                        select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
-                    case 'android':
-                        select_submenu = menu_ui_title.update_for_android(mobile_key, [], dt, current_time)
-                    case 'web':
-                        select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
-
-                match select_submenu:
-                    case 'New Game':
-                        player.start_new_game()
-                        pygame_event.game_state = 0
-                    case 'Continue':
-                        reset_menu(menu_ui_load, display)
-                        pygame_event.game_state = -3
-                    case 'Setting':
-                        pygame_event.game_state = -4
-                    case 'Quit':
-                        pygame_event.running = False
-                    case _:
-                        pass
-            reset_menu(menu_ui, display)
-            reset_menu(menu_ui_save, display)
-            reset_menu(menu_ui_load, display)
-            reset_menu(menu_ui_settings, display)
+            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings)
 
         case -2:
-            menu_ui_title.speed = 20
-            menu_ui_title.menu_y = display.get_size()[1]
-            pygame_event.game_state = -1
+            reset_title_screen(menu_ui_title, display, pygame_event)
 
         case -3:
-            select_submenu = False
-            if new_size:
-                reset_menu(menu_ui_load, display, cursor = menu_ui_load.cursor)
-            slide_in = menu_ui_load.draw(display, dt, current_time)
-            if not slide_in:
-                match platform:
-                    case 'pc':
-                        select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
-                    case 'android':
-                        select_submenu = menu_ui_load.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
-                    case 'web':
-                        select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
-            if select_submenu:
-                match select_submenu:
-                    case 'Back':
-                        pygame_event.game_state = -1
-                        if pygame_event.is_save_state:
-                            reset_menu(menu_ui, display, 3)
-                            pygame_event.is_save_state = False
-                        elif pygame_event.is_load_state:
-                            reset_menu(menu_ui, display, 4)
-                            pygame_event.is_load_state = False
-                    case _:
-                        menu_ui_load.menu = menu_ui_save.menu
-                        pygame_event.game_state = 0
-                        pygame_event.is_save_state = False
-                        pygame_event.is_load_state = False
+            load_game_update(new_size, menu_ui, menu_ui_load, menu_ui_save, display, dt, current_time, key, input, platform, mobile_key, player, rpgmap, pygame_event)
 
         case -4:
-            new_sound_volume = menu_ui_settings.sound_slider.save_value/100
-            menu_ui.select_sfx.set_volume(new_sound_volume)
-            menu_ui.open_menu_sfx.set_volume(new_sound_volume)
-            menu_ui_save.select_sfx.set_volume(new_sound_volume)
-            menu_ui_load.select_sfx.set_volume(new_sound_volume)
-            menu_ui_inventory.select_sfx.set_volume(new_sound_volume)
-            menu_ui_skills.select_sfx.set_volume(new_sound_volume)
-            menu_ui_achievement.select_sfx.set_volume(new_sound_volume)
-            select_submenu = False
-            if new_size:
-                reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
-            slide_in = menu_ui_settings.draw(display, dt, current_time)
-            if not slide_in:
-                match platform:
-                    case 'pc':
-                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
-                    case 'android':
-                        select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time, input)
-                    case 'web':
-                        select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
-            if select_submenu:
-                match select_submenu:
-                    case 'Back':
-                        pygame_event.game_state = -2
+            settings_update(-2, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, input, pygame_event)
 
         case _:
             if not platform == 'android':
@@ -142,218 +59,25 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
 
             # Logic
             if pygame_event.game_state == 0:
-                match platform:
-                    case 'pc':
-                        player.update(key, dt, joysticks=input.joysticks, collision_rects=collision_rects)
-                    case 'android':
-                        player.update(key=None, dt=dt, mobile_key=mobile_key, joysticks=[], collision_rects=collision_rects)
-                    case 'web':
-                        player.update(key, dt, joysticks=input.joysticks, collision_rects=collision_rects)
-
-                camera.update(player)
-                reset_menu(menu_ui, display)
-                reset_menu(menu_ui_save, display)
-                reset_menu(menu_ui_load, display)
-                reset_menu(menu_ui_title, display)
-                reset_menu(menu_ui_settings, display)
-                reset_menu(menu_ui_inventory, display)
-                reset_menu(menu_ui_skills, display)
-                reset_menu(menu_ui_achievement, display)
-                menu_ui.is_open = False
+                main_game_update(platform, player, key, mobile_key, input, dt, collision_rects, camera, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, display)
 
             match pygame_event.game_state:
                 case 1:
-                    reset_meny_y_pos = display.get_size()[1]
-                    menu_ui_inventory.menu_y = reset_meny_y_pos
-                    menu_ui_skills.menu_y = reset_meny_y_pos
-                    menu_ui_achievement.menu_y = reset_meny_y_pos
-                    if menu_ui.is_open == False:
-                        menu_ui.is_open = True
-                        menu_ui.open_menu_sfx.play()
-                    if new_size:
-                        reset_menu(menu_ui, display, cursor = menu_ui.cursor)
-                    select_submenu = False
-                    slide_in = menu_ui.draw(display, dt, current_time)
-                    if not slide_in:
-                        match platform:
-                            case 'pc':
-                                select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
-                            case 'android':
-                                select_submenu = menu_ui.update_for_android(mobile_key, [], dt, current_time)
-                            case 'web':
-                                select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
-                    if select_submenu:
-                        match select_submenu:
-
-                            case 'Inventory':
-                                pygame_event.game_state = 4
-                                reset_menu(menu_ui_inventory, display)
-
-                            case 'Skills':
-                                pygame_event.game_state = 5
-                                reset_menu(menu_ui_skills, display)
-
-                            case 'Achievement':
-                                pygame_event.game_state = 6
-                                reset_menu(menu_ui_skills, display)
-
-                            case 'Save':
-                                pygame_event.game_state = 2
-                                pygame_event.is_save_state = True
-                                pygame_event.is_load_state = False
-                                reset_menu(menu_ui_save, display)
-                                reset_menu(menu_ui_load, display)
-
-                            case 'Load':
-                                pygame_event.game_state = 2
-                                pygame_event.is_load_state = True
-                                pygame_event.is_save_state = False
-                                reset_menu(menu_ui_save, display)
-                                reset_menu(menu_ui_load, display)
-
-                            case 'Setting':
-                                pygame_event.game_state = 3
-                                pygame_event.is_save_state = False
-                                pygame_event.is_load_state = False
-
-                            case 'Back':
-                                pygame_event.game_state -= 1
-                                pygame_event.is_save_state = False
-                                pygame_event.is_load_state = False
-
-                            case 'Exit to title':
-                                pygame_event.game_state = -2
-
-                            case _:
-                                pass
+                    pause_game_update(display, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui, new_size, dt, current_time, platform, key, mobile_key, input, pygame_event, menu_ui_save, menu_ui_load)
 
                 case 2:
-                    select_submenu = False
-                    if pygame_event.is_save_state:
-                        if new_size:
-                            reset_menu(menu_ui_save, display, cursor = menu_ui_save.cursor)
-                        slide_in = menu_ui_save.draw(display, dt, current_time)
-                        if not slide_in:
-                            match platform:
-                                case 'pc':
-                                    select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
-                                case 'android':
-                                    select_submenu = menu_ui_save.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
-                                case 'web':
-                                    select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
-                    elif pygame_event.is_load_state:
-                        if new_size:
-                            reset_menu(menu_ui_load, display, cursor = menu_ui_load.cursor)
-                        slide_in = menu_ui_load.draw(display, dt, current_time)
-                        if not slide_in:
-                            match platform:
-                                case 'pc':
-                                    select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
-                                case 'android':
-                                    select_submenu = menu_ui_load.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
-                                case 'web':
-                                    select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
-                    if select_submenu:
-                        match select_submenu:
-                            case 'Back':
-                                pygame_event.game_state -= 1
-                                if pygame_event.is_save_state:
-                                    reset_menu(menu_ui, display, 3)
-                                    pygame_event.is_save_state = False
-                                elif pygame_event.is_load_state:
-                                    reset_menu(menu_ui, display, 4)
-                                    pygame_event.is_load_state = False
-                            case _:
-                                menu_ui_load.menu = menu_ui_save.menu
-                                pygame_event.game_state = 0
-                                pygame_event.is_save_state = False
-                                pygame_event.is_load_state = False
+                    save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, input, player, rpgmap, menu_ui_load, menu_ui)
 
                 case 3:
-                    new_sound_volume = menu_ui_settings.sound_slider.save_value/100
-                    menu_ui.select_sfx.set_volume(new_sound_volume)
-                    menu_ui.open_menu_sfx.set_volume(new_sound_volume)
-                    menu_ui_save.select_sfx.set_volume(new_sound_volume)
-                    menu_ui_load.select_sfx.set_volume(new_sound_volume)
-                    menu_ui_inventory.select_sfx.set_volume(new_sound_volume)
-                    menu_ui_skills.select_sfx.set_volume(new_sound_volume)
-                    menu_ui_achievement.select_sfx.set_volume(new_sound_volume)
-                    select_submenu = False
-                    if new_size:
-                        reset_menu(menu_ui_settings, display, cursor = menu_ui_settings.cursor)
-                    slide_in = menu_ui_settings.draw(display, dt, current_time)
-                    if not slide_in:
-                        match platform:
-                            case 'pc':
-                                select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
-                            case 'android':
-                                select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time, input)
-                            case 'web':
-                                select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
-                    if select_submenu:
-                        match select_submenu:
-                            case 'Back':
-                                reset_menu(menu_ui_settings, display)
-                                reset_menu(menu_ui, display, 5)
-                                pygame_event.game_state = 1
+                    settings_update(1, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, input, pygame_event)
 
                 case 4:
-                    select_submenu = False
-                    if new_size:
-                        reset_menu(menu_ui_inventory, display, cursor = menu_ui_inventory.cursor)
-                    slide_in = menu_ui_inventory.draw(display, dt, current_time)
-                    if not slide_in:
-                        match platform:
-                            case 'pc':
-                                select_submenu = menu_ui_inventory.update_for_pc(key, input.joysticks, dt, current_time, input)
-                            case 'android':
-                                select_submenu = menu_ui_inventory.update_for_android(mobile_key, [], dt, current_time, input)
-                            case 'web':
-                                select_submenu = menu_ui_inventory.update_for_pc(key, input.joysticks, dt, current_time, input)
-                    if select_submenu:
-                        match select_submenu:
-                            case 'Back':
-                                reset_menu(menu_ui_inventory, display)
-                                reset_menu(menu_ui, display, 0)
-                                pygame_event.game_state = 1
+                    inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, input, menu_ui, pygame_event)
+
                 case 5:
-                    select_submenu = False
-                    if new_size:
-                        reset_menu(menu_ui_skills, display, cursor = menu_ui_skills.cursor)
-                    slide_in = menu_ui_skills.draw(display, dt, current_time)
-                    if not slide_in:
-                        match platform:
-                            case 'pc':
-                                select_submenu = menu_ui_skills.update_for_pc(key, input.joysticks, dt, current_time, input)
-                            case 'android':
-                                select_submenu = menu_ui_skills.update_for_android(mobile_key, [], dt, current_time, input)
-                            case 'web':
-                                select_submenu = menu_ui_skills.update_for_pc(key, input.joysticks, dt, current_time, input)
-                    if select_submenu:
-                        match select_submenu:
-                            case 'Back':
-                                reset_menu(menu_ui_skills, display)
-                                reset_menu(menu_ui, display, 1)
-                                pygame_event.game_state = 1
+                    skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, input, mobile_key, pygame_event, menu_ui)
                 case 6:
-                    select_submenu = False
-                    if new_size:
-                        reset_menu(menu_ui_achievement, display, cursor = menu_ui_achievement.cursor)
-                    slide_in = menu_ui_achievement.draw(display, dt, current_time)
-                    if not slide_in:
-                        match platform:
-                            case 'pc':
-                                select_submenu = menu_ui_achievement.update_for_pc(key, input.joysticks, dt, current_time, input)
-                            case 'android':
-                                select_submenu = menu_ui_achievement.update_for_android(mobile_key, [], dt, current_time, input)
-                            case 'web':
-                                select_submenu = menu_ui_achievement.update_for_pc(key, input.joysticks, dt, current_time, input)
-                    if select_submenu:
-                        match select_submenu:
-                            case 'Back':
-                                reset_menu(menu_ui_achievement, display)
-                                reset_menu(menu_ui, display, 2)
-                                pygame_event.game_state = 1
+                    achievement_update(new_size, menu_ui_achievement, display, dt, current_time, key, input, mobile_key, platform, menu_ui, pygame_event)
 
             pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
@@ -366,7 +90,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
         except Exception as e:
             debug_message = f"{e}"
         blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
-        top_ui.draw_fps(display, clock)
+        debug_ui.draw_fps(display, clock)
 
     match platform:
         case 'pc':

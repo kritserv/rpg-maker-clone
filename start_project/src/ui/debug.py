@@ -1,10 +1,9 @@
 import pygame as pg
-from .timer import Timer
-from .blit_text import blit_text
-from .load_asset import asset_loader
+from ..utils import Timer
+from .text_blit import blit_text
 from psutil import cpu_percent, virtual_memory
 
-class TopUI:
+class DebugUI:
     def __init__(self, g):
         self.fps_font = g['font']['font_9']
         self.fps = 0

@@ -1,0 +1,21 @@
+from .menu_reset import reset_menu
+
+def skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, input, mobile_key, pygame_event, menu_ui):
+    select_submenu = False
+    if new_size:
+        reset_menu(menu_ui_skills, display, cursor = menu_ui_skills.cursor)
+    slide_in = menu_ui_skills.draw(display, dt, current_time)
+    if not slide_in:
+        match platform:
+            case 'pc':
+                select_submenu = menu_ui_skills.update_for_pc(key, input.joysticks, dt, current_time, input)
+            case 'android':
+                select_submenu = menu_ui_skills.update_for_android(mobile_key, [], dt, current_time, input)
+            case 'web':
+                select_submenu = menu_ui_skills.update_for_pc(key, input.joysticks, dt, current_time, input)
+    if select_submenu:
+        match select_submenu:
+            case 'Back':
+                reset_menu(menu_ui_skills, display)
+                reset_menu(menu_ui, display, 1)
+                pygame_event.game_state = 1

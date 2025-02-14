@@ -1,8 +1,6 @@
-from sys import _current_frames
 import pygame as pg
-from .load_asset import asset_loader
+from ..utils import asset_loader
 from math import floor, ceil
-import os
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, xy, player_img):

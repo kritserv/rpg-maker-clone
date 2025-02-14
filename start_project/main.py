@@ -48,7 +48,7 @@ if g['game_mode'] == 'android':
 
 from src import json_loader, run_game_loop, \
     Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, \
-    blit_text, TopUI, \
+    blit_text, DebugUI, \
     MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
     MenuUIInventory, MenuUISkills, MenuUIAchievement, \
     asset_loader, load_player_sprite, load_map_data
@@ -74,7 +74,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, g)
-    top_ui = TopUI(g)
+    debug_ui = DebugUI(g)
     menu_ui = MenuUI(g)
     menu_ui.open_menu_sfx = open_menu_sfx
     menu_ui.select_sfx = select_sfx
@@ -101,7 +101,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     menu_ui_inventory.select_sfx.set_volume(first_sound_volume)
     menu_ui_skills.select_sfx.set_volume(first_sound_volume)
     menu_ui_achievement.select_sfx.set_volume(first_sound_volume)
-    return player, rpgmap, camera, top_ui, \
+    return player, rpgmap, camera, debug_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
         menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
         menu_ui_achievement
@@ -218,7 +218,7 @@ async def main():
             # Window.from_display_module().maximize()
 
             pg.display.set_icon(asset_loader('img', 'icon'))
-            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
+            player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
            menu_ui_achievement = load_game(
                 player_start_pos, start_map, db, screen, False)
@@ -232,7 +232,7 @@ async def main():
 
             while pygame_event.running:
                 display = run_game_loop(g, delta_time, clock, pygame_event, \
-                    input, display, rpgmap, player, camera, top_ui, \
+                    input, display, rpgmap, player, camera, debug_ui, \
                     debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
                     menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
                     menu_ui_achievement, screen)
@@ -255,7 +255,7 @@ async def main():
                 def app_storage_path():
                     return full_path
 
-            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
+            player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
            menu_ui_achievement = load_game(
                 player_start_pos, start_map, db, screen, app_storage_path())
@@ -266,7 +266,7 @@ async def main():
             while pygame_event.running:
                 run_game_loop(
                     g, delta_time, clock, pygame_event, input, display,
-                    rpgmap, player, camera, top_ui, debug_message, opengl,
+                    rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills,
                     menu_ui_achievement, screen)
@@ -278,7 +278,7 @@ async def main():
             screen = pg.display.set_mode(
                 (game_size_native),
                 pg.RESIZABLE)
-            player, rpgmap, camera, top_ui, menu_ui, menu_ui_save, menu_ui_load, \
+            player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
            menu_ui_achievement = load_game(
                 player_start_pos, start_map, db, screen, False)
@@ -288,7 +288,7 @@ async def main():
 
             while pygame_event.running:
                 run_game_loop(g, delta_time, clock, pygame_event, input, display,
-                    rpgmap, player, camera, top_ui, debug_message, opengl,
+                    rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement,
                     screen)

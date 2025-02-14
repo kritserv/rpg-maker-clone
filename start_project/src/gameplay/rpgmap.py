@@ -1,7 +1,5 @@
-from .load_json import json_loader
-from .load_asset import asset_loader
+from ..utils import json_loader, asset_loader
 import pygame as pg
-import os
 
 class RpgMap(pg.sprite.Sprite):
     """Handles loading and rendering of RPG map layers."""
