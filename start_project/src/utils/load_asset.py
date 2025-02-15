@@ -111,7 +111,7 @@ def load_map_data(map_json, all_tile_imgs):
         map_data[map_name] = map_layers
     return map_data
 
-def asset_loader(asset_type: str, asset: str) -> pg.mixer.Sound | NoSound | pg.Surface | pg.font.Font:
+def asset_loader(asset_type: str, asset: str, special: int = 0) -> pg.mixer.Sound | NoSound | pg.Surface | pg.font.Font:
     match asset_type:
         case 'sfx':
             try:
@@ -143,7 +143,7 @@ def asset_loader(asset_type: str, asset: str) -> pg.mixer.Sound | NoSound | pg.S
                 return noimage
         case 'font':
             try:
-                return pg.font.Font(f"{full_path}assets/font/{asset}.ttf", 9)
+                return pg.font.Font(f"{full_path}assets/font/{asset}.ttf", special)
             except OSError as e:
                 print(e)
                 return pg.font.SysFont('', size=14)

@@ -64,12 +64,14 @@ def load_asset(db):
             )
     open_menu_sfx = asset_loader('sfx', 'open_menu')
     select_sfx = asset_loader('sfx', 'select')
-    font_9 = asset_loader('font', 'PixelatedElegance')
-    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, font_9
+    font_9 = asset_loader('font', 'PixelatedElegance', 9)
+    font_18 = asset_loader('font', 'PixelatedElegance', 18)
+    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, font_9, font_18
 
 def load_game(player_start_pos, start_map, db, screen, save_file_path):
-    player_img, all_tile_imgs, open_menu_sfx, select_sfx, font_9 = load_asset(db)
+    player_img, all_tile_imgs, open_menu_sfx, select_sfx, font_9, font_18 = load_asset(db)
     g['font']['font_9'] = font_9
+    g['font']['font_18'] = font_18
     player = Player(player_start_pos, player_img)
     rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
     camera_width, camera_height = screen.get_size()

@@ -50,6 +50,9 @@ class Slider(pg.sprite.Sprite):
 class MenuUISettings(BaseMenuUI):
     def __init__(self, settings_file_path, g):
         game_size = g['game_size']
+        self.settings_font = g['font']['font_18']
+        self.screen_center_y = game_size[1]//2-18
+        self.screen_center_x = game_size[0]//2-20
         full_path = g['full_path']
         self.settings_path = f"{full_path}/user_data/settings.json"
         if settings_file_path:
@@ -131,15 +134,15 @@ class MenuUISettings(BaseMenuUI):
             case 'Music':
                 self.music_slider.draw(display)
             case 'Fps':
-                text = f"Cap at {self.cap_fps}"
+                text = f"{self.cap_fps}"
                 if self.cap_fps == 0:
-                    text = 'No limit'
-                blit_text(display, text, self.menu_font, self.WHITE, (185, 42))
+                    text = '8'
+                blit_text(display, text, self.settings_font, self.WHITE, (self.screen_center_x, self.screen_center_y))
             case 'Debug':
                 text = "On"
                 if self.debug == False:
                     text = 'Off'
-                blit_text(display, text, self.menu_font, self.WHITE, (203, 54))
+                blit_text(display, text, self.settings_font, self.WHITE, (self.screen_center_x, self.screen_center_y))
 
         return slide_in
 
