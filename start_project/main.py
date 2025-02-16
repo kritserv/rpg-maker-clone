@@ -47,7 +47,7 @@ if g['game_mode'] == 'android':
         g['game_size'][0] += 1
 
 from src import json_loader, run_game_loop, \
-    Player, RpgMap, Camera, Input, DeltaTime, PygameEvent, Timer, \
+    Player, RpgMap, Camera, MusicPlayer, Input, DeltaTime, PygameEvent, Timer, \
     blit_text, DebugUI, \
     MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
     MenuUIInventory, MenuUISkills, MenuUIAchievement, \
@@ -96,6 +96,12 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     first_music_volume = menu_ui_settings.music_slider.save_value/100
     if first_sound_volume<0:
         first_sound_volume=0
+
+    pg.mixer.music.set_volume(first_music_volume)
+    music_player = MusicPlayer()
+    music_player.current_music = 'sonatina_letsadventure_1ATaleForTheJourney'
+    music_player.update()
+
     menu_ui.select_sfx.set_volume(first_sound_volume)
     menu_ui.open_menu_sfx.set_volume(first_sound_volume)
     menu_ui_save.select_sfx.set_volume(first_sound_volume)
@@ -106,7 +112,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     return player, rpgmap, camera, debug_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
         menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-        menu_ui_achievement
+        menu_ui_achievement, music_player
 
 async def main():
     delta_time = DeltaTime()
@@ -222,7 +228,7 @@ async def main():
             pg.display.set_icon(asset_loader('img', 'icon'))
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement = load_game(
+           menu_ui_achievement, music_player = load_game(
                 player_start_pos, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
@@ -237,7 +243,7 @@ async def main():
                     input, display, rpgmap, player, camera, debug_ui, \
                     debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
                     menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-                    menu_ui_achievement, screen)
+                    menu_ui_achievement, screen, music_player)
 
         case 'android':
 
@@ -259,7 +265,7 @@ async def main():
 
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement = load_game(
+           menu_ui_achievement, music_player = load_game(
                 player_start_pos, start_map, db, screen, app_storage_path())
 
             input = Input('android', g['game_size'], full_path)
@@ -271,7 +277,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills,
-                    menu_ui_achievement, screen)
+                    menu_ui_achievement, screen, music_player)
 
         case 'web':
             import sys, platform
@@ -282,7 +288,7 @@ async def main():
                 pg.RESIZABLE)
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement = load_game(
+           menu_ui_achievement, music_player = load_game(
                 player_start_pos, start_map, db, screen, False)
 
             input = Input('web')
@@ -293,7 +299,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement,
-                    screen)
+                    screen, music_player)
                 await asyncio.sleep(0)
 
     pg.quit()

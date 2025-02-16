@@ -1,4 +1,4 @@
-from .gameplay import Player, RpgMap, Camera
+from .gameplay import Player, RpgMap, Camera, MusicPlayer
 
 from .utils import DeltaTime, Input, PygameEvent, \
     Timer, json_loader, asset_loader, \

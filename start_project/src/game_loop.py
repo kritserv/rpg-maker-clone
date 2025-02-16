@@ -1,8 +1,9 @@
 from .ui import blit_text
 import pygame as pg
+from .utils import asset_loader
 from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, reset_menu
 
-def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen):
+def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen, music_player):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -86,11 +87,18 @@ def run_game_loop(g, delta_time, clock, pygame_event, input, display, rpgmap, pl
         # Debug
         debug_message = ""
         try:
-            debug_message = f"inven: {player.items}"
+            debug_message = f"{pygame_event.game_state}"
         except Exception as e:
             debug_message = f"{e}"
         blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
         debug_ui.draw_fps(display, clock)
+
+    match pygame_event.game_state:
+        case -1:
+            music_player.current_music = 'sonatina_letsadventure_1ATaleForTheJourney'
+        case 0:
+            music_player.current_music = 'sonatina_letsadventure_4IslandScenery'
+    music_player.update()
 
     match platform:
         case 'pc':

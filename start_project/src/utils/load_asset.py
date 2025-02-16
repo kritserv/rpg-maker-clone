@@ -116,13 +116,18 @@ def asset_loader(asset_type: str, asset: str, special: int = 0) -> pg.mixer.Soun
         case 'sfx':
             try:
                 return pg.mixer.Sound(f"{full_path}assets/sfx/{asset}.ogg")
-            except OSError as e:
+            except Exception as e:
                 print(e)
                 return NoSound()
+        case 'music':
+            try:
+                pg.mixer.music.load(f"{full_path}assets/music/{asset}.ogg")
+            except Exception as e:
+                print(e)
         case 'sprite':
             try:
                 return pg.image.load(f"{full_path}assets/img/sprite/{asset}.png").convert_alpha()
-            except OSError as e:
+            except Exception as e:
                 print(e)
                 match asset:
                     case 'player':
@@ -132,19 +137,19 @@ def asset_loader(asset_type: str, asset: str, special: int = 0) -> pg.mixer.Soun
         case 'tile':
             try:
                 return pg.image.load(f"{full_path}assets/img/tile/{asset}.png").convert_alpha()
-            except OSError as e:
+            except Exception as e:
                 print(e)
                 return pg.transform.scale(noimage, (16, 16))
         case 'img':
             try:
                 return pg.image.load(f"{full_path}assets/{asset}.png").convert_alpha()
-            except OSError as e:
+            except Exception as e:
                 print(e)
                 return noimage
         case 'font':
             try:
                 return pg.font.Font(f"{full_path}assets/font/{asset}.ttf", special)
-            except OSError as e:
+            except Exception as e:
                 print(e)
                 return pg.font.SysFont('', size=14)
         case _:

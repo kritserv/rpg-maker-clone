@@ -10,9 +10,11 @@ class DebugUI:
         self.fps_update_timer.start()
         self.game_size = g['game_size']
 
+        self.black = g['colors']['black']
+
     def draw_fps(self, display, clock):
         if self.fps_update_timer.get_elapsed_time() >= 0.5:
             self.fps = "{:.2f}".format(clock.get_fps())
             self.fps_update_timer.restart()
 
-        blit_text(display, f'fps :{self.fps}', self.fps_font, pg.Color('black'), (5, self.game_size[1]-12))
+        blit_text(display, f'fps :{self.fps}', self.fps_font, self.black, (5, self.game_size[1]-12))
