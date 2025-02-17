@@ -1,6 +1,6 @@
 from .menu_reset import reset_menu
 
-def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, input, player, rpgmap, menu_ui_load, menu_ui):
+def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui):
     select_submenu = False
     if pygame_event.is_save_state:
         if new_size:
@@ -9,11 +9,11 @@ def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, cur
         if not slide_in:
             match platform:
                 case 'pc':
-                    select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
+                    select_submenu = menu_ui_save.update_for_pc(key, game_input.joysticks, dt, current_time, player, rpgmap)
                 case 'android':
                     select_submenu = menu_ui_save.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
                 case 'web':
-                    select_submenu = menu_ui_save.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
+                    select_submenu = menu_ui_save.update_for_pc(key, game_input.joysticks, dt, current_time, player, rpgmap)
     elif pygame_event.is_load_state:
         if new_size:
             reset_menu(menu_ui_load, display, cursor = menu_ui_load.cursor)
@@ -21,11 +21,11 @@ def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, cur
         if not slide_in:
             match platform:
                 case 'pc':
-                    select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
+                    select_submenu = menu_ui_load.update_for_pc(key, game_input.joysticks, dt, current_time, player, rpgmap)
                 case 'android':
                     select_submenu = menu_ui_load.update_for_android(mobile_key, [], dt, current_time, player, rpgmap)
                 case 'web':
-                    select_submenu = menu_ui_load.update_for_pc(key, input.joysticks, dt, current_time, player, rpgmap)
+                    select_submenu = menu_ui_load.update_for_pc(key, game_input.joysticks, dt, current_time, player, rpgmap)
     if select_submenu:
         match select_submenu:
             case 'Back':

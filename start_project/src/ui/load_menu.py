@@ -50,6 +50,7 @@ class MenuUILoad(BaseMenuUI):
             player.direction = select_save_slot.get('player_direction')
             player.levels = select_save_slot.get('player_levels')
             player.items = select_save_slot.get('player_items')
+            player.variables = select_save_slot.get('player_variables')
             rpgmap.curr_map = select_save_slot.get('current_map')
             return True
         return False

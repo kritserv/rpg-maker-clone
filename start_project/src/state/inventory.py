@@ -1,6 +1,6 @@
 from .menu_reset import reset_menu
 
-def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, input, menu_ui, pygame_event):
+def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, game_input, menu_ui, pygame_event):
     select_submenu = False
     if new_size:
         reset_menu(menu_ui_inventory, display, cursor = menu_ui_inventory.cursor)
@@ -8,11 +8,11 @@ def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, pla
     if not slide_in:
         match platform:
             case 'pc':
-                select_submenu = menu_ui_inventory.update_for_pc(key, input.joysticks, dt, current_time, input)
+                select_submenu = menu_ui_inventory.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
             case 'android':
-                select_submenu = menu_ui_inventory.update_for_android(mobile_key, [], dt, current_time, input)
+                select_submenu = menu_ui_inventory.update_for_android(mobile_key, [], dt, current_time, game_input)
             case 'web':
-                select_submenu = menu_ui_inventory.update_for_pc(key, input.joysticks, dt, current_time, input)
+                select_submenu = menu_ui_inventory.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
     if select_submenu:
         match select_submenu:
             case 'Back':

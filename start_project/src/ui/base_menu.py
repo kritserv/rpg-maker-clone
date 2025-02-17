@@ -59,7 +59,7 @@ class BaseMenuUI:
         return slide_in
 
     def update_for_pc(self, key, joysticks, dt, current_time, *args, **kwargs):
-        """Update menu cursor position based on key input and cooldown logic."""
+        """Update menu cursor position based on key game_input and cooldown logic."""
 
         up, left, right, down, cancel, action = False, False, False, False, False, False
 
@@ -71,7 +71,7 @@ class BaseMenuUI:
             if joystick.get_button(0):
                 action = True
             if joystick.get_button(1):
-                cancel = True
+                action = True
             if joystick.get_button(10):
                 cancel = True
 

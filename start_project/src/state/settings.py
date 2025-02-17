@@ -1,7 +1,7 @@
 from .menu_reset import reset_menu
 import pygame as pg
 
-def settings_update(back_to_game_state, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, input, pygame_event):
+def settings_update(back_to_game_state, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event):
     new_sound_volume = menu_ui_settings.sound_slider.save_value/100
     menu_ui.select_sfx.set_volume(new_sound_volume)
     menu_ui.open_menu_sfx.set_volume(new_sound_volume)
@@ -19,11 +19,11 @@ def settings_update(back_to_game_state, menu_ui_settings, menu_ui, menu_ui_save,
     if not slide_in:
         match platform:
             case 'pc':
-                select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
+                select_submenu = menu_ui_settings.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
             case 'android':
-                select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time, input)
+                select_submenu = menu_ui_settings.update_for_android(mobile_key, [], dt, current_time, game_input)
             case 'web':
-                select_submenu = menu_ui_settings.update_for_pc(key, input.joysticks, dt, current_time, input)
+                select_submenu = menu_ui_settings.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
     if select_submenu:
         match select_submenu:
             case 'Back':

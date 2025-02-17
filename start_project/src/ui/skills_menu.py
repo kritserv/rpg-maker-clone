@@ -4,7 +4,7 @@ import pygame as pg
 
 class MenuUISkills(BaseMenuUI):
     def __init__(self, saves_file_path, g):
-        menu_items = ('Fire ball: LVL 1', '', '', '', '', '', '', '', '', '')
+        menu_items = (' ')
         super().__init__(menu_items, g)
         self.speed = 20
         self.play_sound = True

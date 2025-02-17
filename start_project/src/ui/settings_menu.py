@@ -109,27 +109,27 @@ class MenuUISettings(BaseMenuUI):
 
         super().__init__(menu_items, g)
 
-    def save_settings(self, select_slot, input):
+    def save_settings(self, select_slot, game_input):
         settings = json_loader(self.settings_path)
         match select_slot:
             case 'Fullscreen':
-                if input.fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
+                if game_input.fullscreen_toggle_timer.get_elapsed_time() >= 0.3:
                     pg.display.toggle_fullscreen()
-                    input.fullscreen_toggle_timer.restart()
+                    game_input.fullscreen_toggle_timer.restart()
                     if settings['Fullscreen'] == True:
                         settings['Fullscreen'] = False
                     else:
                         settings['Fullscreen'] = True
             case 'Fps':
                 FPS_VALUES = [0, 30, 60, 90, 120, 240, 480]
-                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
-                    input.fps_toggle_timer.restart()
+                if game_input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    game_input.fps_toggle_timer.restart()
                     current_index = FPS_VALUES.index(self.cap_fps)
                     new_index = (current_index + 1) % len(FPS_VALUES)
                     self.cap_fps = FPS_VALUES[new_index]
             case 'Debug':
-                if input.debug_toggle_timer.get_elapsed_time() >= 0.3:
-                    input.debug_toggle_timer.restart()
+                if game_input.debug_toggle_timer.get_elapsed_time() >= 0.3:
+                    game_input.debug_toggle_timer.restart()
                     if self.debug == True:
                         self.debug = False
                     else:
@@ -169,11 +169,11 @@ class MenuUISettings(BaseMenuUI):
 
         return slide_in
 
-    def update_for_pc(self, key, joysticks, dt, current_time, input):
+    def update_for_pc(self, key, joysticks, dt, current_time, game_input):
         select_slot = super(MenuUISettings, self).update_for_pc(key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                select_slot = self.save_settings(select_slot, input)
+                select_slot = self.save_settings(select_slot, game_input)
 
         joystick_left, joystick_right = False, False
         for joystick in joysticks:
@@ -198,8 +198,8 @@ class MenuUISettings(BaseMenuUI):
             case 'Fps':
                 FPS_VALUES = [0, 30, 60, 90, 120, 240, 480]
 
-                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
-                    input.fps_toggle_timer.restart()
+                if game_input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    game_input.fps_toggle_timer.restart()
                     current_index = FPS_VALUES.index(self.cap_fps)
                     if left:
                         new_index = (current_index - 1) % len(FPS_VALUES)
@@ -212,8 +212,8 @@ class MenuUISettings(BaseMenuUI):
             case 'Debug':
                 DEBUG_VALUES = [True, False]
 
-                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
-                    input.fps_toggle_timer.restart()
+                if game_input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    game_input.fps_toggle_timer.restart()
                     current_index = DEBUG_VALUES.index(self.debug)
                     if left:
                         new_index = (current_index - 1) % len(DEBUG_VALUES)
@@ -225,11 +225,11 @@ class MenuUISettings(BaseMenuUI):
 
         return select_slot
 
-    def update_for_android(self, mobile_key, joysticks, dt, current_time, input):
+    def update_for_android(self, mobile_key, joysticks, dt, current_time, game_input):
         select_slot = super(MenuUISettings, self).update_for_android(mobile_key, joysticks, dt, current_time)
         if select_slot:
             if select_slot != "Back":
-                select_slot = self.save_settings(select_slot, input)
+                select_slot = self.save_settings(select_slot, game_input)
 
         left, right = False, False
         if mobile_key["K_LEFT"]:
@@ -247,8 +247,8 @@ class MenuUISettings(BaseMenuUI):
             case 'Fps':
                 FPS_VALUES = [0, 30, 60, 90, 120, 240, 480]
 
-                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
-                    input.fps_toggle_timer.restart()
+                if game_input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    game_input.fps_toggle_timer.restart()
                     current_index = FPS_VALUES.index(self.cap_fps)
                     if left:
                         new_index = (current_index - 1) % len(FPS_VALUES)
@@ -261,8 +261,8 @@ class MenuUISettings(BaseMenuUI):
             case 'Debug':
                 DEBUG_VALUES = [True, False]
 
-                if input.fps_toggle_timer.get_elapsed_time() >= 0.11:
-                    input.fps_toggle_timer.restart()
+                if game_input.fps_toggle_timer.get_elapsed_time() >= 0.11:
+                    game_input.fps_toggle_timer.restart()
                     current_index = DEBUG_VALUES.index(self.debug)
                     if left:
                         new_index = (current_index - 1) % len(DEBUG_VALUES)

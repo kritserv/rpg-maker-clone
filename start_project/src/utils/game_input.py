@@ -3,7 +3,7 @@ from pygame.key import ScancodeWrapper
 from .timer import Timer
 from .load_asset import asset_loader
 
-class Input:
+class GameInput:
     def __init__(self, platform, game_size = [], full_path=''):
         self.fps_toggle_timer = Timer()
         self.fps_toggle_timer.start()

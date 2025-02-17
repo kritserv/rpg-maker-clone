@@ -5,13 +5,7 @@ import pygame as pg
 class MenuUIAchievement(BaseMenuUI):
     def __init__(self, saves_file_path, g):
         menu_items = (
-            '1st time Open inventory',
-            'Clear 5 Quests',
-            'Reach LVL 5',
-            'Reach LVL 10',
-            'Defeat Kraken',
-            'Finish the Game',
-            'Collect All CG'
+            ' ',
         )
         super().__init__(menu_items, g)
         self.speed = 20

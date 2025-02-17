@@ -1,6 +1,6 @@
 from .menu_reset import reset_menu
 
-def pause_game_update(display, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui, new_size, dt, current_time, platform, key, mobile_key, input, pygame_event, menu_ui_save, menu_ui_load):
+def pause_game_update(display, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui, new_size, dt, current_time, platform, key, mobile_key, game_input, pygame_event, menu_ui_save, menu_ui_load):
     reset_meny_y_pos = display.get_size()[1]
     menu_ui_inventory.menu_y = reset_meny_y_pos
     menu_ui_skills.menu_y = reset_meny_y_pos
@@ -15,11 +15,11 @@ def pause_game_update(display, menu_ui_inventory, menu_ui_skills, menu_ui_achiev
     if not slide_in:
         match platform:
             case 'pc':
-                select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
+                select_submenu = menu_ui.update_for_pc(key, game_input.joysticks, dt, current_time)
             case 'android':
                 select_submenu = menu_ui.update_for_android(mobile_key, [], dt, current_time)
             case 'web':
-                select_submenu = menu_ui.update_for_pc(key, input.joysticks, dt, current_time)
+                select_submenu = menu_ui.update_for_pc(key, game_input.joysticks, dt, current_time)
     if select_submenu:
         match select_submenu:
 

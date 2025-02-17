@@ -1,16 +1,16 @@
 from .menu_reset import reset_menu
 
-def title_screen_update(menu_ui_title, display, dt, current_time, platform, key, input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings):
+def title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings):
     slide_in = menu_ui_title.draw(display, dt, current_time)
     select_submenu = False
     if not slide_in:
         match platform:
             case 'pc':
-                select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
+                select_submenu = menu_ui_title.update_for_pc(key, game_input.joysticks, dt, current_time)
             case 'android':
                 select_submenu = menu_ui_title.update_for_android(mobile_key, [], dt, current_time)
             case 'web':
-                select_submenu = menu_ui_title.update_for_pc(key, input.joysticks, dt, current_time)
+                select_submenu = menu_ui_title.update_for_pc(key, game_input.joysticks, dt, current_time)
 
         match select_submenu:
             case 'New Game':

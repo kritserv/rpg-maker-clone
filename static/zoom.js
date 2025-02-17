@@ -6,6 +6,5 @@ const zoomLevel = document.getElementById("zoom-level");
 zoomSlider.addEventListener("input", () => {
   const zoomValue = zoomSlider.value;
   zoomLevel.textContent = `${zoomValue}%`;
-  mapContainer.style.transform = `scale(${zoomValue / 100})`;
-  mapContainer.style.transformOrigin = "top left";
+  mapContainer.style.zoom = `${zoomValue / 100}`;
 });

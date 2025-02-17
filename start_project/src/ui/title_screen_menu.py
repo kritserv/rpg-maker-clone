@@ -1,5 +1,6 @@
 from .base_menu import BaseMenuUI
 from .text_blit import blit_text
+from .image_blit import blit_img
 import pygame as pg
 
 class MenuUITitle(BaseMenuUI):
@@ -9,6 +10,7 @@ class MenuUITitle(BaseMenuUI):
         self.speed = 20
 
     def draw(self, display, dt, current_time):
+        blit_img(display, self.bg, (0,0), True)
         menu_y_finish = self.game_size[1] - 77
         if self.menu_y > menu_y_finish:
             self.menu_y -= self.speed * dt

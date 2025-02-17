@@ -5,20 +5,7 @@ import pygame as pg
 class MenuUIInventory(BaseMenuUI):
     def __init__(self, saves_file_path, g):
         menu_items = (
-            'Iron Sword: 1',
-            'Iron Chestplate: 1',
-            'Iron Helmet: 1',
-            'Iron Leggings: 1',
-            'Iron Boots: 1',
-            'HP Potion: 5',
-            'SP Potion: 5',
-            'Quest Notebook: 2',
-            'Bread: 10',
-            'Water: 10',
-            'Wine: 5',
-            'Antidote: 1',
-            'HP Full Restore: 5',
-            'SP Full Restore: 5',
+            ' ',
         )
         super().__init__(menu_items, g)
         self.speed = 20

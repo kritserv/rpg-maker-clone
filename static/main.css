@@ -13,8 +13,8 @@ body {
 }
 
 .map-container table {
-    margin-left: 120px;
     border: None;
+    margin-left: 8%;
     transform-origin: top left;
     transition: transform 0.2s;
 }

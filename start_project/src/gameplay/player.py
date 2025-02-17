@@ -9,6 +9,7 @@ class Player(pg.sprite.Sprite):
 
 		self.levels = 0
 		self.items = {}
+		self.variables = {}
 
 		self.speed = 50
 		self.is_running = False

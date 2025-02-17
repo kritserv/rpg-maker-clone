@@ -47,6 +47,7 @@ class MenuUISave(BaseMenuUI):
             'name': save_name,
             'player_levels': player.levels,
             'player_items': player.items,
+            'player_variables': player.variables,
             'player_pos': [player.last_pos.x, player.last_pos.y],
             'player_direction': player.direction,
             'current_map': rpgmap.curr_map,
