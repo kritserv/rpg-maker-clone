@@ -1,5 +1,6 @@
 from .base_menu import BaseMenuUI
 from .text_blit import blit_text
+from .image_blit import blit_img
 import pygame as pg
 
 class MenuUIInventory(BaseMenuUI):
@@ -11,7 +12,7 @@ class MenuUIInventory(BaseMenuUI):
         self.speed = 20
         self.play_sound = True
 
-    def draw(self, display, dt, current_time):
+    def draw(self, display, dt, current_time, items, item_dict):
         menu_y_finish = 5
         if self.cursor >= 10:
             menu_y_finish = self.cursor * -8
@@ -35,6 +36,7 @@ class MenuUIInventory(BaseMenuUI):
 
         pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
         menu_text_y = self.menu_y + 6
+
         blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
         for i, menu_text in enumerate(self.menu):
             if i == self.cursor:
@@ -43,10 +45,17 @@ class MenuUIInventory(BaseMenuUI):
                     blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
                 else:
                     blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+
             else:
                 blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
+
             menu_text_y += 12
         for i in range(4):
             pg.draw.rect(display, self.GREY, (menu_x - i, self.menu_y - i, menu_w + 1, menu_h + 1), 1)
+
+        select_item = item_dict.get(self.menu[self.cursor])
+        if select_item:
+            width = display.get_width()
+            blit_img(display, select_item.img, (width//2 + width//4, display.get_height()//3))
 
         return slide_in

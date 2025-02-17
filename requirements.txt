@@ -7,3 +7,4 @@ cython
 javac
 cmake
 pillow
+pyinstaller

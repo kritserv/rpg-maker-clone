@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}RPPYG Maker Browser{% endblock %} {%
+{% extends "base.html" %} {% block title %}RPPYG Maker Desktop{% endblock %} {%
 block navbar %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
@@ -28,7 +28,7 @@ block navbar %}
     </div>
 </nav>
 {% endblock %} {% block content %}
-<h1>Browser Export Instructions</h1>
+<h1>Desktop Export Instructions</h1>
 <p>
     Make sure you've backup your game project and/or commit to git before export
     your game.
@@ -41,43 +41,42 @@ block navbar %}
         <strong>2. Edit <code>game_data/game_mode.txt</code>:</strong>
     </p>
     <ul>
-        <li><code>web</code></li>
+        <li><code>pc</code></li>
     </ul>
     <p>
         <strong
-            >3. If you have previously exported to Android and/or Desktop,
+            >3. If you have previously exported to Android and/or Browser,
             ensure you delete the <code>folder names 'bin', 'build'</code> and
             <code>hidden folder names '.buildozer'</code> before proceeding.
-            Otherwise, Pygbag might attempt to include the binary file alongside
-            WebAssembly, causing an error.</strong
+            Otherwise, Pyinstaller might attempt to include unnecessary
+            file.</strong
         >
     </p>
-    <p><strong>4. Build and Run:</strong></p>
+    <p><strong>4. Create Executable file.</strong></p>
     <ul>
+        <li>Run <code>pyinstaller --onefile --noconsole main.py</code></li>
         <li>
-            Run <code>pygbag .</code> for test locally or
-            <code>pygbag --archive .</code> for a compressed file which can be
-            host on any static website such as github page or itch.io.
+            The created executable file will be inside dist folder, move it
+            outside (to the root game folder) and try to run the game.
         </li>
         <li>
-            The process may take some time initially, but subsequent builds will
-            be faster.
+            Finally, remove the following:
+            <ul>
+                <li>folder name 'src'</li>
+                <li>folder name 'build'</li>
+                <li>hidden folder name '.git' and .gitignore (if using git)</li>
+                <li>requirements.txt</li>
+            </ul>
+            Then, Pack every file in root game folder to zip and shipping your
+            game to any platform.
         </li>
         <li>
-            Test on
-            <a href="http://localhost:8000/" target="_blank"
-                >http://localhost:8000/</a
-            >
-        </li>
-        <li>
-            or
-            <a href="http://localhost:8000/?-i" target="_blank"
-                >http://localhost:8000/?-i</a
-            >
+            The executable file should be able to execute without python install
+            on user's pc.
         </li>
         <li>
             check
-            <a target="_blank" href="https://pygame-web.github.io/wiki/pygbag/"
+            <a target="_blank" href="https://pyinstaller.org/en/stable/"
                 >documentation</a
             >
             for more info.

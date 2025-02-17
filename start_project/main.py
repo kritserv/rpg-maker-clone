@@ -11,6 +11,35 @@ pg.init()
 import os
 full_path = f"{os.path.abspath('.')}/"
 
+correct_path = True
+if not os.path.exists(f"{full_path}/game_data/game_mode.txt") \
+    or not os.path.exists(f"{full_path}/game_data/db.json"):
+    correct_path = False
+
+if not correct_path:
+    from src import PygameEvent, Timer, blit_text
+    pygame_event = PygameEvent(game_size=[800, 400])
+    display = pg.Surface((800, 400))
+    exit_timer = Timer()
+    exit_timer.start()
+    error_font = pg.font.SysFont('', size=40)
+    white = pg.Color('white')
+    blue = pg.Color(53, 126, 199)
+    screen = pg.display.set_mode(
+        ((800, 400)))
+    while pygame_event.running:
+        display.fill(blue)
+        message = ':( \n\nCan\'t find the necessary files to start the game.\n(You have to run executable inside its root folder.)'
+        exit_countdown = exit_timer.get_elapsed_time()
+        message += f'\n\nAutomatically exit in {5-int(exit_countdown)} ...'
+        blit_text(display, message, error_font, white, (0, 0), 0, True)
+        pg.display.flip()
+        pg.transform.scale(display, screen.get_size(), screen)
+        if exit_countdown > 5:
+            pygame_event.running = False
+    pg.quit()
+    exit()
+
 with open(f"{full_path}/game_data/game_mode.txt") as f:
     game_mode = f.readlines()[0].rstrip('\n') # pc / android / web
 
@@ -48,7 +77,8 @@ if g['game_mode'] == 'android':
 
 from src import json_loader, run_game_loop, \
     Player, RpgMap, Camera, MusicPlayer, \
-    Command, Conversation, \
+    Item, \
+    Command, Conversation, AddItem, \
     GameInput, DeltaTime, PygameEvent, Timer, \
     blit_text, DebugUI, \
     MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
@@ -113,14 +143,38 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     menu_ui_skills.select_sfx.set_volume(first_sound_volume)
     menu_ui_achievement.select_sfx.set_volume(first_sound_volume)
 
+    item_dict = {
+        'Iron sword':Item('Iron sword', asset_loader('sprite', 'iron_sword'), 5, 10, 10, 5, False)
+    }
+
     command_list = [
-        Command([Conversation(font_9)], (0, 0))
+        Command(
+            'beginning',
+            [
+                Conversation(font_9, ['Hello, world', 'Have fun.'])
+            ],
+            (0, 0),
+            False,
+            False,
+            False
+        ),
+        Command(
+            'action',
+            [
+                Conversation(font_9, ['Opening chest', 'You received a Iron sword']),
+                AddItem(item_dict['Iron sword'])
+            ],
+            (16, 32),
+            True,
+            asset_loader('sprite', 'chest'),
+            True
+        ),
     ]
 
     return player, rpgmap, camera, debug_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
         menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-        menu_ui_achievement, music_player, command_list
+        menu_ui_achievement, music_player, command_list, item_dict
 
 async def main():
     delta_time = DeltaTime()
@@ -236,7 +290,7 @@ async def main():
             pg.display.set_icon(asset_loader('img', 'icon'))
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, music_player, command_list = load_game(
+           menu_ui_achievement, music_player, command_list, item_dict = load_game(
                 player_start_pos, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
@@ -251,7 +305,7 @@ async def main():
                     game_input, display, rpgmap, player, camera, debug_ui, \
                     debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
                     menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-                    menu_ui_achievement, screen, music_player, command_list)
+                    menu_ui_achievement, screen, music_player, command_list, item_dict)
 
         case 'android':
 
@@ -273,7 +327,7 @@ async def main():
 
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, music_player, command_list = load_game(
+           menu_ui_achievement, music_player, command_list, item_dict = load_game(
                 player_start_pos, start_map, db, screen, app_storage_path())
 
             game_input = GameInput('android', g['game_size'], full_path)
@@ -285,7 +339,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills,
-                    menu_ui_achievement, screen, music_player, command_list)
+                    menu_ui_achievement, screen, music_player, command_list, item_dict)
 
         case 'web':
             import sys, platform
@@ -296,7 +350,7 @@ async def main():
                 pg.RESIZABLE)
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, music_player, command_list = load_game(
+           menu_ui_achievement, music_player, command_list, item_dict = load_game(
                 player_start_pos, start_map, db, screen, False)
 
             game_input = GameInput('web')
@@ -307,7 +361,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement,
-                    screen, music_player, command_list)
+                    screen, music_player, command_list, item_dict)
                 await asyncio.sleep(0)
 
     pg.quit()

@@ -32,6 +32,7 @@ class Player(pg.sprite.Sprite):
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos
 		self.next_pos = self.pos
+		self.focus_point = self.pos
 
 		self.current_frame = 0
 		self.last_update = pg.time.get_ticks()
@@ -150,6 +151,19 @@ class Player(pg.sprite.Sprite):
 				current_index = self.rect.centerx // 16, self.rect.centery // 16
 				self.last_pos = pg.math.Vector2(current_index) * 16
 				self.next_pos = self.last_pos + self.dirvec * 16
+
+		match self.direction:
+			case 'top':
+				focus = pg.math.Vector2(0, -1)
+			case 'bottom':
+				focus = pg.math.Vector2(0, 1)
+			case 'left':
+				focus = pg.math.Vector2(-1, 0)
+			case 'right':
+				focus = pg.math.Vector2(1, 0)
+			case _:
+				focus = pg.math.Vector2(0, 0)
+		self.focus_point = self.pos + focus * 16
 
 	def animate(self, is_idle, dt) -> None:
 		if is_idle:

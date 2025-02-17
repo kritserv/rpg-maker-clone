@@ -29,6 +29,10 @@ block navbar %}
 </nav>
 {% endblock %} {% block content %}
 <h1>Android Build Instructions</h1>
+<p>
+    Make sure you've backup your game project and/or commit to git before export
+    your game.
+</p>
 <div class="mb-3">
     <p>
         <strong>1. Open game folder</strong>
@@ -41,10 +45,10 @@ block navbar %}
     </ul>
     <p>
         <strong
-            >3. If you have previously exported to Browser, ensure you delete
-            the <code>folder name 'build'</code> before proceeding. Otherwise,
-            Buildozer might attempt to include the browser file alongside,
-            causing an error.</strong
+            >3. If you have previously exported to Browser and/or Desktop,
+            ensure you delete the <code>folder name 'build'</code> before
+            proceeding. Otherwise, Buildozer might attempt to include the
+            browser file alongside, causing an error.</strong
         >
     </p>
     <p>

@@ -3,7 +3,7 @@ import pygame as pg
 from .utils import asset_loader
 from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, reset_menu
 
-def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen, music_player, command_list):
+def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen, music_player, command_list, item_dict):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -52,8 +52,13 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
             player.collision = pg.Rect(center_x-16, center_y-2, 16, 16)
 
             # Graphic
+            collision_rects = []
             draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
-            collision_rects = rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
+            for command in command_list:
+                collision = command.draw(display, player, rpgmap, camera)
+                if collision:
+                    collision_rects.append(collision)
+            collision_rects += rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
             # pg.draw.rect(display, g['colors']['green'], player.collision) # player collision box
             blit_img(display, player.img, (center_x-16, center_y-18))
             draw_count += rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
@@ -63,10 +68,11 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 main_game_update(platform, player, key, mobile_key, game_input, dt, collision_rects, camera, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, display)
 
                 for command in command_list:
-                    if platform == 'android':
-                        command.update_for_android(display, dt, current_time, mobile_key)
-                    else:
-                        command.update_for_pc(display, dt, current_time, key, game_input.joysticks)
+                    match platform:
+                        case 'android':
+                            command.update_for_android(display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict)
+                        case _:
+                            command.update_for_pc(display, dt, current_time, key, game_input.joysticks, player, rpgmap, camera, item_dict)
 
             match pygame_event.game_state:
                 case 1:
@@ -79,7 +85,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                     settings_update(1, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
 
                 case 4:
-                    inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, game_input, menu_ui, pygame_event)
+                    inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, game_input, player, item_dict, menu_ui, pygame_event)
 
                 case 5:
                     skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, game_input, mobile_key, pygame_event, menu_ui)

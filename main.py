@@ -280,6 +280,19 @@ def open_folder():
 
     return redirect(url_for('index'))
 
+@app.route('/export-to-desktop')
+def export_to_desktop():
+    try:
+        config = json_loader(CONFIG_FILE)
+        current_project = config.get("current_project")
+    except FileNotFoundError:
+        return redirect(url_for('index'))
+
+    if current_project:
+        return render_template('export/desktop.html')
+
+    return redirect(url_for('index'))
+
 @app.route('/export-to-browser')
 def export_to_browser():
     try:
@@ -475,4 +488,4 @@ def start_game():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

@@ -62,7 +62,7 @@ navbar %}
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a id="openGitDialog" class="nav-link" href="#"
+                    <a onclick="gitdialog.showModal();" class="nav-link" href="#"
                     >🐈 Git</a
                     >
                 </li>
@@ -76,7 +76,7 @@ navbar %}
                         >Export 🚀</a
                     >
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Desktop 🖥️</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('export_to_desktop') }}">Desktop 🖥️</a></li>
                         <li>
                             <a
                                 class="dropdown-item"
@@ -130,7 +130,7 @@ navbar %}
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="openDBDialog" href="#"
+                    <a class="nav-link" href="#" onclick="dbdialog.showModal();"
                         >🛢 Database</a
                     >
                 </li>
@@ -215,7 +215,7 @@ navbar %}
 <div class="mb-3">
     <label for="layer-select" class="form-label">Choose a Layer to edit</label>
     <select class="form-select" id="layer-select" name="layer-select" required>
-      <option value="default" selected>Nothing</option>
+      <option value="default" selected>Not selected</option>
       {% for layer_index, _ in context.table %}
         {%  if layer_index != 4 %}
             <option value="{{ layer_index + 1 }}">Layer {{ layer_index + 1 }}</option>
@@ -259,7 +259,7 @@ navbar %}
             {% for cell in row %}
             <td>
                 {% if cell %} {% if layer_index == 4 %}
-                <img draggable="false" class="object" src="data:image/png;base64,{{ cell }}" />
+                <img draggable="false" class="object" onclick="dbdialog.showModal();" src="data:image/png;base64,{{ cell }}"/>
                 {% else %}
                 <img draggable="false" id="{{ context.inv_map[cell] }}" src="data:image/png;base64,{{ cell }}" />
                 {% endif %} {% endif %}
