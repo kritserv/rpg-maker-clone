@@ -45,7 +45,7 @@ with open(f"{full_path}/game_data/game_mode.txt") as f:
 
 g = {
     'game_mode': game_mode,
-    'game_size': [256, 140],
+    'game_size': [256, 137],
     'font': {},
     'full_path': full_path,
     'colors': {
@@ -175,7 +175,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
             'open the chest',
             'action',
             [
-                Conversation(font_9, ['Opening chest', 'You received a Iron sword']),
+                Conversation(font_9, ['Opening chest', 'You received a Iron sword', 'Try open your inventory and\nequip it']),
                 AddItem(item_dict['Iron sword'])
             ],
             (16, 32),

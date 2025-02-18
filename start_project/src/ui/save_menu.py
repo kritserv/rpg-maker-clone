@@ -48,6 +48,7 @@ class MenuUISave(BaseMenuUI):
             'player_levels': player.levels,
             'player_items': player.items,
             'player_variables': player.variables,
+            'player_skills': player.skills,
             'player_pos': [player.last_pos.x, player.last_pos.y],
             'player_direction': player.direction,
             'player_clear_commands': player.clear_commands,

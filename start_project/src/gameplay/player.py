@@ -186,8 +186,9 @@ class Player(pg.sprite.Sprite):
 		if self.is_running:
 		      self.img = self.imgs['running_'+self.direction][self.current_img]
 
-	def update(self, key, dt, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
-		self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks, dt=dt)
+	def update(self, key, dt, game_pause, mobile_key={}, joysticks=[], collision_rects=[]) -> None:
+		if not game_pause:
+			self.calculate_val_from_key(key, mobile_key=mobile_key, joysticks=joysticks, dt=dt)
 		is_idle = True
 		if self.pos != self.next_pos:
 			is_idle = False

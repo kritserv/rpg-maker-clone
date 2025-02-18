@@ -10,7 +10,4 @@ class MusicPlayer:
         if self.old_music != self.current_music:
             asset_loader('music', self.current_music)
             self.old_music = self.current_music
-            try:
-                pg.mixer.music.play(-1)
-            except Exception as e:
-                print(e)
+            pg.mixer.music.play(-1)

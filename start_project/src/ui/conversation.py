@@ -11,18 +11,26 @@ class Conversation:
         self.message_done = False
         self.finish = False
         self.speed = 20
+        self.delay = 10
+
+        for i in range(len(self.dialogs)):
+            self.dialogs[i] += ' ' * self.delay
 
         self.index = 0
 
-        self.BLACK = pg.Color('black')
+        self.BLUE = pg.Color('darkblue')
         self.WHITE = pg.Color('white')
+        self.GREY = pg.Color('grey90')
 
     def draw(self, display, dt, current_time):
         if not self.finish:
             height = display.get_height()
             height_div_3 = height//2.5
             width = display.get_width()
-            pg.draw.rect(display, self.BLACK, [20, height-height_div_3, width-40, height_div_3])
+
+            pg.draw.rect(display, self.BLUE, [20, height-height_div_3, width-40, height_div_3])
+            for i in range(4):
+                pg.draw.rect(display, self.GREY, (20 - i, height-height_div_3 - i, width-40 + 1, height_div_3 + 1), 1)
 
             dialog = self.dialogs[self.active_dialog]
 

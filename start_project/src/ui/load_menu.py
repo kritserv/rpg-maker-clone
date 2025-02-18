@@ -50,6 +50,7 @@ class MenuUILoad(BaseMenuUI):
             player.direction = select_save_slot.get('player_direction')
             player.levels = select_save_slot.get('player_levels')
             player.items = select_save_slot.get('player_items')
+            player.skills = select_save_slot.get('player_skills')
             player.variables = select_save_slot.get('player_variables')
             player.clear_commands = select_save_slot.get('player_clear_commands')
             rpgmap.curr_map = select_save_slot.get('current_map')
@@ -79,4 +80,3 @@ class MenuUILoad(BaseMenuUI):
                     select_slot = False
 
         return select_slot
-        super().__init__(full_path, menu_items)

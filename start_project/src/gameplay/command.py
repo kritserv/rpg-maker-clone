@@ -6,6 +6,7 @@ class Command(pg.sprite.Sprite):
         self.name = name
         self.trigger_by = trigger_by # beginning / action / step on / always on
         self.has_triggered = False
+        self.finish = False
         self.sequence = sequence
         self.pos = pg.math.Vector2(xy)
 
@@ -20,6 +21,7 @@ class Command(pg.sprite.Sprite):
         self.has_triggered = False
         for sequence in self.sequence:
             sequence.finish = False
+        self.finish = False
 
     def draw(self, display, player, rpgmap, camera):
         if self.show:
@@ -62,6 +64,7 @@ class Command(pg.sprite.Sprite):
 
             if finish_sequence == len(self.sequence):
                 player.clear_commands.append(self.name)
+                self.finish = True
 
         if self.trigger_by == 'always on':
             for sequence in self.sequence:
@@ -95,6 +98,14 @@ class Command(pg.sprite.Sprite):
 
             if finish_sequence == len(self.sequence):
                 player.clear_commands.append(self.name)
+                self.finish = True
+
+        if self.trigger_by == 'always on':
+            require_game_to_pause = False
+            for sequence in self.sequence:
+                sequence.always_on = True
+                sequence.draw(display, dt, current_time)
+                sequence.update_for_android(mobile_key, player)
 
 class PythonScript:
     def __init__(self, script):
