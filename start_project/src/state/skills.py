@@ -1,10 +1,14 @@
 from .menu_reset import reset_menu
 
-def skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, game_input, mobile_key, pygame_event, menu_ui):
+def skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, game_input, player, mobile_key, pygame_event, menu_ui, skill_dict):
     select_submenu = False
     if new_size:
         reset_menu(menu_ui_skills, display, cursor = menu_ui_skills.cursor)
-    slide_in = menu_ui_skills.draw(display, dt, current_time)
+    slide_in = menu_ui_skills.draw(display, dt, current_time, skill_dict)
+    if player.skills:
+        menu_ui_skills.menu = [skill for skill in player.skills]
+    else:
+        menu_ui_skills.menu = (' ')
     if not slide_in:
         match platform:
             case 'pc':

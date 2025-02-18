@@ -3,7 +3,7 @@ import pygame as pg
 from .utils import asset_loader
 from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, reset_menu
 
-def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen, music_player, command_list, item_dict):
+def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, screen, music_player, command_list, item_dict, skill_dict):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -64,15 +64,17 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
             draw_count += rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
 
             # Logic
-            if pygame_event.game_state == 0:
-                main_game_update(platform, player, key, mobile_key, game_input, dt, collision_rects, camera, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, display)
 
+            if pygame_event.game_state >= 0:
                 for command in command_list:
                     match platform:
                         case 'android':
                             command.update_for_android(display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict)
                         case _:
                             command.update_for_pc(display, dt, current_time, key, game_input.joysticks, player, rpgmap, camera, item_dict)
+
+            if pygame_event.game_state == 0:
+                main_game_update(platform, player, key, mobile_key, game_input, dt, collision_rects, camera, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, display)
 
             elif pygame_event.game_state > 1:
                 filter_effect(display, 'darken')
@@ -92,7 +94,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                     inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, game_input, player, item_dict, menu_ui, pygame_event)
 
                 case 5:
-                    skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, game_input, mobile_key, pygame_event, menu_ui)
+                    skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, game_input, player, mobile_key, pygame_event, menu_ui, skill_dict)
                 case 6:
                     achievement_update(new_size, menu_ui_achievement, display, dt, current_time, key, game_input, mobile_key, platform, menu_ui, pygame_event)
 

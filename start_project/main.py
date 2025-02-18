@@ -77,8 +77,9 @@ if g['game_mode'] == 'android':
 
 from src import json_loader, run_game_loop, \
     Player, RpgMap, Camera, MusicPlayer, \
-    Item, \
-    Command, Conversation, AddItem, \
+    Item, Skill, \
+    Command, Conversation, PythonScript, \
+    AddItem, RemoveItem, AddSkill, RemoveSkill, \
     GameInput, DeltaTime, PygameEvent, Timer, \
     blit_text, DebugUI, \
     MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
@@ -152,6 +153,12 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
         'Iron sword':Item('Iron sword', asset_loader('sprite', 'iron_sword'), 'add slash skill', False, True)
     }
 
+    skill_dict = {
+        'Slash':Skill('Slash', asset_loader('sprite', 'slash'), 'deal 10 damage\nto enemy', {'atk': 10})
+    }
+
+    player.skill_dict = skill_dict
+
     command_list = [
         Command(
             'game start',
@@ -176,12 +183,29 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
             asset_loader('sprite', 'chest'),
             True
         ),
+        Command(
+            'check sword',
+            'always on',
+            [
+PythonScript("""
+if 'Iron sword' in player.items:
+    if player.items['Iron sword']['is_equip']:
+        AddSkill(player.skill_dict['Slash']).update(player)
+    else:
+        RemoveSkill(player.skill_dict['Slash']).update(player)
+"""),
+            ],
+            (0, 0),
+            False,
+            False,
+            False
+        ),
     ]
 
     return player, rpgmap, camera, debug_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
         menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-        menu_ui_achievement, music_player, command_list, item_dict
+        menu_ui_achievement, music_player, command_list, item_dict, skill_dict
 
 async def main():
     delta_time = DeltaTime()
@@ -297,7 +321,7 @@ async def main():
             pg.display.set_icon(asset_loader('img', 'icon'))
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, music_player, command_list, item_dict = load_game(
+           menu_ui_achievement, music_player, command_list, item_dict, skill_dict = load_game(
                 player_start_pos, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
@@ -312,7 +336,7 @@ async def main():
                     game_input, display, rpgmap, player, camera, debug_ui, \
                     debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
                     menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-                    menu_ui_achievement, screen, music_player, command_list, item_dict)
+                    menu_ui_achievement, screen, music_player, command_list, item_dict, skill_dict)
 
         case 'android':
 
@@ -334,7 +358,7 @@ async def main():
 
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, music_player, command_list, item_dict = load_game(
+           menu_ui_achievement, music_player, command_list, item_dict, skill_dict = load_game(
                 player_start_pos, start_map, db, screen, app_storage_path())
 
             game_input = GameInput('android', g['game_size'], full_path)
@@ -346,7 +370,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills,
-                    menu_ui_achievement, screen, music_player, command_list, item_dict)
+                    menu_ui_achievement, screen, music_player, command_list, item_dict, skill_dict)
 
         case 'web':
             import sys, platform
@@ -357,7 +381,7 @@ async def main():
                 pg.RESIZABLE)
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, music_player, command_list, item_dict = load_game(
+           menu_ui_achievement, music_player, command_list, item_dict, skill_dict = load_game(
                 player_start_pos, start_map, db, screen, False)
 
             game_input = GameInput('web')
@@ -368,7 +392,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement,
-                    screen, music_player, command_list, item_dict)
+                    screen, music_player, command_list, item_dict, skill_dict)
                 await asyncio.sleep(0)
 
     pg.quit()

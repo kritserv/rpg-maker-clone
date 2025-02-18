@@ -25,10 +25,11 @@ def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, pla
                 pygame_event.game_state = 1
             case _:
                 if current_time - menu_ui_inventory.last_cursor_move_time > menu_ui_inventory.cursor_cooldown_time:
-                    if player.items[select_submenu]['is_equip']:
-                        player.items[select_submenu]['is_equip'] = False
-                        player.unequip_sfx.play()
-                    else:
-                        player.items[select_submenu]['is_equip'] = True
-                        player.equip_sfx.play()
+                    if player.items.get(select_submenu):
+                        if player.items[select_submenu]['is_equip']:
+                            player.items[select_submenu]['is_equip'] = False
+                            player.unequip_sfx.play()
+                        else:
+                            player.items[select_submenu]['is_equip'] = True
+                            player.equip_sfx.play()
                     menu_ui_inventory.last_cursor_move_time = current_time

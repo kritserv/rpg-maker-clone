@@ -1,31 +1,9 @@
 {
-    "Slot 0": {
-        "name": "Slot 0 20250218",
-        "player_levels": 0,
-        "player_items": {
-            "Iron sword": {
-                "desc": "add slash skill",
-                "quant": 1,
-                "is_equip": false
-            }
-        },
-        "player_variables": {},
-        "player_pos": [
-            48.0,
-            32.0
-        ],
-        "player_direction": "right",
-        "player_clear_commands": [
-            "game start",
-            "open the chest"
-        ],
-        "current_map": "map001",
-        "time": "2025:02:18 15:35:02"
-    },
-    "Slot 1": {},
-    "Slot 2": {},
-    "Slot 3": {},
-    "Slot 4": {},
-    "Slot 5": {},
-    "Slot 6": {}
+  "Slot 0": {},
+  "Slot 1": {},
+  "Slot 2": {},
+  "Slot 3": {},
+  "Slot 4": {},
+  "Slot 5": {},
+  "Slot 6": {}
 }

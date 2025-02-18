@@ -12,6 +12,9 @@ class Player(pg.sprite.Sprite):
 		self.variables = {}
 		self.clear_commands = []
 
+		self.skill_dict = {}
+		self.skills = []
+
 		self.speed = 50
 		self.is_running = False
 		self.imgs = player_img
@@ -48,12 +51,14 @@ class Player(pg.sprite.Sprite):
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos
 		self.next_pos = self.pos
+		self.focus_point = self.pos
 		self.direction = "bottom"
 
 		self.levels = 0
 		self.items = {}
 		self.variables = {}
 		self.clear_commands = []
+		self.skills = []
 
 		self.speed = 50
 		self.is_running = False

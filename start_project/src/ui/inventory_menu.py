@@ -13,7 +13,6 @@ class MenuUIInventory(BaseMenuUI):
         self.play_sound = True
 
     def draw(self, display, dt, current_time, player_items, item_dict):
-        # display.fill((40,40,40))
         menu_y_finish = 5
         if self.cursor >= 10:
             menu_y_finish = self.cursor * -8
@@ -41,7 +40,7 @@ class MenuUIInventory(BaseMenuUI):
         select_item = item_dict.get(self.menu[self.cursor])
         select_item_quant = 0
         select_item_is_equip = False
-        if select_item:
+        if select_item and player_items.get(select_item.name):
             select_item_quant = player_items[select_item.name]['quant']
             select_item_is_equip = player_items[select_item.name]['is_equip']
 
@@ -69,7 +68,7 @@ class MenuUIInventory(BaseMenuUI):
             width = display.get_width()
             height = display.get_height()
             blit_img(display, select_item.img, (width//2 + width//5, height//6))
-            blit_text(display, select_item.description, self.menu_font, self.WHITE, (width//2 + width//7, height - height//6))
+            blit_text(display, select_item.description, self.menu_font, self.WHITE, (width//2 + width//7, height//2*1.3))
             if select_item.is_equipable:
                 if select_item_is_equip:
                     blit_text(display, 'is equip', self.menu_font, self.WHITE, (width//2 + width//7, height//10))

@@ -4,5 +4,6 @@ from .camera import Camera
 from .music_player import MusicPlayer
 
 from .item import Item
+from .skill import Skill
 
-from .command import Command, AddItem
+from .command import Command, PythonScript, AddItem, RemoveItem, AddSkill, RemoveSkill

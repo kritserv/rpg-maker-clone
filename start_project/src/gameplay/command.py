@@ -4,7 +4,7 @@ from ..ui import blit_img
 class Command(pg.sprite.Sprite):
     def __init__(self, name, trigger_by, sequence, xy, show, img, has_collision):
         self.name = name
-        self.trigger_by = trigger_by # beginning / action / step on
+        self.trigger_by = trigger_by # beginning / action / step on / always on
         self.has_triggered = False
         self.sequence = sequence
         self.pos = pg.math.Vector2(xy)
@@ -44,7 +44,7 @@ class Command(pg.sprite.Sprite):
                         self.has_triggered = True
                     if self.has_triggered:
                         sequence.draw(display, dt, current_time)
-                        sequence.update_for_pc(key, joysticks, player, item_dict)
+                        sequence.update_for_pc(key, joysticks, player)
                 elif self.trigger_by == 'action':
                     if not self.has_triggered:
                         action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
@@ -55,7 +55,7 @@ class Command(pg.sprite.Sprite):
                                 self.has_triggered = True
                     if self.has_triggered:
                         sequence.draw(display, dt, current_time)
-                        sequence.update_for_pc(key, joysticks, player, item_dict)
+                        sequence.update_for_pc(key, joysticks, player)
 
                 if sequence.finish:
                     finish_sequence += 1
@@ -63,6 +63,11 @@ class Command(pg.sprite.Sprite):
             if finish_sequence == len(self.sequence):
                 player.clear_commands.append(self.name)
 
+        if self.trigger_by == 'always on':
+            for sequence in self.sequence:
+                sequence.always_on = True
+                sequence.draw(display, dt, current_time)
+                sequence.update_for_pc(key, joysticks, player)
 
 
     def update_for_android(self, display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict):
@@ -74,7 +79,7 @@ class Command(pg.sprite.Sprite):
                             self.has_triggered = True
                         if self.has_triggered:
                             sequence.draw(display, dt, current_time)
-                            sequence.update_for_android(mobile_key, player, item_dict)
+                            sequence.update_for_android(mobile_key, player)
                 elif self.trigger_by == 'action':
                     if not self.has_triggered:
                         action = mobile_key["K_A"]
@@ -83,7 +88,7 @@ class Command(pg.sprite.Sprite):
                                 self.has_triggered = True
                     if self.has_triggered:
                         sequence.draw(display, dt, current_time)
-                        sequence.update_for_android(mobile_key, player, item_dict)
+                        sequence.update_for_android(mobile_key, player)
 
                 if sequence.finish:
                     finish_sequence += 1
@@ -91,30 +96,119 @@ class Command(pg.sprite.Sprite):
             if finish_sequence == len(self.sequence):
                 player.clear_commands.append(self.name)
 
+class PythonScript:
+    def __init__(self, script):
+        self.script = script
+        self.finish = False
+        self.always_on = False
+
+    def update(self, player):
+        if not self.finish:
+            exec(self.script)
+            if not self.always_on:
+                self.finish = True
+
+    def draw(self, display, dt, current_time):
+        pass
+
+    def update_for_pc(self, key, joysticks, player):
+        self.update(player)
+
+    def update_for_android(self, mobile_key, player):
+        self.update(player)
 
 class AddItem:
     def __init__(self, item):
         self.item = item
         self.finish = False
+        self.always_on = False
 
-    def update(self, action, player, item_dict):
+    def update(self, player):
         if not self.finish:
             if player.items.get(self.item.name):
                 player.items[self.item.name]['quant'] += 1
                 player.items[self.item.name]['is_equip'] = False
             else:
                 player.items[self.item.name] = {'desc': self.item.description, 'quant': 1, 'is_equip': False}
-            self.finish = True
+            if not self.always_on:
+                self.finish = True
 
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, item_dict):
-        action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
-        for joystick in joysticks:
-            action = joystick.get_button(1)
-        self.update(action, player, item_dict)
+    def update_for_pc(self, key, joysticks, player):
+        self.update(player)
 
-    def update_for_android(self, mobile_key, player, item_dict):
-        action = mobile_key["K_A"]
-        self.update(action, player, item_dict)
+    def update_for_android(self, mobile_key, player):
+        self.update(player)
+
+class RemoveItem:
+    def __init__(self, item, quant):
+        self.item = item
+        self.quant = quant
+        self.finish = False
+        self.always_on = False
+
+    def update(self, player):
+        if not self.finish:
+            if player.items.get(self.item.name):
+                player.items[self.item.name]['quant'] -= self.quant
+            else:
+                player.items[self.item.name] = {'desc': self.item.description, 'quant': 0, 'is_equip': False}
+            if not self.always_on:
+                self.finish = True
+
+    def draw(self, display, dt, current_time):
+        pass
+
+    def update_for_pc(self, key, joysticks, player):
+        self.update(player)
+
+    def update_for_android(self, mobile_key, player):
+        self.update(player)
+
+class AddSkill:
+    def __init__(self, skill):
+        self.skill = skill
+        self.finish = False
+        self.always_on = False
+
+    def update(self, player):
+        if not self.finish:
+            if self.skill.name not in player.skills:
+                player.skills.append(self.skill.name)
+                self.finish = True
+            if not self.always_on:
+                self.finish = True
+
+    def draw(self, display, dt, current_time):
+        pass
+
+    def update_for_pc(self, key, joysticks, player):
+        self.update(player)
+
+    def update_for_android(self, mobile_key, player):
+        self.update(player)
+
+class RemoveSkill:
+    def __init__(self, skill):
+        self.skill = skill
+        self.finish = False
+        self.always_on = False
+
+    def update(self, player):
+        if not self.finish:
+            if self.skill.name in player.skills:
+                player.skills.remove(self.skill.name)
+                self.finish = True
+            if not self.always_on:
+                self.finish = True
+
+    def draw(self, display, dt, current_time):
+        pass
+
+    def update_for_pc(self, key, joysticks, player):
+        self.update(player)
+
+    def update_for_android(self, mobile_key, player):
+        self.update(player)
