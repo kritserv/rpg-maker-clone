@@ -45,7 +45,7 @@ with open(f"{full_path}/game_data/game_mode.txt") as f:
 
 g = {
     'game_mode': game_mode,
-    'game_size': [256, 137],
+    'game_size': [256, 140],
     'font': {},
     'full_path': full_path,
     'colors': {
@@ -105,6 +105,8 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     g['font']['font_9'] = font_9
     g['font']['font_18'] = font_18
     player = Player(player_start_pos, player_img)
+    player.equip_sfx = asset_loader('sfx', 'equip')
+    player.unequip_sfx = asset_loader('sfx', 'unequip')
     rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, g)
@@ -143,12 +145,16 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     menu_ui_skills.select_sfx.set_volume(first_sound_volume)
     menu_ui_achievement.select_sfx.set_volume(first_sound_volume)
 
+    player.equip_sfx.set_volume(first_sound_volume)
+    player.unequip_sfx.set_volume(first_sound_volume)
+
     item_dict = {
-        'Iron sword':Item('Iron sword', asset_loader('sprite', 'iron_sword'), 5, 10, 10, 5, False)
+        'Iron sword':Item('Iron sword', asset_loader('sprite', 'iron_sword'), 'add slash skill', False, True)
     }
 
     command_list = [
         Command(
+            'game start',
             'beginning',
             [
                 Conversation(font_9, ['Hello, world', 'Have fun.'])
@@ -159,6 +165,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
             False
         ),
         Command(
+            'open the chest',
             'action',
             [
                 Conversation(font_9, ['Opening chest', 'You received a Iron sword']),

@@ -50,6 +50,7 @@ class Conversation:
 
                 if self.active_dialog >= len(self.dialogs):
                     self.finish = True
+                    self.active_dialog = 0
 
                 self.message_done = False
                 self.index = 0

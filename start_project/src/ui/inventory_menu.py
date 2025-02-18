@@ -12,7 +12,8 @@ class MenuUIInventory(BaseMenuUI):
         self.speed = 20
         self.play_sound = True
 
-    def draw(self, display, dt, current_time, items, item_dict):
+    def draw(self, display, dt, current_time, player_items, item_dict):
+        # display.fill((40,40,40))
         menu_y_finish = 5
         if self.cursor >= 10:
             menu_y_finish = self.cursor * -8
@@ -37,14 +38,25 @@ class MenuUIInventory(BaseMenuUI):
         pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
         menu_text_y = self.menu_y + 6
 
+        select_item = item_dict.get(self.menu[self.cursor])
+        select_item_quant = 0
+        select_item_is_equip = False
+        if select_item:
+            select_item_quant = player_items[select_item.name]['quant']
+            select_item_is_equip = player_items[select_item.name]['is_equip']
+
+        add_text = ''
+        if select_item_quant:
+            add_text = f' : {select_item_quant}'
+
         blink_on = (current_time // self.cursor_blink_interval) % 2 == 0
         for i, menu_text in enumerate(self.menu):
             if i == self.cursor:
                 pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
                 if blink_on:
-                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                    blit_text(display, f'> {menu_text}{add_text}', self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
                 else:
-                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                    blit_text(display, f'  {menu_text}{add_text}', self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
 
             else:
                 blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
@@ -53,9 +65,15 @@ class MenuUIInventory(BaseMenuUI):
         for i in range(4):
             pg.draw.rect(display, self.GREY, (menu_x - i, self.menu_y - i, menu_w + 1, menu_h + 1), 1)
 
-        select_item = item_dict.get(self.menu[self.cursor])
         if select_item:
             width = display.get_width()
-            blit_img(display, select_item.img, (width//2 + width//4, display.get_height()//3))
+            height = display.get_height()
+            blit_img(display, select_item.img, (width//2 + width//5, height//6))
+            blit_text(display, select_item.description, self.menu_font, self.WHITE, (width//2 + width//7, height - height//6))
+            if select_item.is_equipable:
+                if select_item_is_equip:
+                    blit_text(display, 'is equip', self.menu_font, self.WHITE, (width//2 + width//7, height//10))
+                else:
+                    blit_text(display, 'is unequip', self.menu_font, self.WHITE, (width//2 + width//7, height//10))
 
         return slide_in

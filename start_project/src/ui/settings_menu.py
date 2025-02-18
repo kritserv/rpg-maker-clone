@@ -35,8 +35,8 @@ class Slider(pg.sprite.Sprite):
         center_y = display_height // 2
 
         # Update slider positions relative to center
-        self.slider_left_pos = center_x - (self.size[0] // 2)
-        self.slider_right_pos = center_x + (self.size[0] // 2)
+        self.slider_left_pos = center_x - (self.size[0] // 2) - 60
+        self.slider_right_pos = center_x + (self.size[0] // 2) - 60
         self.slider_top_pos = center_y - (self.size[1] // 2)
 
         # Update rectangles with new positions
@@ -71,6 +71,7 @@ class Slider(pg.sprite.Sprite):
 class MenuUISettings(BaseMenuUI):
     def __init__(self, settings_file_path, g):
         game_size = g['game_size']
+        self.platform = g['game_mode']
         self.settings_font = g['font']['font_18']
         self.screen_center_y = game_size[1]//2-18
         self.screen_center_x = game_size[0]//2-20
@@ -94,7 +95,7 @@ class MenuUISettings(BaseMenuUI):
         menu_items = []
         for key, items in settings.items():
             menu_items.append(key)
-        if g['game_mode'] != 'pc':
+        if self.platform != 'pc':
             menu_items.pop(0)
         menu_items.append('Apply')
 
@@ -157,15 +158,17 @@ class MenuUISettings(BaseMenuUI):
             case 'Fps':
                 text = f"{self.cap_fps}"
                 if self.cap_fps == 0:
-                    text = '8'
+                    text = '8\n\n\n\n\n\n'
                     blit_text(display, text, self.settings_font, self.WHITE, (0, 0), 90, True)
                 else:
-                    blit_text(display, text, self.settings_font, self.WHITE, (0, 0), 0, True)
+                    blit_text(display, f'{text}              ', self.settings_font, self.WHITE, (0, 0), 0, True)
+                if self.platform == 'web':
+                    blit_text(display, '\n\n\n\n\n\n:(\n\nPlaying a game in a browser\nis limited to a maximum of 60 FPS.', self.menu_font, self.WHITE, (0, 0), 0, True)
             case 'Debug':
                 text = "On"
                 if self.debug == False:
                     text = 'Off'
-                blit_text(display, text, self.settings_font, self.WHITE, (self.screen_center_x, self.screen_center_y), 0, True)
+                blit_text(display, f'{text}              ', self.settings_font, self.WHITE, (self.screen_center_x, self.screen_center_y), 0, True)
 
         return slide_in
 

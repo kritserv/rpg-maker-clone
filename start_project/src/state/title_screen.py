@@ -1,6 +1,6 @@
 from .menu_reset import reset_menu
 
-def title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings):
+def title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings, command_list):
     slide_in = menu_ui_title.draw(display, dt, current_time)
     select_submenu = False
     if not slide_in:
@@ -16,6 +16,8 @@ def title_screen_update(menu_ui_title, display, dt, current_time, platform, key,
             case 'New Game':
                 player.start_new_game()
                 pygame_event.game_state = 0
+                for command in command_list:
+                    command.start_new_game()
             case 'Continue':
                 reset_menu(menu_ui_load, display)
                 pygame_event.game_state = -3

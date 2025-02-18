@@ -21,6 +21,8 @@ class PygameEvent:
 			running = False
 		else:
 			if event.type == pg.VIDEORESIZE:
+				event.w = max(event.w, self.game_size[0])
+				event.h = max(event.h, self.game_size[1])
 				new_size = self.get_size_and_maintain_aspect_ratio(event)
 				new_display = pg.Surface(new_size)
 				return new_display

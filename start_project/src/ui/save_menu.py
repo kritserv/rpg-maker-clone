@@ -50,6 +50,7 @@ class MenuUISave(BaseMenuUI):
             'player_variables': player.variables,
             'player_pos': [player.last_pos.x, player.last_pos.y],
             'player_direction': player.direction,
+            'player_clear_commands': player.clear_commands,
             'current_map': rpgmap.curr_map,
             'time': datetime.now().strftime('%Y:%m:%d %H:%M:%S')
             }

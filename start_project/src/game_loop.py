@@ -1,4 +1,4 @@
-from .ui import blit_text, blit_img
+from .ui import blit_text, blit_img, filter_effect
 import pygame as pg
 from .utils import asset_loader
 from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, reset_menu
@@ -30,7 +30,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
     match pygame_event.game_state:
         case -1:
-            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings)
+            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings, command_list)
 
         case -2:
             reset_title_screen(menu_ui_title, display, pygame_event)
@@ -39,7 +39,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
             load_game_update(new_size, menu_ui, menu_ui_load, menu_ui_save, display, dt, current_time, key, game_input, platform, mobile_key, player, rpgmap, pygame_event)
 
         case -4:
-            settings_update(-2, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
+            settings_update(-2, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
 
         case _:
             if not platform == 'android':
@@ -74,6 +74,10 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                         case _:
                             command.update_for_pc(display, dt, current_time, key, game_input.joysticks, player, rpgmap, camera, item_dict)
 
+            elif pygame_event.game_state > 1:
+                filter_effect(display, 'darken')
+                filter_effect(display, 'blur')
+
             match pygame_event.game_state:
                 case 1:
                     pause_game_update(display, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui, new_size, dt, current_time, platform, key, mobile_key, game_input, pygame_event, menu_ui_save, menu_ui_load)
@@ -82,7 +86,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                     save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui)
 
                 case 3:
-                    settings_update(1, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
+                    settings_update(1, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
 
                 case 4:
                     inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, game_input, player, item_dict, menu_ui, pygame_event)
@@ -95,11 +99,11 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
             pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
 
+    # Debug
     if menu_ui_settings.debug:
-        # Debug
         debug_message = ""
         try:
-            debug_message = f"{pygame_event.game_state}"
+            debug_message = f"state: {pygame_event.game_state}"
         except Exception as e:
             debug_message = f"{e}"
         blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
