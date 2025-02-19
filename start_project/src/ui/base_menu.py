@@ -71,8 +71,6 @@ class BaseMenuUI:
             if joystick.get_button(0):
                 action = True
             if joystick.get_button(1):
-                action = True
-            if joystick.get_button(10):
                 cancel = True
 
         if not up:

@@ -51,10 +51,18 @@ class Command(pg.sprite.Sprite):
                     if not self.has_triggered:
                         action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
                         for joystick in joysticks:
-                            action = joystick.get_button(1)
+                            action = joystick.get_button(0)
                         if self.rect.collidepoint(player.focus_point):
                             if action:
                                 self.has_triggered = True
+                    if self.has_triggered:
+                        sequence.draw(display, dt, current_time)
+                        sequence.update_for_pc(key, joysticks, player)
+                elif self.trigger_by == 'step on':
+                    if not self.has_triggered:
+                        step_on = int(player.pos.x) == int(self.pos.x) and int(player.pos.y) == int(self.pos.y)
+                        if step_on:
+                            self.has_triggered = True
                     if self.has_triggered:
                         sequence.draw(display, dt, current_time)
                         sequence.update_for_pc(key, joysticks, player)

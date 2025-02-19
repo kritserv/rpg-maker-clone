@@ -43,7 +43,7 @@ class GameInput:
 
 
     def update_for_pc(self, pygame_event, display):
-        new_size, joystick = pygame_event.check_pc()
+        new_size, joystick = pygame_event.check_pc(self.joysticks)
         if new_size:
             display = new_size
         if joystick:
@@ -67,7 +67,7 @@ class GameInput:
             display.blit(image, pos)
 
     def update_for_web(self, pygame_event):
-        _, joystick = pygame_event.check_pc()
+        _, joystick = pygame_event.check_pc(self.joysticks)
         if joystick:
             self.joysticks.append(joystick)
         return pg.key.get_pressed()

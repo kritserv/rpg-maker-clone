@@ -200,6 +200,17 @@ if 'Iron sword' in player.items:
             False,
             False
         ),
+        Command(
+            'test step on',
+            'step on',
+            [
+                Conversation(font_9, ['You step on position (32, 80)']),
+            ],
+            (32, 80),
+            False,
+            False,
+            False
+        ),
     ]
 
     return player, rpgmap, camera, debug_ui, \

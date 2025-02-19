@@ -60,9 +60,15 @@ class PygameEvent:
 				running = False
 		self.running = running
 
-	def check_game_state(self, key) -> None:
+	def check_game_state(self, key, joysticks) -> None:
 		if self.keydown:
 			if key == pg.K_ESCAPE or key == pg.K_KP0:  # Esc, Keypad 0
+				if self.game_state == 0:
+					self.game_state = 1
+				elif self.game_state == 1:
+					self.game_state = 0
+		for joystick in joysticks:
+			if joystick.get_button(10):
 				if self.game_state == 0:
 					self.game_state = 1
 				elif self.game_state == 1:
@@ -75,7 +81,7 @@ class PygameEvent:
 		except AttributeError:
 			return False
 
-	def check_pc(self):
+	def check_pc(self, joysticks):
 		for event in pg.event.get():
 			key = self.check_key(event)
 			new_size = self.check_type(event)
@@ -84,7 +90,7 @@ class PygameEvent:
 				return (new_size, joy)
 			if key:
 				self.check_quit_game(event, key)
-				self.check_game_state(key)
+				self.check_game_state(key, joysticks)
 		return (False, False)
 
 	def check_android(self, active_touches, image_controls):
