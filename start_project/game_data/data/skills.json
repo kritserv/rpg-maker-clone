@@ -1,0 +1,7 @@
+{
+  "Slash": {
+    "img": "slash",
+    "description": "deal 10 damage\nto enemy",
+    "attrs": { "atk": 10 }
+  }
+}

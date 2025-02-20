@@ -1,0 +1,8 @@
+{
+  "Iron sword": {
+    "img": "iron_sword",
+    "description": "add slash skill",
+    "key_item": false,
+    "equipable": true
+  }
+}

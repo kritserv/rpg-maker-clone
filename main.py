@@ -124,9 +124,9 @@ def index():
             # Add player position layer
             player_position = game_data.get("player_start_position", (0, 0))
             player_position = (player_position[1] // 16, player_position[0] // 16)
-            object_layer = render_player_layer(tile_map_layer_paths[1], player_position, base64_images['player'])
+            command_layer = render_player_layer(tile_map_layer_paths[1], player_position, base64_images['player'])
             if map_name == start_map_name:
-                table.append(object_layer)
+                table.append(command_layer)
 
         except Exception as e:
             return render_template('error.html', message=str(e))
@@ -358,26 +358,59 @@ def database():
 
     game_data_folder_path = False
     dbjson = {}
+    skillsjson = {}
 
     if current_project and project_folder:
         folder_path = current_project['project_folder']
         game_data_folder_path = f"{folder_path}/game_data"
         dbjson = json_loader(f"{game_data_folder_path}/db.json")
+        skillsjson = json_loader(f"{game_data_folder_path}/data/skills.json")
 
     if request.method == 'POST':
-        data = request.json
-        new_main_title = data.get('main_title')
-        if new_main_title:
+        data = request.form
+
+        if 'add_skill' in data:
+            # Add new empty skill
+            new_skill_name = data['skill_name']
+            skillsjson[new_skill_name] = {
+                "img": "",
+                "description": "",
+                "attrs": {"atk": 0}
+            }
+        elif 'save_skills' in data:
+            # Update existing skills
+            new_skillsjson = {}
+            skill_names = request.form.getlist('skill_name')
+            skill_imgs = request.form.getlist('skill_img')
+            skill_descs = request.form.getlist('skill_desc')
+            skill_atks = request.form.getlist('skill_atk')
+
+            for i in range(len(skill_names)):
+                if skill_names[i]:  # Only save if name exists
+                    new_skillsjson[skill_names[i]] = {
+                        "img": skill_imgs[i],
+                        "description": skill_descs[i],
+                        "attrs": {"atk": int(skill_atks[i])}
+                    }
+            skillsjson = new_skillsjson
+
+        elif 'save_main_title' in request.form:
+            new_main_title = request.form['main_title']
             dbjson['main']['main_title'] = new_main_title
+            # Save DB to file
             json_saver(dbjson, f"{game_data_folder_path}/db.json")
-            return jsonify({'message': 'Saved successfully!'}), 200
-        return jsonify({'message': 'Invalid data'}), 400
+
+        # Save Skill to file
+        if 'add_skill' in request.form or 'save_skills' in request.form:
+            json_saver(skillsjson, f"{game_data_folder_path}/data/skills.json")
+
+        return redirect(url_for('database'))
 
     context = {
         "game_data_folder_path": game_data_folder_path,
         "dbjson": dbjson,
+        "skillsjson": skillsjson,
     }
-
     return render_template('database/database.html', context=context)
 
 def _git_add_dot():

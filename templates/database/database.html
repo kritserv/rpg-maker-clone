@@ -21,29 +21,29 @@ block content %}
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
-            id="pills-objects-tab"
+            id="pills-commands-tab"
             data-bs-toggle="pill"
-            data-bs-target="#pills-objects"
+            data-bs-target="#pills-commands"
             type="button"
             role="tab"
-            aria-controls="pills-objects"
+            aria-controls="pills-commands"
             aria-selected="false"
         >
-            Objects 📜
+            Commands 📜
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
-            id="pills-attacks-tab"
+            id="pills-skills-tab"
             data-bs-toggle="pill"
-            data-bs-target="#pills-attacks"
+            data-bs-target="#pills-skills"
             type="button"
             role="tab"
-            aria-controls="pills-attacks"
+            aria-controls="pills-skills"
             aria-selected="false"
         >
-            Attacks 💥
+            Skills 💥
         </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -58,20 +58,6 @@ block content %}
             aria-selected="false"
         >
             Items 🍪
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button
-            class="nav-link"
-            id="pills-equipments-tab"
-            data-bs-toggle="pill"
-            data-bs-target="#pills-equipments"
-            type="button"
-            role="tab"
-            aria-controls="pills-equipments"
-            aria-selected="false"
-        >
-            Equipments 🪖
         </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -142,19 +128,97 @@ block content %}
     </div>
     <div
         class="tab-pane fade"
-        id="pills-attacks"
+        id="pills-skills"
         role="tabpanel"
-        aria-labelledby="pills-attacks-tab"
+        aria-labelledby="pills-skills-tab"
     >
-        attacks...
+        <!-- Skills table form -->
+        <form method="POST">
+            <button type="submit" name="save_skills" class="btn btn-success">
+                💾 Save
+            </button>
+            <div style="height: 22px"></div>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Skill Name</th>
+                        <th>Image</th>
+                        <th>Description</th>
+                        <th>Attack</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="skillsTableBody">
+                    {% for skill_name, skill_data in context.skillsjson.items()
+                    %}
+                    <tr>
+                        <td>
+                            <input
+                                type="text"
+                                name="skill_name"
+                                value="{{ skill_name }}"
+                                class="form-control"
+                                required
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="skill_img"
+                                value="{{ skill_data.img }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <textarea name="skill_desc" class="form-control">
+{{ skill_data.description }}</textarea
+                            >
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                name="skill_atk"
+                                value="{{ skill_data.attrs.atk }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                onclick="this.closest('tr').remove()"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        <!-- Add new skill form -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="skill_name"
+                    class="form-control"
+                    placeholder="New skill name"
+                    required
+                />
+                <button type="submit" name="add_skill" class="btn btn-primary">
+                    Add Skill
+                </button>
+            </div>
+        </form>
     </div>
     <div
         class="tab-pane fade"
-        id="pills-objects"
+        id="pills-commands"
         role="tabpanel"
-        aria-labelledby="pills-objects-tab"
+        aria-labelledby="pills-commands-tab"
     >
-        objects...
+        commands...
     </div>
     <div
         class="tab-pane fade"
@@ -163,14 +227,6 @@ block content %}
         aria-labelledby="pills-items-tab"
     >
         items...
-    </div>
-    <div
-        class="tab-pane fade"
-        id="pills-equipments"
-        role="tabpanel"
-        aria-labelledby="pills-equipments-tab"
-    >
-        equipments...
     </div>
     <div
         class="tab-pane fade"
@@ -202,29 +258,23 @@ block content %}
         role="tabpanel"
         aria-labelledby="pills-games-tab"
     >
-        <form id="mainTitleForm">
-            <button type="button" id="saveMainTitle" class="btn btn-success">
+        <form method="POST">
+            <button
+                type="submit"
+                name="save_main_title"
+                class="btn btn-success"
+            >
                 💾 Save
             </button>
             <div style="height: 22px"></div>
-
-            {% if context.dbjson %}
-            <label for="main_title" class="col-sm-2 col-form-label"
-                >Main Title</label
-            >
-            <div class="col-sm-10">
-                <input
-                    type="text"
-                    class="form-control"
-                    id="main_title"
-                    name="main_title"
-                    value="{{ context.dbjson['main']['main_title'] }}"
-                />
-            </div>
-            {% endif %}
+            <input
+                type="text"
+                id="main_title"
+                name="main_title"
+                value="{{ context.dbjson.main.main_title }}"
+            />
         </form>
     </div>
 </div>
-<script src="{{url_for('static', filename='save_database.js')}}"></script>
 
 {% endblock %}

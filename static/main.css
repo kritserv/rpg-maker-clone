@@ -41,13 +41,9 @@ img {
     user-select: none;
 }
 
-.object {
+.command {
     height: 48px;
     margin-top: -48px;
-}
-
-.object:hover {
-    cursor: pointer;
 }
 
 #hideMe {

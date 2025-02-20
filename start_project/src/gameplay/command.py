@@ -37,35 +37,36 @@ class Command(pg.sprite.Sprite):
                     return pg.Rect(adjusted_x, adjusted_y, self.tile_size, self.tile_size)
         return False
 
-    def update_for_pc(self, display, dt, current_time, key, joysticks, player, rpgmap, camera, item_dict):
+    def update_for_pc(self, display, dt, current_time, key, joysticks, player, rpgmap, camera, item_dict, game_state):
         if not self.name in player.clear_commands:
             finish_sequence = 0
             for sequence in self.sequence:
-                if self.trigger_by == 'beginning':
-                    if not self.has_triggered:
-                        self.has_triggered = True
-                    if self.has_triggered:
-                        sequence.draw(display, dt, current_time)
-                        sequence.update_for_pc(key, joysticks, player)
-                elif self.trigger_by == 'action':
-                    if not self.has_triggered:
-                        action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
-                        for joystick in joysticks:
-                            action = joystick.get_button(0)
-                        if self.rect.collidepoint(player.focus_point):
-                            if action:
-                                self.has_triggered = True
-                    if self.has_triggered:
-                        sequence.draw(display, dt, current_time)
-                        sequence.update_for_pc(key, joysticks, player)
-                elif self.trigger_by == 'step on':
-                    if not self.has_triggered:
-                        step_on = int(player.pos.x) == int(self.pos.x) and int(player.pos.y) == int(self.pos.y)
-                        if step_on:
+                match self.trigger_by:
+                    case 'beginning':
+                        if not self.has_triggered:
                             self.has_triggered = True
-                    if self.has_triggered:
-                        sequence.draw(display, dt, current_time)
-                        sequence.update_for_pc(key, joysticks, player)
+                        if self.has_triggered:
+                            sequence.draw(display, dt, current_time)
+                            sequence.update_for_pc(key, joysticks, player)
+                    case 'action':
+                        if not self.has_triggered:
+                            action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
+                            for joystick in joysticks:
+                                action = joystick.get_button(0)
+                            if game_state == 0 and self.rect.collidepoint(player.focus_point):
+                                if action:
+                                    self.has_triggered = True
+                        if self.has_triggered:
+                            sequence.draw(display, dt, current_time)
+                            sequence.update_for_pc(key, joysticks, player)
+                    case 'step on':
+                        if not self.has_triggered:
+                            step_on = player.last_pos == self.pos or player.pos == self.pos
+                            if step_on:
+                                self.has_triggered = True
+                        if self.has_triggered:
+                            sequence.draw(display, dt, current_time)
+                            sequence.update_for_pc(key, joysticks, player)
 
                 if sequence.finish:
                     finish_sequence += 1
@@ -81,25 +82,34 @@ class Command(pg.sprite.Sprite):
                 sequence.update_for_pc(key, joysticks, player)
 
 
-    def update_for_android(self, display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict):
+    def update_for_android(self, display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict, game_state):
         if not self.name in player.clear_commands:
             finish_sequence = 0
             for sequence in self.sequence:
-                if self.trigger_by == 'beginning':
+                match self.trigger_by:
+                    case 'beginning':
+                            if not self.has_triggered:
+                                self.has_triggered = True
+                            if self.has_triggered:
+                                sequence.draw(display, dt, current_time)
+                                sequence.update_for_android(mobile_key, player)
+                    case 'action':
                         if not self.has_triggered:
-                            self.has_triggered = True
+                            action = mobile_key["K_A"]
+                            if game_state == 0 and self.rect.collidepoint(player.focus_point):
+                                if action:
+                                    self.has_triggered = True
                         if self.has_triggered:
                             sequence.draw(display, dt, current_time)
                             sequence.update_for_android(mobile_key, player)
-                elif self.trigger_by == 'action':
-                    if not self.has_triggered:
-                        action = mobile_key["K_A"]
-                        if self.rect.collidepoint(player.focus_point):
-                            if action:
+                    case 'step on':
+                        if not self.has_triggered:
+                            step_on = int(player.pos.x) == int(self.pos.x) and int(player.pos.y) == int(self.pos.y)
+                            if step_on:
                                 self.has_triggered = True
-                    if self.has_triggered:
-                        sequence.draw(display, dt, current_time)
-                        sequence.update_for_android(mobile_key, player)
+                        if self.has_triggered:
+                            sequence.draw(display, dt, current_time)
+                            sequence.update_for_pc(mobile_key, player)
 
                 if sequence.finish:
                     finish_sequence += 1
@@ -137,15 +147,16 @@ class PythonScript:
         self.update(player)
 
 class AddItem:
-    def __init__(self, item):
+    def __init__(self, item, quant):
         self.item = item
+        self.quant = quant
         self.finish = False
         self.always_on = False
 
     def update(self, player):
         if not self.finish:
             if player.items.get(self.item.name):
-                player.items[self.item.name]['quant'] += 1
+                player.items[self.item.name]['quant'] += quant
                 player.items[self.item.name]['is_equip'] = False
             else:
                 player.items[self.item.name] = {'desc': self.item.description, 'quant': 1, 'is_equip': False}

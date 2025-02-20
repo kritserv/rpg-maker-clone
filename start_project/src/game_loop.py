@@ -70,9 +70,9 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 for command in command_list:
                     match platform:
                         case 'android':
-                            command.update_for_android(display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict)
+                            command.update_for_android(display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict, pygame_event.game_state)
                         case _:
-                            command.update_for_pc(display, dt, current_time, key, game_input.joysticks, player, rpgmap, camera, item_dict)
+                            command.update_for_pc(display, dt, current_time, key, game_input.joysticks, player, rpgmap, camera, item_dict, pygame_event.game_state)
 
                     if command.has_triggered and not command.finish:
                         game_pause = True
@@ -82,7 +82,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
             elif pygame_event.game_state > 1:
                 filter_effect(display, 'darken')
-                filter_effect(display, 'blur')
+                # filter_effect(display, 'blur')
 
             match pygame_event.game_state:
                 case 1:

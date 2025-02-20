@@ -13,7 +13,10 @@ full_path = f"{os.path.abspath('.')}/"
 
 correct_path = True
 if not os.path.exists(f"{full_path}/game_data/game_mode.txt") \
-    or not os.path.exists(f"{full_path}/game_data/db.json"):
+or not os.path.exists(f"{full_path}/game_data/db.json") \
+or not os.path.exists(f"{full_path}/game_data/data/items.json") \
+or not os.path.exists(f"{full_path}/game_data/data/skills.json") \
+    or not os.path.exists(f"{full_path}/game_data/data/commands"):
     correct_path = False
 
 if not correct_path:
@@ -149,69 +152,81 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     player.equip_sfx.set_volume(first_sound_volume)
     player.unequip_sfx.set_volume(first_sound_volume)
 
-    item_dict = {
-        'Iron sword':Item('Iron sword', asset_loader('sprite', 'iron_sword'), 'add slash skill', False, True)
-    }
+    item_data = json_loader(f'{full_path}game_data/data/items.json')
+    item_dict = {}
+    for item_name in item_data:
+        data = item_data[item_name]
 
-    skill_dict = {
-        'Slash':Skill('Slash', asset_loader('sprite', 'slash'), 'deal 10 damage\nto enemy', {'atk': 10})
-    }
+        item_dict[item_name] = Item(
+            name=item_name,
+            img=asset_loader('sprite', data['img']),
+            description=data['description'],
+            is_key_item=data['key_item'],
+            is_equipable=data['equipable']
+        )
+
+    skill_data = json_loader(f'{full_path}game_data/data/skills.json')
+    skill_dict = {}
+    for skill_name in skill_data:
+        data = skill_data[skill_name]
+
+        skill_dict[skill_name] = Skill(
+            name=skill_name,
+            img=asset_loader('sprite', 'slash'),
+            description=data['description'],
+            attrs=data['attrs'],
+        )
 
     player.skill_dict = skill_dict
 
-    command_list = [
-        Command(
-            'game start',
-            'beginning',
-            [
-                Conversation(font_9, ['Hello, world', 'Have fun.'])
-            ],
-            (0, 0),
-            False,
-            False,
-            False
-        ),
-        Command(
-            'open the chest',
-            'action',
-            [
-                Conversation(font_9, ['Opening chest', 'You received a Iron sword', 'Try open your inventory and\nequip it']),
-                AddItem(item_dict['Iron sword'])
-            ],
-            (16, 32),
-            True,
-            asset_loader('sprite', 'chest'),
-            True
-        ),
-        Command(
-            'check sword',
-            'always on',
-            [
-PythonScript("""
-if 'Iron sword' in player.items:
-    if player.items['Iron sword']['is_equip']:
-        AddSkill(player.skill_dict['Slash']).update(player)
-    else:
-        RemoveSkill(player.skill_dict['Slash']).update(player)
-"""),
-            ],
-            (0, 0),
-            False,
-            False,
-            False
-        ),
-        Command(
-            'test step on',
-            'step on',
-            [
-                Conversation(font_9, ['You step on position (32, 80)']),
-            ],
-            (32, 80),
-            False,
-            False,
-            False
-        ),
-    ]
+    command_data = json_loader(f'{full_path}game_data/data/commands/{start_map}.json')
+    command_list = []
+    for command_name in command_data:
+        data = command_data[command_name]
+
+        sequence = []
+        for sequence_data in data['sequence']:
+            match sequence_data['type']:
+                case 'python_script':
+                    sequence.append(
+                        PythonScript(sequence_data['script'])
+                    )
+                case 'conversation':
+                    sequence.append(
+                        Conversation(font_9, sequence_data['dialogs'])
+                    )
+                case 'add_item':
+                    sequence.append(
+                        AddItem(item_dict[sequence_data['item']], sequence_data['quant'])
+                    )
+                case 'remove_item':
+                    sequence.append(
+                        RemoveItem(item_dict[sequence_data['item']], sequence_data['quant'])
+                    )
+                case 'add_skill':
+                    sequence.append(
+                        AddSkill(skill_dict[sequence_data['skill']])
+                    )
+                case 'remove_skill':
+                    sequence.append(
+                        RemoveSkill(skill_dict[sequence_data['skill']])
+                    )
+
+        img = False
+        if data['img']:
+            img = asset_loader("sprite", data['img'])
+
+        command_list.append(
+            Command(
+                name=command_name,
+                trigger_by=data['trigger_by'],
+                sequence=sequence,
+                xy=data['position'],
+                show=data['show'],
+                img=img,
+                has_collision=data['has_collision']
+            )
+        )
 
     return player, rpgmap, camera, debug_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \

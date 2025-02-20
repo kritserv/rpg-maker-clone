@@ -259,7 +259,7 @@ navbar %}
             {% for cell in row %}
             <td>
                 {% if cell %} {% if layer_index == 4 %}
-                <img draggable="false" class="object" onclick="dbdialog.showModal();" src="data:image/png;base64,{{ cell }}"/>
+                <img draggable="false" class="command" src="data:image/png;base64,{{ cell }}"/>
                 {% else %}
                 <img draggable="false" id="{{ context.inv_map[cell] }}" src="data:image/png;base64,{{ cell }}" />
                 {% endif %} {% endif %}
