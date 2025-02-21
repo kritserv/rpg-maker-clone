@@ -113,7 +113,7 @@ class Command(pg.sprite.Sprite):
                                         self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_android(mobile_key, player)
+                                sequence.update_for_android(mobile_key, player, rpgmap)
                         case 'step on':
                             if not self.has_triggered:
                                 step_on = int(player.pos.x) == int(self.pos.x) and int(player.pos.y) == int(self.pos.y)
@@ -121,7 +121,7 @@ class Command(pg.sprite.Sprite):
                                     self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_pc(mobile_key, player, rpgmap)
+                                sequence.update_for_android(mobile_key, player, rpgmap)
 
                 if sequence.finish:
                     finish_sequence += 1
