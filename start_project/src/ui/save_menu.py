@@ -43,13 +43,17 @@ class MenuUISave(BaseMenuUI):
         select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
 
         save_name = f"{select_slot} {datetime.now().strftime('%Y%m%d')}"
+        if player.pos != player.next_pos:
+            save_pos = [player.last_pos.x, player.last_pos.y]
+        else:
+            save_pos = [player.pos.x, player.pos.y]
         save_slots[select_slot] = {
             'name': save_name,
             'player_levels': player.levels,
             'player_items': player.items,
             'player_variables': player.variables,
             'player_skills': player.skills,
-            'player_pos': [player.last_pos.x, player.last_pos.y],
+            'player_pos': save_pos,
             'player_direction': player.direction,
             'player_clear_commands': player.clear_commands,
             'current_map': rpgmap.curr_map,

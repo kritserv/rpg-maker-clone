@@ -1,6 +1,6 @@
 from .menu_reset import reset_menu
 
-def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui):
+def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui, command_list):
     select_submenu = False
     if pygame_event.is_save_state:
         if new_size:
@@ -37,6 +37,9 @@ def save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, cur
                     reset_menu(menu_ui, display, 4)
                     pygame_event.is_load_state = False
             case _:
+                for command in command_list:
+                    command.start_new_game()
+
                 menu_ui_load.menu = menu_ui_save.menu
                 pygame_event.game_state = 0
                 pygame_event.is_save_state = False

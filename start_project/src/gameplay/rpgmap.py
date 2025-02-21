@@ -7,11 +7,15 @@ class RpgMap(pg.sprite.Sprite):
         super().__init__()
         self.tile_size = 16  # Standard tile size
         self.map_data = map_data   # Stores map layers for each map
+        self.start_map = start_map
         self.curr_map = start_map
 
         self.game_size = g['game_size']
         self.view_height = self.game_size[1]//2+self.tile_size
         self.view_width = self.game_size[0]//2+self.tile_size
+
+    def start_new_game(self):
+        self.curr_map = self.start_map
 
     def resize_view(self, new_size):
         """

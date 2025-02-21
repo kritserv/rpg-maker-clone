@@ -6,4 +6,5 @@ from .music_player import MusicPlayer
 from .item import Item
 from .skill import Skill
 
-from .command import Command, PythonScript, AddItem, RemoveItem, AddSkill, RemoveSkill
+from .command import Command, PythonScript, AddItem, RemoveItem, \
+    AddSkill, RemoveSkill, Teleport, FadeIn, FadeOut

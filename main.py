@@ -512,6 +512,7 @@ def database():
                         file.write('{}')
 
             all_map_files.append(f"{folder_path}/game_data/data/maps/tilesets.json")
+            all_map_files.append(f"{folder_path}/game_data/data/commands/all_map.json")
 
             for file in glob(f"{folder_path}/game_data/data/maps/*") + glob(f"{folder_path}/game_data/data/commands/*"):
                 if file not in all_map_files:

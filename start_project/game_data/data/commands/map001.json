@@ -1,63 +1,33 @@
 {
-  "game start": {
-    "trigger_by": "beginning",
-    "sequence": [
-      {
-        "type": "conversation",
-        "dialogs": ["Hello, world", "Have fun"]
-      }
-    ],
-    "position": [0, 0],
-    "show": false,
-    "img": false,
-    "has_collision": false
-  },
-  "open the chest": {
-    "trigger_by": "action",
-    "sequence": [
-      {
-        "type": "conversation",
-        "dialogs": [
-          "Opening chest",
-          "You received a Iron sword",
-          "Try open your inventory and\nequip it"
-        ]
-      },
-      {
-        "type": "add_item",
-        "item": "Iron sword",
-        "quant": 1
-      }
-    ],
-    "position": [16, 32],
-    "show": true,
-    "img": "chest",
-    "has_collision": true
-  },
-  "check sword": {
-    "trigger_by": "always on",
-    "sequence": [
-      {
-        "type": "python_script",
-        "script": "if 'Iron sword' in player.items:\n    if player.items['Iron sword']['is_equip']:\n        AddSkill(player.skill_dict['Slash']).update(player)\n    else:\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
-      }
-    ],
-    "position": [0, 0],
-    "show": false,
-    "img": false,
-    "has_collision": false
-  },
   "test step on": {
     "trigger_by": "step on",
     "sequence": [
       {
-        "type": "conversation",
-        "dialogs": ["You step on position (32, 80)"]
+        "type": "fade_out"
+      },
+      {
+        "type": "teleport",
+        "map_name": "map002",
+        "position": [80, 80]
       }
     ],
-    "position": [32, 80],
+    "position": [176, 64],
     "show": false,
     "img": false,
-    "has_collision": false
+    "has_collision": false,
+    "run_in_loop": true
+  },
+  "fade at the beginning": {
+    "trigger_by": "beginning",
+    "sequence": [
+      {
+        "type": "fade_in"
+      }
+    ],
+    "position": [0, 0],
+    "show": false,
+    "img": false,
+    "has_collision": false,
+    "run_in_loop": false
   }
 }

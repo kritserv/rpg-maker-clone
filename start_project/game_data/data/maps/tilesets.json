@@ -12,6 +12,20 @@
     "9": "dirtgrass_5",
     "10": "dirtgrass_6",
     "11": "dirtgrass_7",
-    "12": "dirtgrass_8"
+    "12": "dirtgrass_8",
+    "13": "house_outside_door_top",
+    "14": "house_outside_door_bottom",
+    "15": "house_outside_wall_1",
+    "16": "house_outside_wall_2",
+    "17": "house_outside_wall_3",
+    "18": "house_outside_window_1",
+    "19": "house_outside_window_2",
+    "20": "house_outside_roof_1",
+    "21": "house_outside_roof_2"
+  },
+  "inside_houses": {
+    "0": "collision",
+    "1": "house_inside_floor_1",
+    "2": "house_inside_wall_1"
   }
 }

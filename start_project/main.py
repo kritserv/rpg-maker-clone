@@ -1,6 +1,7 @@
 import asyncio
 import pygame as pg
 from sys import exit
+from glob import glob
 
 pg.mixer.init()
 pg.mixer.pre_init(44100, -16, 2, 512)
@@ -83,6 +84,7 @@ from src import json_loader, run_game_loop, \
     Item, Skill, \
     Command, Conversation, PythonScript, \
     AddItem, RemoveItem, AddSkill, RemoveSkill, \
+    Teleport, FadeIn, FadeOut, \
     GameInput, DeltaTime, PygameEvent, Timer, \
     blit_text, DebugUI, \
     MenuUI, MenuUISave, MenuUILoad, MenuUITitle, MenuUISettings, \
@@ -179,54 +181,70 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
 
     player.skill_dict = skill_dict
 
-    command_data = json_loader(f'{full_path}game_data/data/commands/{start_map}.json')
     command_list = []
-    for command_name in command_data:
-        data = command_data[command_name]
+    for command_json in glob(f'{full_path}game_data/data/commands/*'):
+        command_data = json_loader(command_json)
 
-        sequence = []
-        for sequence_data in data['sequence']:
-            match sequence_data['type']:
-                case 'python_script':
-                    sequence.append(
-                        PythonScript(sequence_data['script'])
-                    )
-                case 'conversation':
-                    sequence.append(
-                        Conversation(font_9, sequence_data['dialogs'])
-                    )
-                case 'add_item':
-                    sequence.append(
-                        AddItem(item_dict[sequence_data['item']], sequence_data['quant'])
-                    )
-                case 'remove_item':
-                    sequence.append(
-                        RemoveItem(item_dict[sequence_data['item']], sequence_data['quant'])
-                    )
-                case 'add_skill':
-                    sequence.append(
-                        AddSkill(skill_dict[sequence_data['skill']])
-                    )
-                case 'remove_skill':
-                    sequence.append(
-                        RemoveSkill(skill_dict[sequence_data['skill']])
-                    )
+        for command_name in command_data:
+            data = command_data[command_name]
 
-        img = False
-        if data['img']:
-            img = asset_loader("sprite", data['img'])
+            sequence = []
+            for sequence_data in data['sequence']:
+                match sequence_data['type']:
+                    case 'python_script':
+                        sequence.append(
+                            PythonScript(sequence_data['script'])
+                        )
+                    case 'conversation':
+                        sequence.append(
+                            Conversation(font_9, sequence_data['dialogs'])
+                        )
+                    case 'add_item':
+                        sequence.append(
+                            AddItem(item_dict[sequence_data['item']], sequence_data['quant'])
+                        )
+                    case 'remove_item':
+                        sequence.append(
+                            RemoveItem(item_dict[sequence_data['item']], sequence_data['quant'])
+                        )
+                    case 'add_skill':
+                        sequence.append(
+                            AddSkill(skill_dict[sequence_data['skill']])
+                        )
+                    case 'remove_skill':
+                        sequence.append(
+                            RemoveSkill(skill_dict[sequence_data['skill']])
+                        )
+                    case 'teleport':
+                        sequence.append(
+                            Teleport(sequence_data['map_name'], sequence_data['position'])
+                        )
+                    case 'fade_in':
+                        sequence.append(
+                            FadeIn()
+                        )
+                    case 'fade_out':
+                        sequence.append(
+                            FadeOut()
+                        )
 
-        command_list.append(
-            Command(
-                name=command_name,
-                trigger_by=data['trigger_by'],
-                sequence=sequence,
-                xy=data['position'],
-                show=data['show'],
-                img=img,
-                has_collision=data['has_collision']
+            img = False
+            if data['img']:
+                img = asset_loader("sprite", data['img'])
+
+            command_list.append(
+                Command(
+                    name=command_name,
+                    trigger_by=data['trigger_by'],
+                    sequence=sequence,
+                    xy=data['position'],
+                    show=data['show'],
+                    img=img,
+                    has_collision=data['has_collision'],
+                    map_name=command_json.split('/')[-1].replace('.json',''),
+                    run_in_loop=data['run_in_loop']
+                )
             )
-        )
 
     return player, rpgmap, camera, debug_ui, \
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \

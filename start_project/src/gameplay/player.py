@@ -53,6 +53,7 @@ class Player(pg.sprite.Sprite):
 		self.next_pos = self.pos
 		self.focus_point = self.pos
 		self.direction = "bottom"
+		self.remembered_obstacle_pos = {}
 
 		self.levels = 0
 		self.items = {}

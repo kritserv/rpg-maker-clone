@@ -30,13 +30,13 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
     match pygame_event.game_state:
         case -1:
-            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings, command_list)
+            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, rpgmap, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings, command_list)
 
         case -2:
             reset_title_screen(menu_ui_title, display, pygame_event)
 
         case -3:
-            load_game_update(new_size, menu_ui, menu_ui_load, menu_ui_save, display, dt, current_time, key, game_input, platform, mobile_key, player, rpgmap, pygame_event)
+            load_game_update(new_size, menu_ui, menu_ui_load, menu_ui_save, display, dt, current_time, key, game_input, platform, mobile_key, player, rpgmap, pygame_event, command_list)
 
         case -4:
             settings_update(-2, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
@@ -91,7 +91,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                     else:
                         pygame_event.game_state = 0
                 case 2:
-                    save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui)
+                    save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui, command_list)
 
                 case 3:
                     settings_update(1, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
@@ -111,7 +111,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
     if menu_ui_settings.debug:
         debug_message = ""
         try:
-            debug_message = f"state: {pygame_event.game_state}"
+            debug_message = f"state: {pygame_event.game_state}\npos: {player.pos}\nmap: {rpgmap.curr_map}"
         except Exception as e:
             debug_message = f"{e}"
         blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))

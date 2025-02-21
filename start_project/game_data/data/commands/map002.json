@@ -1,1 +1,43 @@
-{}
+{
+  "open the chest": {
+    "trigger_by": "action",
+    "sequence": [
+      {
+        "type": "conversation",
+        "dialogs": [
+          "Opening chest",
+          "You received a Iron sword",
+          "Try open your inventory and\nequip it"
+        ]
+      },
+      {
+        "type": "add_item",
+        "item": "Iron sword",
+        "quant": 1
+      }
+    ],
+    "position": [16, 48],
+    "show": true,
+    "img": "chest",
+    "has_collision": true,
+    "run_in_loop": false
+  },
+  "test step on 2": {
+    "trigger_by": "step on",
+    "sequence": [
+      {
+        "type": "fade_out"
+      },
+      {
+        "type": "teleport",
+        "map_name": "map001",
+        "position": [176, 80]
+      }
+    ],
+    "position": [80, 96],
+    "show": false,
+    "img": false,
+    "has_collision": false,
+    "run_in_loop": true
+  }
+}
