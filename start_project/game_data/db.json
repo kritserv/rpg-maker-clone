@@ -2,29 +2,18 @@
   "main": {
     "main_title": "Game Title"
   },
-
   "maps": [
     {
       "name": "map001",
-      "tileset": "forests"
+      "tileset": "forests",
+      "size": [16, 7]
     },
     {
       "name": "map002",
-      "tileset": "forests"
+      "tileset": "forests",
+      "size": [12, 5]
     }
   ],
-
-  "achievements": [
-    {
-      "name": "Receive Iron Sword",
-      "condition": "'Iron sword' in player.items"
-    },
-    {
-      "name": "Reach LVL 5",
-      "condition": "player.levels == 5"
-    }
-  ],
-
   "start_map": "map001",
   "player_start_position": [64, 64]
 }

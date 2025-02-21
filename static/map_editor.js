@@ -2,13 +2,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const mapContainer = document.getElementById("map-container");
   const tileContainer = document.querySelector(".tile-container");
   const layerToggles = document.querySelectorAll(".layer-toggle");
+  const mapSelect = document.getElementById("map-select");
+  const layerSelect = document.getElementById("layer-select");
   let selectedTile = null;
+  let isDragging = false;
+
+  // Map selection handler
+  mapSelect.addEventListener("change", (event) => {
+    // Reset layer selection to default
+    layerSelect.value = "default";
+    // Reset layer interactivity
+    resetLayerInteractivity();
+  });
 
   // Tile selection
   tileContainer.addEventListener("click", (event) => {
     const tile = event.target.closest(".tile");
     if (tile) {
-      // Highlight selected tile
       if (selectedTile) {
         selectedTile.classList.remove("selected-tile");
       }
@@ -16,8 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedTile.classList.add("selected-tile");
     }
   });
-
-  let isDragging = false;
 
   mapContainer.addEventListener("mousedown", (event) => {
     if (event.button === 0) {
@@ -44,19 +52,24 @@ document.addEventListener("DOMContentLoaded", () => {
   function placeTile(target) {
     const cell = target.closest("td");
     if (cell && selectedTile) {
+      const parentLayer = cell.closest(".map-layer");
+      if (parentLayer && parentLayer.style.pointerEvents === "none") {
+        return; // Don't place tiles on inactive layers
+      }
+
       const img = cell.querySelector("img");
       const newTileSrc = selectedTile.src;
       const newTileId = selectedTile.id;
 
       if (img) {
-        img.src = newTileSrc; // Update existing image
+        img.src = newTileSrc;
         img.id = newTileId;
       } else {
         const newImg = document.createElement("img");
         newImg.src = newTileSrc;
         newImg.draggable = false;
         newImg.id = newTileId;
-        cell.appendChild(newImg); // Add new image
+        cell.appendChild(newImg);
       }
     }
   }
@@ -64,9 +77,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function deleteTile(target) {
     const cell = target.closest("td");
     if (cell) {
+      const parentLayer = cell.closest(".map-layer");
+      if (parentLayer && parentLayer.style.pointerEvents === "none") {
+        return; // Don't delete tiles from inactive layers
+      }
+
       const img = cell.querySelector("img");
       if (img) {
-        cell.removeChild(img); // Remove the image
+        cell.removeChild(img);
       }
     }
   }
@@ -85,44 +103,47 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Layer interactivity control
-  const layerSelect = document.getElementById("layer-select");
-
   layerSelect.addEventListener("change", (event) => {
-    const selectedOption = event.target.value;
+    updateLayerInteractivity(event.target.value);
+  });
 
+  function updateLayerInteractivity(selectedOption) {
     document.querySelectorAll(".map-layer").forEach((layer) => {
-      if (selectedOption === "default") {
-        // Default view: all layers visible but uninteractable
-        layer.style.pointerEvents = "none"; // Disable interactivity
-        layer.style.opacity = "1"; // Fully visible
-      } else {
-        const layerIndex = parseInt(layer.getAttribute("data-layer"));
-        const selectedLayer = parseInt(selectedOption) - 1;
+      const layerIndex = parseInt(layer.getAttribute("data-layer"));
 
-        if (layerIndex === selectedLayer) {
-          layer.style.pointerEvents = "auto"; // Enable interactivity
-          layer.style.opacity = "1"; // Fully visible
-        } else {
-          layer.style.pointerEvents = "none"; // Disable interactivity
-          layer.style.opacity = "0.5"; // Make less visible
-        }
+      if (selectedOption === "default") {
+        layer.style.pointerEvents = "none";
+        layer.style.opacity = "1";
+      } else {
+        const selectedLayer = parseInt(selectedOption) - 1;
+        layer.style.pointerEvents =
+          layerIndex === selectedLayer ? "auto" : "none";
+        layer.style.opacity = layerIndex === selectedLayer ? "1" : "0.5";
       }
     });
-  });
+  }
+
+  function resetLayerInteractivity() {
+    document.querySelectorAll(".map-layer").forEach((layer) => {
+      layer.style.pointerEvents = "none";
+      layer.style.opacity = "1";
+    });
+  }
+
+  // Save map functionality
   function saveMapData() {
     const mapData = [];
     const layers = document.querySelectorAll(".map-layer");
 
     layers.forEach((layer, index) => {
-      // Skip the last iteration
-      if (index === layers.length - 1) return;
+      if (index >= 4) return;
 
       const layerData = [];
       layer.querySelectorAll("tr").forEach((row) => {
         const rowData = [];
         row.querySelectorAll("td").forEach((cell) => {
           const img = cell.querySelector("img");
-          rowData.push(img ? img.id : ""); // Store id
+          rowData.push(img ? img.id : "");
         });
         layerData.push(rowData);
       });
@@ -135,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        map_name: document.querySelector("#map-select").value, // Map name
+        map_name: document.querySelector("#map-select").value,
         layers: mapData,
       }),
     })
@@ -150,9 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error saving map:", error);
       });
   }
-  document.getElementById("save-button").addEventListener("click", saveMapData);
 
-  // Prevent context menu on map container (useful for right-click functionality in future)
+  document.getElementById("save-button").addEventListener("click", saveMapData);
   mapContainer.addEventListener("contextmenu", (event) =>
     event.preventDefault(),
   );

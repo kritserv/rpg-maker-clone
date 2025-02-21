@@ -63,21 +63,21 @@ block content %}
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
-            id="pills-maps-tab"
+            id="pills-tilemaps-tab"
             data-bs-toggle="pill"
-            data-bs-target="#pills-maps"
+            data-bs-target="#pills-tilemaps"
             type="button"
             role="tab"
-            aria-controls="pills-maps"
+            aria-controls="pills-tilemaps"
             aria-selected="false"
         >
-            Maps 🏞️
+            Tilemaps 🏞️
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
-            id="pills-maps-tab"
+            id="pills-battles-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-battles"
             type="button"
@@ -91,7 +91,7 @@ block content %}
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
-            id="pills-maps-tab"
+            id="pills-enemies-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-enemies"
             type="button"
@@ -226,15 +226,101 @@ block content %}
         role="tabpanel"
         aria-labelledby="pills-items-tab"
     >
-        items...
+        <!-- Items table form -->
+        <form method="POST">
+            <button type="submit" name="save_items" class="btn btn-success">
+                💾 Save
+            </button>
+            <div style="height: 22px"></div>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Image</th>
+                        <th>Description</th>
+                        <th>Is Key Item</th>
+                        <th>Is Equipable</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                    {% for item_name, item_data in context.itemsjson.items() %}
+                    <tr>
+                        <td>
+                            <input
+                                type="text"
+                                name="item_name"
+                                value="{{ item_name }}"
+                                class="form-control"
+                                required
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="item_img"
+                                value="{{ item_data.img }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <textarea name="item_desc" class="form-control">
+{{ item_data.description }}</textarea
+                            >
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="item_key"
+                                value="{{ item_data.key_item }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="item_equip"
+                                value="{{ item_data.equipable }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                onclick="this.closest('tr').remove()"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        <!-- Add new item form -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="item_name"
+                    class="form-control"
+                    placeholder="New item name"
+                    required
+                />
+                <button type="submit" name="add_item" class="btn btn-primary">
+                    Add Item
+                </button>
+            </div>
+        </form>
     </div>
     <div
         class="tab-pane fade"
-        id="pills-maps"
+        id="pills-tilemaps"
         role="tabpanel"
-        aria-labelledby="pills-maps-tab"
+        aria-labelledby="pills-tilemaps-tab"
     >
-        maps...
+        tilemaps...
     </div>
     <div
         class="tab-pane fade"
@@ -259,20 +345,117 @@ block content %}
         aria-labelledby="pills-games-tab"
     >
         <form method="POST">
-            <button
-                type="submit"
-                name="save_main_title"
-                class="btn btn-success"
-            >
+            <button type="submit" name="save_main" class="btn btn-success">
                 💾 Save
             </button>
             <div style="height: 22px"></div>
+            Game Title:
             <input
                 type="text"
                 id="main_title"
                 name="main_title"
+                class="form-control"
                 value="{{ context.dbjson.main.main_title }}"
+            /><br />
+            Start Map:
+            <input
+                type="text"
+                id="start_map"
+                name="start_map"
+                class="form-control"
+                value="{{ context.dbjson.start_map }}"
+            /><br />
+            Player Start Position <br />
+            X:
+            <input
+                type="number"
+                id="player_start_position_x"
+                name="player_start_position_x"
+                class="form-control"
+                value="{{ context.dbjson.player_start_position[0] }}"
             />
+            Y:
+            <input
+                type="number"
+                id="player_start_position_y"
+                name="player_start_position_y"
+                class="form-control"
+                value="{{ context.dbjson.player_start_position[1] }}"
+            /><br />
+            Maps:
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Map Name</th>
+                        <th>Tileset</th>
+                        <th>CSV Column</th>
+                        <th>CSV Row</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="mapsTableBody">
+                    {% for map_data in context.dbjson.maps %}
+                    <tr>
+                        <td>
+                            <input
+                                type="text"
+                                name="map_name"
+                                value="{{ map_data.name }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="map_tileset"
+                                value="{{ map_data.tileset }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                name="map_width"
+                                value="{{ map_data.size[0] }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                name="map_height"
+                                value="{{ map_data.size[1] }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                onclick="this.closest('tr').remove()"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        <!-- Add new map form -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="map_name"
+                    class="form-control"
+                    placeholder="New map name"
+                    required
+                />
+                <button type="submit" name="add_map" class="btn btn-primary">
+                    Add Map
+                </button>
+            </div>
         </form>
     </div>
 </div>

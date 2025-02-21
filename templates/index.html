@@ -217,7 +217,7 @@ navbar %}
     <select class="form-select" id="layer-select" name="layer-select" required>
       <option value="default" selected>Not selected</option>
       {% for layer_index, _ in context.table %}
-        {%  if layer_index != 4 %}
+        {%  if layer_index not in (4, 5) %}
             <option value="{{ layer_index + 1 }}">Layer {{ layer_index + 1 }}</option>
         {% endif %}
       {% endfor %}
