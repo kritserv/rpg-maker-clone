@@ -65,13 +65,13 @@ block content %}
             class="nav-link"
             id="pills-tilemaps-tab"
             data-bs-toggle="pill"
-            data-bs-target="#pills-tilemaps"
+            data-bs-target="#pills-tilesets"
             type="button"
             role="tab"
-            aria-controls="pills-tilemaps"
+            aria-controls="pills-tilesets"
             aria-selected="false"
         >
-            Tilemaps 🏞️
+            Tilesets 🏞️
         </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -316,11 +316,143 @@ block content %}
     </div>
     <div
         class="tab-pane fade"
-        id="pills-tilemaps"
+        id="pills-tilesets"
         role="tabpanel"
-        aria-labelledby="pills-tilemaps-tab"
+        aria-labelledby="pills-tilesets-tab"
     >
-        tilemaps...
+        <!-- Tilesets table form -->
+        <form method="POST">
+            <button type="submit" name="save_tilesets" class="btn btn-success">
+                💾 Save All
+            </button>
+            <div style="height: 22px"></div>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Tileset Name</th>
+                        <th>Tiles</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tilesetsTableBody">
+                    {% for tileset_name, tiles in context.tilesetsjson.items()
+                    %}
+                    <tr>
+                        <td>
+                            <input
+                                type="text"
+                                name="tileset_name"
+                                value="{{ tileset_name }}"
+                                class="form-control"
+                                required
+                            />
+                        </td>
+                        <td>
+                            <table class="table table-bordered mb-3">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tile Name</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tile_id, tile_name in tiles.items()
+                                    %}
+                                    <tr>
+                                        <td>
+                                            <input
+                                                type="hidden"
+                                                name="hidden_tileset_name"
+                                                value="{{ tileset_name }}"
+                                            />
+                                            <input
+                                                type="text"
+                                                name="tile_id"
+                                                value="{{ tile_id }}"
+                                                class="form-control"
+                                                required
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="tile_name"
+                                                value="{{ tile_name }}"
+                                                class="form-control"
+                                                required
+                                            />
+                                        </td>
+                                        <td>
+                                            <button
+                                                type="button"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="this.closest('tr').remove()"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <!-- Add new tile form -->
+                            <form method="POST" class="input-group">
+                                <input
+                                    type="hidden"
+                                    name="tileset_name"
+                                    value="{{ tileset_name }}"
+                                />
+                                <input
+                                    type="text"
+                                    name="new_tile_name"
+                                    class="form-control"
+                                    placeholder="New tile name"
+                                />
+                                <button
+                                    type="submit"
+                                    name="add_tile"
+                                    class="btn btn-primary"
+                                >
+                                    Add Tile
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                onclick="this.closest('tr').remove()"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+
+        <!-- Add new tileset form -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="tileset_name"
+                    class="form-control"
+                    placeholder="New tileset name"
+                    required
+                />
+                <button
+                    type="submit"
+                    name="add_tileset"
+                    class="btn btn-primary"
+                >
+                    Add Tileset
+                </button>
+            </div>
+        </form>
     </div>
     <div
         class="tab-pane fade"

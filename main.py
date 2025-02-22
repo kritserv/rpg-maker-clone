@@ -132,6 +132,8 @@ def index():
                 if base64_images:
                     # remove player from tile_dict
                     base64_images.popitem()
+            else:
+                table += [['']]
 
             command_layer = []
             for i in range(len(table[0])):
@@ -397,6 +399,7 @@ def database():
     dbjson = {}
     skillsjson = {}
     itemsjson = {}
+    tilesetsjson = {}
 
     if current_project and project_folder:
         folder_path = current_project['project_folder']
@@ -404,6 +407,7 @@ def database():
         dbjson = json_loader(f"{game_data_folder_path}/db.json")
         skillsjson = json_loader(f"{game_data_folder_path}/data/skills.json")
         itemsjson = json_loader(f"{game_data_folder_path}/data/items.json")
+        tilesetsjson = json_loader(f"{game_data_folder_path}/data/maps/tilesets.json")
 
     if request.method == 'POST':
         data = request.form
@@ -461,6 +465,38 @@ def database():
                     }
             itemsjson = new_itemsjson
 
+        elif 'add_tileset' in data:
+            new_tileset_name = data['tileset_name']
+            tilesetsjson[new_tileset_name] = {}
+
+        elif 'add_tile' in data:
+            tileset_name = data['tileset_name']
+            tile_name = data['new_tile_name']
+            try:
+                new_id = str(max([int(k) for k in tilesetsjson[tileset_name].keys()]) + 1)
+            except:
+                new_id = "0"
+            tilesetsjson[tileset_name][new_id] = tile_name
+
+        elif 'save_tilesets' in data:
+            new_tilesetsjson = {}
+
+            hidden_tileset_names = request.form.getlist('hidden_tileset_name')
+            tile_ids = request.form.getlist('tile_id')
+            tile_names = request.form.getlist('tile_name')
+
+            if '' in tile_names:
+                tile_names.remove('')
+
+            for tileset_name in set(hidden_tileset_names):
+                if tileset_name not in new_tilesetsjson:
+                    new_tilesetsjson[tileset_name] = {}
+
+            for i in range(len(tile_ids)):
+                new_tilesetsjson[hidden_tileset_names[i]][tile_ids[i]] = tile_names[i]
+
+            tilesetsjson = new_tilesetsjson
+
         elif 'add_map' in data:
             # Add new map
             new_map_name = data['map_name']
@@ -489,8 +525,6 @@ def database():
             map_tilesets = request.form.getlist('map_tileset')
             map_widths = request.form.getlist('map_width')
             map_heights = request.form.getlist('map_height')
-
-            print(map_names)
 
             all_map_files = []
             for i in range(len(map_names)):
@@ -530,6 +564,10 @@ def database():
         if 'add_item' in request.form or 'save_items' in request.form:
             json_saver(itemsjson, f"{game_data_folder_path}/data/items.json")
 
+        # Save Tileset to file
+        if any(key in request.form for key in ['add_tileset', 'add_tile', 'save_tilesets']):
+            json_saver(tilesetsjson, f"{game_data_folder_path}/data/maps/tilesets.json")
+
         return redirect(url_for('database'))
 
     context = {
@@ -537,6 +575,7 @@ def database():
         "dbjson": dbjson,
         "skillsjson": skillsjson,
         "itemsjson": itemsjson,
+        "tilesetsjson": tilesetsjson,
     }
     return render_template('database/database.html', context=context)
 
