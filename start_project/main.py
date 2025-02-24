@@ -140,7 +140,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
 
     pg.mixer.music.set_volume(first_music_volume)
     music_player = MusicPlayer()
-    music_player.current_music = 'sonatina_letsadventure_1ATaleForTheJourney'
+    music_player.current_music = 'titlescreen'
     music_player.update()
 
     menu_ui.select_sfx.set_volume(first_sound_volume)

@@ -119,9 +119,9 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
     match pygame_event.game_state:
         case -1:
-            music_player.current_music = 'sonatina_letsadventure_1ATaleForTheJourney'
+            music_player.current_music = 'titlescreen'
         case 0:
-            music_player.current_music = 'sonatina_letsadventure_4IslandScenery'
+            music_player.current_music = 'forest'
     music_player.update()
 
     match platform:

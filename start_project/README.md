@@ -1,6 +1,4 @@
 # Start Project For RPPYG Maker
 
-# Credit
-
-# Music
-by Sara Garrard https://sonatina.itch.io/letsadventure
+## credit
+PixelatedElegance Font : https://ggbot.itch.io/pixelated-elegance-font
