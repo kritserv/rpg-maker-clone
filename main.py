@@ -400,6 +400,7 @@ def database():
     skillsjson = {}
     itemsjson = {}
     tilesetsjson = {}
+    commandsjson = {}
 
     if current_project and project_folder:
         folder_path = current_project['project_folder']
@@ -408,6 +409,10 @@ def database():
         skillsjson = json_loader(f"{game_data_folder_path}/data/skills.json")
         itemsjson = json_loader(f"{game_data_folder_path}/data/items.json")
         tilesetsjson = json_loader(f"{game_data_folder_path}/data/maps/tilesets.json")
+
+        for file in glob(f"{game_data_folder_path}/data/commands/*"):
+            commandsjson[file.split('/')[-1].replace('.json','')] = json_loader(file)
+
 
     if request.method == 'POST':
         data = request.form
@@ -556,6 +561,53 @@ def database():
             # Save DB to file
             json_saver(dbjson, f"{game_data_folder_path}/db.json")
 
+        elif 'add_command' in data:
+            # Add new empty command
+            new_command_location = data['command_location']
+            new_command_name = data['new_command_name']
+            commandsjson[new_command_location][new_command_name] = {
+                "trigger_by": "",
+                "sequence": [],
+                "position": [],
+                "show": False,
+                "img": False,
+                "has_collision": False,
+                "run_in_loop": False
+            }
+        elif 'save_commands' in data:
+            # Update existing commands
+            new_commandsjson = {}
+            command_locations = request.form.getlist('hidden_command_location')
+            command_names = request.form.getlist('command_name')
+            command_trigger_bys = request.form.getlist('command_trigger_by')
+            command_sequences = request.form.getlist('command_sequence')
+            command_position_xs = request.form.getlist('command_position_x')
+            command_position_ys = request.form.getlist('command_position_y')
+            command_shows = request.form.getlist('command_show')
+            command_images = request.form.getlist('command_image')
+            command_has_collisions = request.form.getlist('command_has_collision')
+            command_run_in_loops = request.form.getlist('command_run_in_loop')
+
+            for location in set(command_locations):
+                new_commandsjson[location] = {}
+
+            print(new_commandsjson)
+
+            print(command_sequences)
+            print(type(command_sequences))
+
+            for i in range(len(command_names)):
+                new_commandsjson[command_locations[i]][command_names[i]] = {
+                    "trigger_by": command_trigger_bys[i],
+                    "sequence": command_sequences[i],
+                    "position": [command_position_xs[i], command_position_ys[i]],
+                    "show": command_shows[i],
+                    "img": command_images[i],
+                    "has_collision": command_has_collisions[i],
+                    "run_in_loop": command_run_in_loops[i]
+                }
+            commandsjson = new_commandsjson
+
         # Save Skill to file
         if 'add_skill' in request.form or 'save_skills' in request.form:
             json_saver(skillsjson, f"{game_data_folder_path}/data/skills.json")
@@ -568,6 +620,11 @@ def database():
         if any(key in request.form for key in ['add_tileset', 'add_tile', 'save_tilesets']):
             json_saver(tilesetsjson, f"{game_data_folder_path}/data/maps/tilesets.json")
 
+        # Save Command to file
+        if 'add_command' in request.form or 'save_commands' in request.form:
+            for command_name in commandsjson:
+                json_saver(commandsjson[command_name], f"{game_data_folder_path}/data/commands/{command_name}.json")
+
         return redirect(url_for('database'))
 
     context = {
@@ -576,6 +633,7 @@ def database():
         "skillsjson": skillsjson,
         "itemsjson": itemsjson,
         "tilesetsjson": tilesetsjson,
+        "commandsjson": commandsjson,
     }
     return render_template('database/database.html', context=context)
 
