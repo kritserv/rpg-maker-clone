@@ -12,4 +12,6 @@ from .inventory_menu import MenuUIInventory
 from .skills_menu import MenuUISkills
 from .achievement_menu import MenuUIAchievement
 
+from .turn_based_menu import MenuUITurnbased
+
 from .conversation import Conversation

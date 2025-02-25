@@ -1,7 +1,7 @@
 from .menu_reset import reset_menu
 import pygame as pg
 
-def settings_update(back_to_game_state, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event):
+def settings_update(back_to_game_state, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event):
     new_sound_volume = menu_ui_settings.sound_slider.save_value/100
     menu_ui.select_sfx.set_volume(new_sound_volume)
     menu_ui.open_menu_sfx.set_volume(new_sound_volume)
@@ -10,6 +10,7 @@ def settings_update(back_to_game_state, menu_ui_settings, menu_ui, menu_ui_save,
     menu_ui_inventory.select_sfx.set_volume(new_sound_volume)
     menu_ui_skills.select_sfx.set_volume(new_sound_volume)
     menu_ui_achievement.select_sfx.set_volume(new_sound_volume)
+    menu_ui_turn_based.select_sfx.set_volume(new_sound_volume)
     player.equip_sfx.set_volume(new_sound_volume)
     player.unequip_sfx.set_volume(new_sound_volume)
 

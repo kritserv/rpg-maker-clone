@@ -8,5 +8,6 @@ from .save_load_game import save_load_game_update
 from .inventory import inventory_update
 from .skills import skill_update
 from .achievements import achievement_update
+from .turn_based import turn_based_update
 
 from .menu_reset import reset_menu

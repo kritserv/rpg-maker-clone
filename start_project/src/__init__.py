@@ -9,7 +9,7 @@ from .utils import DeltaTime, GameInput, PygameEvent, \
 
 from .ui import blit_text, DebugUI, MenuUI, MenuUITitle, \
     MenuUISave, MenuUILoad, MenuUISettings, MenuUIInventory, \
-    MenuUISkills, MenuUIAchievement, \
+    MenuUISkills, MenuUIAchievement, MenuUITurnbased, \
     Conversation
 
 from .game_loop import run_game_loop

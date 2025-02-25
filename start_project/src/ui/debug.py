@@ -17,4 +17,4 @@ class DebugUI:
             self.fps = "{:.2f}".format(clock.get_fps())
             self.fps_update_timer.restart()
 
-        blit_text(display, f'fps :{self.fps}', self.fps_font, self.black, (5, self.game_size[1]-12))
+        blit_text(display, f'fps :{self.fps}', self.fps_font, self.black, (display.get_width()-75, 5))
