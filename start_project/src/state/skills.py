@@ -7,16 +7,18 @@ def skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, 
     slide_in = menu_ui_skills.draw(display, dt, current_time, skill_dict)
     if player.skills:
         menu_ui_skills.menu = [skill for skill in player.skills]
+        menu_ui_skills.menu_len = len(player.skills)-1
     else:
         menu_ui_skills.menu = (' ')
+        menu_ui_skills.menu_len = 0
     if not slide_in:
         match platform:
             case 'pc':
-                select_submenu = menu_ui_skills.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
+                select_submenu = menu_ui_skills.update_for_pc(key, game_input.joysticks, dt, current_time)
             case 'android':
-                select_submenu = menu_ui_skills.update_for_android(mobile_key, [], dt, current_time, game_input)
+                select_submenu = menu_ui_skills.update_for_android(mobile_key, [], dt, current_time)
             case 'web':
-                select_submenu = menu_ui_skills.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
+                select_submenu = menu_ui_skills.update_for_pc(key, game_input.joysticks, dt, current_time)
     if select_submenu:
         match select_submenu:
             case 'Back':

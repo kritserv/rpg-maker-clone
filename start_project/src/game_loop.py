@@ -82,7 +82,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
             elif pygame_event.game_state > 1:
                 filter_effect(display, 'darken')
-                # filter_effect(display, 'blur')
+                filter_effect(display, 'blur')
 
             match pygame_event.game_state:
                 case 1:

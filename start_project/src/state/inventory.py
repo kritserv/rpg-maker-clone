@@ -9,14 +9,16 @@ def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, pla
     slide_in = menu_ui_inventory.draw(display, dt, current_time, player.items, item_dict)
     if player.items:
         menu_ui_inventory.menu = [key for key in player.items]
+        menu_ui_inventory.menu_len = len(player.items)-1
     else:
         menu_ui_inventory.menu = (' ')
+        menu_ui_inventory.menu_len = 0
     if not slide_in:
         match platform:
             case 'android':
-                select_submenu = menu_ui_inventory.update_for_android(mobile_key, [], dt, current_time, game_input)
+                select_submenu = menu_ui_inventory.update_for_android(mobile_key, [], dt, current_time)
             case _:
-                select_submenu = menu_ui_inventory.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
+                select_submenu = menu_ui_inventory.update_for_pc(key, game_input.joysticks, dt, current_time)
     if select_submenu:
         match select_submenu:
             case 'Back':

@@ -49,7 +49,7 @@ with open(f"{full_path}/game_data/game_mode.txt") as f:
 
 g = {
     'game_mode': game_mode,
-    'game_size': [256, 137],
+    'game_size': [300, 150],
     'font': {},
     'full_path': full_path,
     'colors': {
@@ -174,7 +174,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
 
         skill_dict[skill_name] = Skill(
             name=skill_name,
-            img=asset_loader('sprite', 'slash'),
+            img=asset_loader('sprite', data['img']),
             description=data['description'],
             attrs=data['attrs'],
         )

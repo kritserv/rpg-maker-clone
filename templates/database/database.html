@@ -230,7 +230,6 @@ block content %}
                     <tr>
                         <th>Command Location</th>
                         <th>Commands</th>
-                        <th style="width: 5%"></th>
                     </tr>
                 </thead>
                 <tbody id="commandsTableBody">
@@ -306,11 +305,21 @@ block content %}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    <input
+                                                        type="hidden"
+                                                        name="sequence_length"
+                                                        value="{{ command_variable.sequence|length }}"
+                                                    />
                                                     {% for sequence in
                                                     command_variable.sequence %}
                                                     <tr>
                                                         <td>
                                                             {{ sequence.type }}
+                                                            <input
+                                                                type="hidden"
+                                                                name="sequence_type"
+                                                                value="{{ sequence.type }}"
+                                                            />
                                                         </td>
                                                         <td>
                                                             {% if sequence.type
@@ -331,6 +340,11 @@ block content %}
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
+                                                                    <input
+                                                                        type="hidden"
+                                                                        name="sequence_dialog_length"
+                                                                        value="{{ sequence.dialogs|length }}"
+                                                                    />
                                                                     {% for
                                                                     dialog in
                                                                     sequence.dialogs
@@ -339,6 +353,7 @@ block content %}
                                                                         <td>
                                                                             <textarea
                                                                                 class="form-control"
+                                                                                name="sequence_dialog"
                                                                             >
 {{ dialog }}</textarea
                                                                             >
@@ -347,7 +362,18 @@ block content %}
                                                                             <button
                                                                                 type="button"
                                                                                 class="btn btn-danger btn-sm"
-                                                                                onclick="this.closest('tr').remove()"
+                                                                                onclick="
+                                                                                const row = this.closest('tr');
+                                                                                const table = this.closest('table');
+                                                                                const seqLengthInput = table.querySelector('input[name=\'sequence_dialog_length\']');
+
+                                                                                // Remove the row
+                                                                                row.remove();
+
+                                                                                // Update the hidden input value
+                                                                                const updatedLength = table.querySelectorAll('tbody > tr').length;
+                                                                                seqLengthInput.value = updatedLength;
+                                                                                "
                                                                             >
                                                                                 Delete
                                                                             </button>
@@ -363,13 +389,31 @@ block content %}
                                                             >
                                                                 <input
                                                                     type="text"
+                                                                    name="latest_dialog"
+                                                                    value="{{ sequence.dialogs[-1] }}"
+                                                                    hidden
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    name="new_dialog_command_name"
+                                                                    value="{{ command_name }}"
+                                                                    hidden
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    name="new_dialog_command_location"
+                                                                    value="{{ command_location }}"
+                                                                    hidden
+                                                                />
+                                                                <input
+                                                                    type="text"
                                                                     name="new_dialog"
                                                                     class="form-control"
                                                                     placeholder="New Dialog"
                                                                 />
                                                                 <button
                                                                     type="submit"
-                                                                    name="add_sequence"
+                                                                    name="add_dialog"
                                                                     class="btn btn-primary"
                                                                 >
                                                                     Add Dialog
@@ -380,7 +424,7 @@ block content %}
                                                             'python_script' %}
                                                             <textarea
                                                                 class="form-control"
-                                                                name="python_script"
+                                                                name="sequence_python_script"
                                                             >
 {{ sequence.script }}</textarea
                                                             >
@@ -411,7 +455,7 @@ block content %}
                                                                             <input
                                                                                 type="text"
                                                                                 class="form-control"
-                                                                                name="sequence_item"
+                                                                                name="sequence_add_item_name"
                                                                                 value="{{ sequence.item }}"
                                                                             />
                                                                         </td>
@@ -419,8 +463,104 @@ block content %}
                                                                             <input
                                                                                 type="number"
                                                                                 class="form-control"
-                                                                                name="sequence_quant"
+                                                                                name="sequence_add_item_quant"
                                                                                 value="{{ sequence.quant }}"
+                                                                            />
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            {% endif %} {% if
+                                                            sequence.type ==
+                                                            'remove_item' %}
+                                                            <table
+                                                                class="table table-bordered mb-3"
+                                                            >
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>
+                                                                            Item
+                                                                            Name
+                                                                        </th>
+                                                                        <th
+                                                                            style="
+                                                                                width: 5%;
+                                                                            "
+                                                                        >
+                                                                            Quantity
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input
+                                                                                type="text"
+                                                                                class="form-control"
+                                                                                name="sequence_remove_item_name"
+                                                                                value="{{ sequence.item }}"
+                                                                            />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input
+                                                                                type="number"
+                                                                                class="form-control"
+                                                                                name="sequence_remove_item_quant"
+                                                                                value="{{ sequence.quant }}"
+                                                                            />
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            {% endif %} {% if
+                                                            sequence.type ==
+                                                            'add_skill' %}
+                                                            <table
+                                                                class="table table-bordered mb-3"
+                                                            >
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>
+                                                                            Skill
+                                                                            Name
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input
+                                                                                type="text"
+                                                                                class="form-control"
+                                                                                name="sequence_add_skill_name"
+                                                                                value="{{ sequence.skill }}"
+                                                                            />
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            {% endif %} {% if
+                                                            sequence.type ==
+                                                            'remove_skill' %}
+                                                            <table
+                                                                class="table table-bordered mb-3"
+                                                            >
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>
+                                                                            Skill
+                                                                            Name
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input
+                                                                                type="text"
+                                                                                class="form-control"
+                                                                                name="sequence_remove_skill_name"
+                                                                                value="{{ sequence.skill }}"
                                                                             />
                                                                         </td>
                                                                     </tr>
@@ -491,7 +631,21 @@ block content %}
                                                             <button
                                                                 type="button"
                                                                 class="btn btn-danger btn-sm"
-                                                                onclick="this.closest('tr').remove()"
+                                                                onclick="
+                                                                const row = this.closest('tr');
+                                                                const table = row.closest('table'); // Get the parent table
+                                                                const seqLengthInput = table.querySelector('input[name=\'sequence_length\']');
+
+                                                                // Remove the row
+                                                                row.remove();
+
+                                                                // Correctly count only the direct rows in the main table
+                                                                const updatedLength = [...table.querySelectorAll('tbody > tr')]
+                                                                    .filter(tr => tr.closest('table') === table).length;
+
+                                                                seqLengthInput.value = updatedLength;
+
+                                                                "
                                                             >
                                                                 Delete
                                                             </button>
@@ -507,9 +661,14 @@ block content %}
                                                 class="input-group"
                                             >
                                                 <input
-                                                    type="hidden"
-                                                    name="sequence_location"
+                                                    name="new_sequence_command_name"
+                                                    value="{{ command_name }}"
+                                                    hidden
+                                                />
+                                                <input
+                                                    name="new_sequence_location"
                                                     value="{{ command_location }}"
+                                                    hidden
                                                 />
                                                 <input
                                                     type="text"
@@ -615,15 +774,6 @@ block content %}
                                     Add Command
                                 </button>
                             </form>
-                        </td>
-                        <td>
-                            <button
-                                type="button"
-                                class="btn btn-danger btn-sm"
-                                onclick="this.closest('tr').remove()"
-                            >
-                                Delete
-                            </button>
                         </td>
                     </tr>
                     {% endfor %}

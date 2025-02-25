@@ -561,6 +561,30 @@ def database():
             # Save DB to file
             json_saver(dbjson, f"{game_data_folder_path}/db.json")
 
+        elif 'add_dialog' in data:
+            # Add new empty dialog
+            new_dialog_location = data['new_dialog_command_location']
+            new_dialog_command_name = data['new_dialog_command_name']
+            new_dialog = data['new_dialog']
+            latest_dialog = data['latest_dialog']
+            for sequence in commandsjson[new_dialog_location][new_dialog_command_name]['sequence']:
+                if sequence['type'] == 'conversation':
+                    if sequence['dialogs']:
+                        if sequence['dialogs'][-1] == latest_dialog:
+                            sequence['dialogs'].append(new_dialog)
+                    else:
+                        sequence['dialogs'].append(new_dialog)
+
+        elif 'add_sequence' in data:
+            # Add new empty sequence
+            new_sequence_location = data['new_sequence_location']
+            new_sequence_command_name = data['new_sequence_command_name']
+            new_sequence_type = data['new_sequence_type']
+            if new_sequence_type == 'conversation':
+                commandsjson[new_sequence_location][new_sequence_command_name]['sequence'].append({'type':new_sequence_type, 'dialogs': ['...']})
+            else:
+                commandsjson[new_sequence_location][new_sequence_command_name]['sequence'].append({'type':new_sequence_type})
+
         elif 'add_command' in data:
             # Add new empty command
             new_command_location = data['command_location']
@@ -580,7 +604,22 @@ def database():
             command_locations = request.form.getlist('hidden_command_location')
             command_names = request.form.getlist('command_name')
             command_trigger_bys = request.form.getlist('command_trigger_by')
-            command_sequences = request.form.getlist('command_sequence')
+
+            sequence_types = request.form.getlist('sequence_type')
+            sequence_lengths = request.form.getlist('sequence_length')
+            sequence_dialogs = request.form.getlist('sequence_dialog')
+            sequence_dialog_lengths = request.form.getlist('sequence_dialog_length')
+            sequence_python_scripts = request.form.getlist('sequence_python_script')
+            sequence_add_item_names = request.form.getlist('sequence_add_item_name')
+            sequence_add_item_quants = request.form.getlist('sequence_add_item_quant')
+            sequence_remove_item_names = request.form.getlist('sequence_remove_item_name')
+            sequence_remove_item_quants = request.form.getlist('sequence_remove_item_quant')
+            sequence_add_skill_names = request.form.getlist('sequence_add_skill_name')
+            sequence_remove_skill_names = request.form.getlist('sequence_remove_skill_name')
+            sequence_map_names = request.form.getlist('sequence_map_name')
+            sequence_position_xs = request.form.getlist('sequence_position_x')
+            sequence_position_ys = request.form.getlist('sequence_position_y')
+
             command_position_xs = request.form.getlist('command_position_x')
             command_position_ys = request.form.getlist('command_position_y')
             command_shows = request.form.getlist('command_show')
@@ -591,20 +630,57 @@ def database():
             for location in set(command_locations):
                 new_commandsjson[location] = {}
 
-            print(new_commandsjson)
+            command_sequences = []
+            for i in range(len(sequence_types)-1):
+                current_sequence = []
+                try:
+                    current_length = int(sequence_lengths.pop(0))
+                except:
+                    current_length = 0
+                for j in range(current_length):
+                    sequence_type = sequence_types.pop(0)
+                    value = {"type": sequence_type}
+                    match sequence_type:
+                        case 'conversation':
+                            dialogs = []
+                            for k in range(int(sequence_dialog_lengths.pop(0))):
+                                try:
+                                    dialogs.append(sequence_dialogs.pop(0))
+                                except IndexError:
+                                    pass
+                            value['dialogs'] = dialogs
+                        case 'python_script':
+                            value['script'] = sequence_python_scripts.pop(0)
+                        case 'add_item':
+                            value['item'] = sequence_add_item_names.pop(0)
+                            value['quant'] = int(sequence_add_item_quants.pop(0))
+                        case 'remove_item':
+                            value['item'] = sequence_remove_item_names.pop(0)
+                            value['quant'] = int(sequence_remove_item_quants.pop(0))
+                        case 'add_skill':
+                            value['skill'] = sequence_add_skill_names.pop(0)
+                        case 'remove_skill':
+                            value['skill'] = sequence_remove_skill_names.pop(0)
+                        case 'teleport':
+                            value['map_name'] = sequence_map_names.pop(0)
+                            value['position'] = [int(sequence_position_xs.pop(0)), int(sequence_position_ys.pop(0))]
 
-            print(command_sequences)
-            print(type(command_sequences))
+                    current_sequence.append(value)
+
+                command_sequences.append(current_sequence)
 
             for i in range(len(command_names)):
+                img = command_images[i]
+                if img == 'False':
+                    img = False
                 new_commandsjson[command_locations[i]][command_names[i]] = {
                     "trigger_by": command_trigger_bys[i],
                     "sequence": command_sequences[i],
-                    "position": [command_position_xs[i], command_position_ys[i]],
-                    "show": command_shows[i],
-                    "img": command_images[i],
-                    "has_collision": command_has_collisions[i],
-                    "run_in_loop": command_run_in_loops[i]
+                    "position": [int(command_position_xs[i]), int(command_position_ys[i])],
+                    "show": command_shows[i]=='True',
+                    "img": img,
+                    "has_collision": command_has_collisions[i]=='True',
+                    "run_in_loop": command_run_in_loops[i]=='True'
                 }
             commandsjson = new_commandsjson
 
@@ -621,7 +697,7 @@ def database():
             json_saver(tilesetsjson, f"{game_data_folder_path}/data/maps/tilesets.json")
 
         # Save Command to file
-        if 'add_command' in request.form or 'save_commands' in request.form:
+        if any(key in request.form for key in ['add_dialog', 'add_sequence', 'add_command', 'save_commands']):
             for command_name in commandsjson:
                 json_saver(commandsjson[command_name], f"{game_data_folder_path}/data/commands/{command_name}.json")
 

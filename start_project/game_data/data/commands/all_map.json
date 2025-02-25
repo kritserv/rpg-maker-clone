@@ -5,6 +5,10 @@
       {
         "type": "conversation",
         "dialogs": ["Hello, world", "Have fun"]
+      },
+      {
+        "type": "add_skill",
+        "skill": "Punch"
       }
     ],
     "position": [0, 0],
@@ -18,7 +22,7 @@
     "sequence": [
       {
         "type": "python_script",
-        "script": "if 'Iron sword' in player.items:\n    if player.items['Iron sword']['is_equip']:\n        AddSkill(player.skill_dict['Slash']).update(player)\n    else:\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
+        "script": "if 'Iron sword' in player.items:\r\n    if player.items['Iron sword']['is_equip']:\r\n        AddSkill(player.skill_dict['Slash']).update(player)\r\n    else:\r\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
       }
     ],
     "position": [0, 0],

@@ -1,7 +1,16 @@
 {
   "Slash": {
     "img": "slash",
-    "description": "deal 10 damage\nto enemy",
-    "attrs": { "atk": 10 }
+    "description": "dmg: 10, acc: 0.8\r\nClassic skill\r\nto start your\r\nadventure.",
+    "attrs": {
+      "atk": 10
+    }
+  },
+  "Punch": {
+    "img": "punch",
+    "description": "dmg: 5, acc: 1.0\r\nYour most\r\nreliable weapon.",
+    "attrs": {
+      "atk": 5
+    }
   }
 }

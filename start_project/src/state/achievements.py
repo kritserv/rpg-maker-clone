@@ -8,11 +8,11 @@ def achievement_update(new_size, menu_ui_achievement, display, dt, current_time,
     if not slide_in:
         match platform:
             case 'pc':
-                select_submenu = menu_ui_achievement.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
+                select_submenu = menu_ui_achievement.update_for_pc(key, game_input.joysticks, dt, current_time)
             case 'android':
-                select_submenu = menu_ui_achievement.update_for_android(mobile_key, [], dt, current_time, game_input)
+                select_submenu = menu_ui_achievement.update_for_android(mobile_key, [], dt, current_time)
             case 'web':
-                select_submenu = menu_ui_achievement.update_for_pc(key, game_input.joysticks, dt, current_time, game_input)
+                select_submenu = menu_ui_achievement.update_for_pc(key, game_input.joysticks, dt, current_time)
     if select_submenu:
         match select_submenu:
             case 'Back':

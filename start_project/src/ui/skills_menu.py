@@ -45,7 +45,7 @@ class MenuUISkills(BaseMenuUI):
         if select_skill:
             width = display.get_width()
             height = display.get_height()
-            blit_img(display, select_skill.img, (width//2 + width//5, height//6))
-            blit_text(display, select_skill.description, self.menu_font, self.WHITE, (width//2 + width//7, height//2*1.3))
+            blit_img(display, select_skill.img, (width//2 + width//7, 5))
+            blit_text(display, select_skill.description, self.menu_font, self.WHITE, (width//2 + width//10, height//2+5))
 
         return slide_in
