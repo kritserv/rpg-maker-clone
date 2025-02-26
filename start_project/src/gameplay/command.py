@@ -311,7 +311,7 @@ class FadeOut:
                 self.fade_level += 1000 * dt
 
 
-    def update(self, player, rpgmap):
+    def update(self):
         if self.fade_level >= 254:
             if not self.always_on:
                 self.finish = True
@@ -320,10 +320,10 @@ class FadeOut:
                 self.fade_level = 255
 
     def update_for_pc(self, key, joysticks, player, rpgmap):
-        self.update(player, rpgmap)
+        self.update()
 
     def update_for_android(self, mobile_key, player, rpgmap):
-        self.update(player, rpgmap)
+        self.update()
 
 class FadeIn:
     def __init__(self):
@@ -340,14 +340,14 @@ class FadeIn:
             if self.fade_level > 1:
                 self.fade_level -= 1000 * dt
 
-    def update(self, player, rpgmap):
+    def update(self):
         if self.fade_level < 1:
             if not self.always_on:
                 self.finish = True
                 self.fade_level = 255
 
     def update_for_pc(self, key, joysticks, player, rpgmap):
-        self.update(player, rpgmap)
+        self.update()
 
     def update_for_android(self, mobile_key, player, rpgmap):
-        self.update(player, rpgmap)
+        self.update()

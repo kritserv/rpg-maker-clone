@@ -12,6 +12,8 @@ class Player(pg.sprite.Sprite):
 		self.items = {}
 		self.variables = {}
 		self.clear_commands = []
+		self.clear_achievements = []
+		self.alert = ''
 
 		self.start_hp = hp
 		self.max_hp = self.start_hp
@@ -69,6 +71,7 @@ class Player(pg.sprite.Sprite):
 		self.items = {}
 		self.variables = {}
 		self.clear_commands = []
+		self.clear_achievements = []
 		self.skills = []
 
 		self.is_running = False

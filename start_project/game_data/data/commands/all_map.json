@@ -1,48 +1,53 @@
 {
-    "game start": {
-        "trigger_by": "beginning",
-        "sequence": [
-            {
-                "type": "conversation",
-                "dialogs": [
-                    "Hello, world",
-                    "Have fun"
-                ]
-            },
-            {
-                "type": "add_skill",
-                "skill": "Punch"
-            },
-            {
-                "type": "add_item",
-                "item": "HP Potion",
-                "quant": 5
-            }
-        ],
-        "position": [
-            0,
-            0
-        ],
-        "show": false,
-        "img": false,
-        "has_collision": false,
-        "run_in_loop": false
-    },
-    "check sword": {
-        "trigger_by": "always on",
-        "sequence": [
-            {
-                "type": "python_script",
-                "script": "if 'Iron sword' in player.items:\r\n    if player.items['Iron sword']['is_equip']:\r\n        AddSkill(player.skill_dict['Slash']).update(player)\r\n    else:\r\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
-            }
-        ],
-        "position": [
-            0,
-            0
-        ],
-        "show": false,
-        "img": false,
-        "has_collision": false,
-        "run_in_loop": false
-    }
+  "game start": {
+    "trigger_by": "beginning",
+    "sequence": [
+      {
+        "type": "conversation",
+        "dialogs": ["Hello, world", "Have fun"]
+      },
+      {
+        "type": "add_skill",
+        "skill": "Punch"
+      },
+      {
+        "type": "add_item",
+        "item": "HP Potion",
+        "quant": 5
+      }
+    ],
+    "position": [0, 0],
+    "show": false,
+    "img": false,
+    "has_collision": false,
+    "run_in_loop": false
+  },
+  "sword equip add slash": {
+    "trigger_by": "always on",
+    "sequence": [
+      {
+        "type": "python_script",
+        "script": "if 'Iron sword' in player.items:\r\n    if player.items['Iron sword']['is_equip']:\r\n        AddSkill(player.skill_dict['Slash']).update(player)\r\n    else:\r\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
+      }
+    ],
+    "position": [0, 0],
+    "show": false,
+    "img": false,
+    "has_collision": false,
+    "run_in_loop": false
+  },
+  "achievement": {
+    "trigger_by": "always on",
+    "sequence": [
+      {
+        "type": "python_script",
+        "script": "if 'Learn Slash' not in player.clear_achievements:\r\n    if 'Slash' in player.skills:\r\n        player.clear_achievements.append('Learn Slash')\r\n        player.alert = 'Achievement clear\\nLearn Slash'"
+      }
+    ],
+    "position": [0, 0],
+    "show": false,
+    "img": false,
+    "has_collision": false,
+    "run_in_loop": false
+  }
 }

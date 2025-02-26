@@ -56,6 +56,7 @@ class MenuUILoad(BaseMenuUI):
             player.max_hp = select_save_slot.get('player_max_hp')
             player.hp = select_save_slot.get('player_hp')
             player.clear_commands = select_save_slot['player_clear_commands']
+            player.clear_achievements = select_save_slot['player_clear_achievements']
             player.remembered_obstacle_pos = {}
             rpgmap.curr_map = select_save_slot.get('current_map')
             return True

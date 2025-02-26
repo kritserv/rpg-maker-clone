@@ -1,9 +1,9 @@
-from .ui import blit_text, blit_img, filter_effect
+from .ui import blit_text, blit_img, filter_effect, Alert
 import pygame as pg
 from .utils import asset_loader
 from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, turn_based_update, reset_menu
 
-def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, screen, music_player, command_list, item_dict, skill_dict):
+def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, alert, screen, music_player, command_list, item_dict, skill_dict):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -102,7 +102,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 case 5:
                     skill_update(new_size, menu_ui_skills, display, dt, current_time, platform, key, game_input, player, mobile_key, pygame_event, menu_ui, skill_dict)
                 case 6:
-                    achievement_update(new_size, menu_ui_achievement, display, dt, current_time, key, game_input, mobile_key, platform, menu_ui, pygame_event)
+                    achievement_update(new_size, menu_ui_achievement, display, dt, player, current_time, key, game_input, mobile_key, platform, menu_ui, pygame_event)
                 case 7:
                     turn_based_update(new_size, display, dt, current_time, key, game_input, mobile_key, player, rpgmap, platform, menu_ui, pygame_event, menu_ui_turn_based, item_dict)
 
@@ -122,6 +122,12 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
     # Debug
     if menu_ui_settings.debug:
         debug_ui.draw(display, clock, pygame_event, player, rpgmap)
+
+    # Alert
+    if player.alert:
+        alert.menu = player.alert
+        player.alert = False
+    alert.draw(display, dt, current_time)
 
     match pygame_event.game_state:
         case -1:

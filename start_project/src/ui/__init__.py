@@ -15,3 +15,4 @@ from .achievement_menu import MenuUIAchievement
 from .turn_based_menu import MenuUITurnbased
 
 from .conversation import Conversation
+from .alert import Alert

@@ -59,6 +59,7 @@ class MenuUISave(BaseMenuUI):
             'player_pos': save_pos,
             'player_direction': player.direction,
             'player_clear_commands': player.clear_commands,
+            'player_clear_achievements': player.clear_achievements,
             'current_map': rpgmap.curr_map,
             'time': datetime.now().strftime('%Y:%m:%d %H:%M:%S')
             }
