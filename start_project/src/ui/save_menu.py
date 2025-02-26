@@ -50,9 +50,12 @@ class MenuUISave(BaseMenuUI):
         save_slots[select_slot] = {
             'name': save_name,
             'player_levels': player.levels,
+            'player_xp': player.xp,
             'player_items': player.items,
             'player_variables': player.variables,
             'player_skills': player.skills,
+            'player_max_hp': player.max_hp,
+            'player_hp': player.hp,
             'player_pos': save_pos,
             'player_direction': player.direction,
             'player_clear_commands': player.clear_commands,

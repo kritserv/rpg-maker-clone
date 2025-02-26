@@ -1,33 +1,42 @@
 {
-  "test step on": {
-    "trigger_by": "step on",
-    "sequence": [
-      {
-        "type": "fade_out"
-      },
-      {
-        "type": "teleport",
-        "map_name": "map002",
-        "position": [80, 80]
-      }
-    ],
-    "position": [176, 64],
-    "show": false,
-    "img": false,
-    "has_collision": false,
-    "run_in_loop": true
-  },
-  "fade at the beginning": {
-    "trigger_by": "beginning",
-    "sequence": [
-      {
-        "type": "fade_in"
-      }
-    ],
-    "position": [0, 0],
-    "show": false,
-    "img": false,
-    "has_collision": false,
-    "run_in_loop": false
-  }
+    "test step on": {
+        "trigger_by": "step on",
+        "sequence": [
+            {
+                "type": "fade_out"
+            },
+            {
+                "type": "teleport",
+                "map_name": "map002",
+                "position": [
+                    80,
+                    80
+                ]
+            }
+        ],
+        "position": [
+            176,
+            64
+        ],
+        "show": false,
+        "img": false,
+        "has_collision": false,
+        "run_in_loop": true
+    },
+    "fade at the beginning": {
+        "trigger_by": "beginning",
+        "sequence": [
+            {
+                "type": "fade_in"
+            }
+        ],
+        "position": [
+            0,
+            0
+        ],
+        "show": false,
+        "img": false,
+        "has_collision": false,
+        "run_in_loop": false
+    }
 }

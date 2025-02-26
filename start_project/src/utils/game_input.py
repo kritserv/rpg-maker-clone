@@ -35,9 +35,9 @@ class GameInput:
                 "LEFT": (self.dpad_left, (10, 66)),
                 "RIGHT": (self.dpad_right, (70, 66)),
                 "DOWN": (self.dpad_down, (40, 94)),
-                "A": (self.a, (game_size[0] - 50, 100)),
-                "B": (self.b, (game_size[0] - 85, 100)),
-                "SELECT": (self.select, (game_size[0]//2-16, 100)),
+                "A": (self.a, (game_size[0] - 50, 102)),
+                "B": (self.b, (game_size[0] - 85, 102)),
+                "SELECT": (self.select, (game_size[0] - 50, 74)),
             }
             self.active_touches = {}
 

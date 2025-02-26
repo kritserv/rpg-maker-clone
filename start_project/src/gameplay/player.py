@@ -3,14 +3,19 @@ from ..utils import asset_loader
 from math import floor, ceil
 
 class Player(pg.sprite.Sprite):
-	def __init__(self, xy, player_img):
+	def __init__(self, xy, hp, player_img):
 		pg.sprite.Sprite.__init__(self)
-		self.start_position = xy
 
-		self.levels = 0
+		self.levels = 1
+		self.xp = 0
+
 		self.items = {}
 		self.variables = {}
 		self.clear_commands = []
+
+		self.start_hp = hp
+		self.max_hp = self.start_hp
+		self.hp = self.start_hp
 
 		self.skill_dict = {}
 		self.skills = []
@@ -32,6 +37,7 @@ class Player(pg.sprite.Sprite):
 
 
 		self.walk_buffer = 80
+		self.start_position = xy
 		self.pos = pg.math.Vector2(xy)
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos
@@ -47,6 +53,9 @@ class Player(pg.sprite.Sprite):
 		self.rect = self.image.get_rect()
 
 	def start_new_game(self):
+
+		self.max_hp = self.start_hp
+		self.hp = self.start_hp
 		self.pos = pg.math.Vector2(self.start_position)
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos
@@ -55,13 +64,13 @@ class Player(pg.sprite.Sprite):
 		self.direction = "bottom"
 		self.remembered_obstacle_pos = {}
 
-		self.levels = 0
+		self.levels = 1
+		self.xp = 0
 		self.items = {}
 		self.variables = {}
 		self.clear_commands = []
 		self.skills = []
 
-		self.speed = 50
 		self.is_running = False
 
 	def calculate_val_from_key(self, key, mobile_key={}, joysticks=[], dt=0.016):

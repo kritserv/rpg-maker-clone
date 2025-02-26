@@ -1,5 +1,6 @@
 from .menu_reset import reset_menu
 import pygame as pg
+from ..gameplay import RemoveItem
 
 def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, platform, key, mobile_key, game_input, player, item_dict, menu_ui, pygame_event):
     select_submenu = False
@@ -28,10 +29,21 @@ def inventory_update(new_size, menu_ui_inventory, display, dt, current_time, pla
             case _:
                 if current_time - menu_ui_inventory.last_cursor_move_time > menu_ui_inventory.cursor_cooldown_time:
                     if player.items.get(select_submenu):
-                        if player.items[select_submenu]['is_equip']:
-                            player.items[select_submenu]['is_equip'] = False
-                            player.unequip_sfx.play()
-                        else:
-                            player.items[select_submenu]['is_equip'] = True
-                            player.equip_sfx.play()
+                        item = item_dict[select_submenu]
+                        if item.is_equipable:
+                            select_item = player.items[select_submenu]
+                            if select_item['is_equip']:
+                                select_item['is_equip'] = False
+                                player.unequip_sfx.play()
+                            else:
+                                select_item['is_equip'] = True
+                                player.equip_sfx.play()
+
+                        if item.is_consumable:
+                            select_item = player.items[select_submenu]
+                            if select_item['quant'] > 0:
+                                exec(item.consume_effect)
+                                player.consume_sfx.play()
+                            RemoveItem(item, 1).update(player)
+
                     menu_ui_inventory.last_cursor_move_time = current_time

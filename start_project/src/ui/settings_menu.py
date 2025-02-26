@@ -158,7 +158,7 @@ class MenuUISettings(BaseMenuUI):
             case 'Fps':
                 text = f"{self.cap_fps}"
                 if self.cap_fps == 0:
-                    text = '8\n\n\n\n\n\n'
+                    text = '8\n\n\n\n\n'
                     blit_text(display, text, self.settings_font, self.WHITE, (0, 0), 90, True)
                 else:
                     blit_text(display, f'{text}              ', self.settings_font, self.WHITE, (0, 0), 0, True)

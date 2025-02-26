@@ -175,7 +175,7 @@ class AddItem:
                 player.items[self.item.name]['quant'] += self.quant
                 player.items[self.item.name]['is_equip'] = False
             else:
-                player.items[self.item.name] = {'desc': self.item.description, 'quant': 1, 'is_equip': False}
+                player.items[self.item.name] = {'desc': self.item.description, 'quant': self.quant, 'is_equip': False}
             if not self.always_on:
                 self.finish = True
 
@@ -198,7 +198,10 @@ class RemoveItem:
     def update(self, player):
         if not self.finish:
             if player.items.get(self.item.name):
-                player.items[self.item.name]['quant'] -= self.quant
+                if player.items[self.item.name]['quant'] > 1:
+                    player.items[self.item.name]['quant'] -= self.quant
+                else:
+                    del player.items[self.item.name]
             else:
                 player.items[self.item.name] = {'desc': self.item.description, 'quant': 0, 'is_equip': False}
             if not self.always_on:

@@ -144,7 +144,7 @@ block content %}
                         <th>Skill Name</th>
                         <th>Image</th>
                         <th>Description</th>
-                        <th>Attack</th>
+                        <th>Skill Effect</th>
                         <th style="width: 5%"></th>
                     </tr>
                 </thead>
@@ -175,12 +175,9 @@ block content %}
                             >
                         </td>
                         <td>
-                            <input
-                                type="number"
-                                name="skill_atk"
-                                value="{{ skill_data.attrs.atk }}"
-                                class="form-control"
-                            />
+                            <textarea name="skill_effect" class="form-control">
+{{ skill_data.effect }}</textarea
+                            >
                         </td>
                         <td>
                             <button
@@ -801,6 +798,8 @@ block content %}
                         <th>Description</th>
                         <th style="width: 10%">Is Key Item</th>
                         <th style="width: 10%">Is Equipable</th>
+                        <th style="width: 10%">Is Consumable</th>
+                        <th>Consume Effect</th>
                         <th style="width: 5%"></th>
                     </tr>
                 </thead>
@@ -844,6 +843,22 @@ block content %}
                                 value="{{ item_data.equipable }}"
                                 class="form-control"
                             />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="item_consume"
+                                value="{{ item_data.consumable }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <textarea
+                                name="item_consume_effect"
+                                class="form-control"
+                            >
+{{ item_data.consume_effect }}</textarea
+                            >
                         </td>
                         <td>
                             <button
@@ -1074,6 +1089,14 @@ block content %}
                 name="player_start_position_y"
                 class="form-control"
                 value="{{ context.dbjson.player_start_position[1] }}"
+            /><br />
+            Player Start HP:<br />
+            <input
+                type="number"
+                id="player_start_hp"
+                name="player_start_hp"
+                class="form-control"
+                value="{{ context.dbjson.player_start_hp }}"
             /><br />
             Maps:
             <table class="table table-bordered">

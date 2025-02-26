@@ -1,34 +1,48 @@
 {
-  "game start": {
-    "trigger_by": "beginning",
-    "sequence": [
-      {
-        "type": "conversation",
-        "dialogs": ["Hello, world", "Have fun"]
-      },
-      {
-        "type": "add_skill",
-        "skill": "Punch"
-      }
-    ],
-    "position": [0, 0],
-    "show": false,
-    "img": false,
-    "has_collision": false,
-    "run_in_loop": false
-  },
-  "check sword": {
-    "trigger_by": "always on",
-    "sequence": [
-      {
-        "type": "python_script",
-        "script": "if 'Iron sword' in player.items:\r\n    if player.items['Iron sword']['is_equip']:\r\n        AddSkill(player.skill_dict['Slash']).update(player)\r\n    else:\r\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
-      }
-    ],
-    "position": [0, 0],
-    "show": false,
-    "img": false,
-    "has_collision": false,
-    "run_in_loop": false
-  }
+    "game start": {
+        "trigger_by": "beginning",
+        "sequence": [
+            {
+                "type": "conversation",
+                "dialogs": [
+                    "Hello, world",
+                    "Have fun"
+                ]
+            },
+            {
+                "type": "add_skill",
+                "skill": "Punch"
+            },
+            {
+                "type": "add_item",
+                "item": "HP Potion",
+                "quant": 5
+            }
+        ],
+        "position": [
+            0,
+            0
+        ],
+        "show": false,
+        "img": false,
+        "has_collision": false,
+        "run_in_loop": false
+    },
+    "check sword": {
+        "trigger_by": "always on",
+        "sequence": [
+            {
+                "type": "python_script",
+                "script": "if 'Iron sword' in player.items:\r\n    if player.items['Iron sword']['is_equip']:\r\n        AddSkill(player.skill_dict['Slash']).update(player)\r\n    else:\r\n        RemoveSkill(player.skill_dict['Slash']).update(player)"
+            }
+        ],
+        "position": [
+            0,
+            0
+        ],
+        "show": false,
+        "img": false,
+        "has_collision": false,
+        "run_in_loop": false
+    }
 }

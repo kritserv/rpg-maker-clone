@@ -411,7 +411,7 @@ def database():
         tilesetsjson = json_loader(f"{game_data_folder_path}/data/maps/tilesets.json")
 
         for file in glob(f"{game_data_folder_path}/data/commands/*"):
-            commandsjson[file.split('/')[-1].replace('.json','')] = json_loader(file)
+            commandsjson[file.replace('\\', '/').split('/')[-1].replace('.json','')] = json_loader(file)
 
 
     if request.method == 'POST':
@@ -423,7 +423,7 @@ def database():
             skillsjson[new_skill_name] = {
                 "img": "",
                 "description": "",
-                "attrs": {"atk": 0}
+                "effect": ""
             }
         elif 'save_skills' in data:
             # Update existing skills
@@ -431,14 +431,14 @@ def database():
             skill_names = request.form.getlist('skill_name')
             skill_imgs = request.form.getlist('skill_img')
             skill_descs = request.form.getlist('skill_desc')
-            skill_atks = request.form.getlist('skill_atk')
+            skill_effects = request.form.getlist('skill_effect')
 
             for i in range(len(skill_names)):
                 if skill_names[i]:  # Only save if name exists
                     new_skillsjson[skill_names[i]] = {
                         "img": skill_imgs[i],
                         "description": skill_descs[i],
-                        "attrs": {"atk": int(skill_atks[i])}
+                        "effect": skill_effects[i]
                     }
             skillsjson = new_skillsjson
 
@@ -450,6 +450,8 @@ def database():
                 "description": "",
                 "key_item": "",
                 "equipable": "",
+                "consumable": "",
+                "consume_effect": ""
             }
         elif 'save_items' in data:
             # Update existing items
@@ -459,6 +461,8 @@ def database():
             item_descs = request.form.getlist('item_desc')
             item_key_items = request.form.getlist('item_key')
             item_equipables = request.form.getlist('item_equip')
+            item_consumables = request.form.getlist('item_consume')
+            item_consume_effects = request.form.getlist('item_consume_effect')
 
             for i in range(len(item_names)):
                 if item_names[i]:  # Only save if name exists
@@ -466,7 +470,9 @@ def database():
                         "img": item_imgs[i],
                         "description": item_descs[i],
                         "key_item": item_key_items[i]=='True',
-                        "equipable": item_equipables[i]=='True'
+                        "equipable": item_equipables[i]=='True',
+                        "consumable": item_consumables[i]=='True',
+                        "consume_effect": item_consume_effects[i]
                     }
             itemsjson = new_itemsjson
 
@@ -523,7 +529,9 @@ def database():
 
             new_player_start_position_x = request.form['player_start_position_x']
             new_player_start_position_y = request.form['player_start_position_y']
+            new_player_start_hp = request.form['player_start_hp']
             dbjson['player_start_position'] = [int(new_player_start_position_x), int(new_player_start_position_y)]
+            dbjson['player_start_hp'] = int(new_player_start_hp)
 
             new_maps = []
             map_names = request.form.getlist('map_name')

@@ -1,28 +1,20 @@
 {
-    "main": {
-        "main_title": "Game Title"
+  "main": {
+    "main_title": "Game Title"
+  },
+  "maps": [
+    {
+      "name": "map001",
+      "tileset": "forests",
+      "size": [16, 10]
     },
-    "maps": [
-        {
-            "name": "map001",
-            "tileset": "forests",
-            "size": [
-                16,
-                10
-            ]
-        },
-        {
-            "name": "map002",
-            "tileset": "inside_houses",
-            "size": [
-                12,
-                8
-            ]
-        }
-    ],
-    "start_map": "map001",
-    "player_start_position": [
-        64,
-        64
-    ]
+    {
+      "name": "map002",
+      "tileset": "inside_houses",
+      "size": [12, 8]
+    }
+  ],
+  "start_map": "map001",
+  "player_start_position": [64, 64],
+  "player_start_hp": 100
 }

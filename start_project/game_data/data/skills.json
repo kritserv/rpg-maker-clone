@@ -1,16 +1,12 @@
 {
-  "Slash": {
-    "img": "slash",
-    "description": "dmg: 10, acc: 0.8\r\nClassic skill\r\nto start your\r\nadventure.",
-    "attrs": {
-      "atk": 10
+    "Slash": {
+        "img": "slash",
+        "description": "dmg: 10\r\nacc: 0.80\r\nRequire skill\r\nto start your\r\njourney.",
+        "effect": ""
+    },
+    "Punch": {
+        "img": "punch",
+        "description": "dmg: 5\r\nacc: 1.00\r\nYour most\r\nreliable weapon.",
+        "effect": ""
     }
-  },
-  "Punch": {
-    "img": "punch",
-    "description": "dmg: 5, acc: 1.0\r\nYour most\r\nreliable weapon.",
-    "attrs": {
-      "atk": 5
-    }
-  }
 }

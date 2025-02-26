@@ -11,7 +11,7 @@ class MenuUITurnbased(BaseMenuUI):
         self.speed = 20
         self.play_sound = True
         self.state = 'exit'
-        self.infomation = Conversation(self.menu_font, ['...'])
+        self.infomation = Conversation(self.menu_font, [' '])
 
     def draw(self, display, dt, current_time):
         menu_y_finish = self.game_size[1]-55
@@ -23,7 +23,7 @@ class MenuUITurnbased(BaseMenuUI):
             slide_in = False
             self.menu_y = menu_y_finish
 
-        menu_x = 2
+        menu_x = display.get_width()-150
         menu_w = 110
         menu_h = 55
         pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))

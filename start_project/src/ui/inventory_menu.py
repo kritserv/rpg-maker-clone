@@ -28,7 +28,7 @@ class MenuUIInventory(BaseMenuUI):
             self.menu_y = menu_y_finish
 
         menu_x = 2
-        menu_w = 150
+        menu_w = 120
         if len(self.menu) <= 10:
             menu_h = 127
         else:
@@ -67,12 +67,12 @@ class MenuUIInventory(BaseMenuUI):
         if select_item:
             width = display.get_width()
             height = display.get_height()
-            blit_img(display, select_item.img, (width//2 + width//5, height//6))
-            blit_text(display, select_item.description, self.menu_font, self.WHITE, (width//2 + width//7, height//2*1.3))
+            blit_img(display, select_item.img, (menu_w + width//20, height//6))
+            blit_text(display, select_item.description, self.menu_font, self.WHITE, (menu_w + width//20, height//2*1.3))
             if select_item.is_equipable:
                 if select_item_is_equip:
-                    blit_text(display, 'is equip', self.menu_font, self.WHITE, (width//2 + width//7, height//10))
+                    blit_text(display, 'is equip', self.menu_font, self.WHITE, (menu_w + width//20, height//10))
                 else:
-                    blit_text(display, 'is unequip', self.menu_font, self.WHITE, (width//2 + width//7, height//10))
+                    blit_text(display, 'is unequip', self.menu_font, self.WHITE, (menu_w + width//20, height//10))
 
         return slide_in

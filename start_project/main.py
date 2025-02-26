@@ -49,7 +49,7 @@ with open(f"{full_path}/game_data/game_mode.txt") as f:
 
 g = {
     'game_mode': game_mode,
-    'game_size': [300, 150],
+    'game_size': [256, 144],
     'font': {},
     'full_path': full_path,
     'colors': {
@@ -104,18 +104,20 @@ def load_asset(db):
     select_sfx = asset_loader('sfx', 'select')
     equip_sfx = asset_loader('sfx', 'unequip')
     unequip_sfx = asset_loader('sfx', 'select')
+    consume_sfx = asset_loader('sfx', 'consume')
     font_9 = asset_loader('font', 'PixelatedElegance', 9)
     font_18 = asset_loader('font', 'PixelatedElegance', 18)
     title_screen_bg = asset_loader('sprite', 'title_screen')
-    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, font_9, font_18, title_screen_bg
+    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, font_9, font_18, title_screen_bg
 
-def load_game(player_start_pos, start_map, db, screen, save_file_path):
-    player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, font_9, font_18, title_screen_bg = load_asset(db)
+def load_game(player_start_pos, player_start_hp, start_map, db, screen, save_file_path):
+    player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, font_9, font_18, title_screen_bg = load_asset(db)
     g['font']['font_9'] = font_9
     g['font']['font_18'] = font_18
-    player = Player(player_start_pos, player_img)
+    player = Player(player_start_pos, player_start_hp, player_img)
     player.equip_sfx = equip_sfx
     player.unequip_sfx = unequip_sfx
+    player.consume_sfx = consume_sfx
     rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, g)
@@ -142,9 +144,11 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     first_music_volume = menu_ui_settings.music_slider.save_value/100
     if first_sound_volume<0:
         first_sound_volume=0
+    if first_music_volume<0:
+        first_music_volume=0
 
-    pg.mixer.music.set_volume(first_music_volume)
     music_player = MusicPlayer()
+    pg.mixer.music.set_volume(first_music_volume)
 
     menu_ui.select_sfx.set_volume(first_sound_volume)
     menu_ui.open_menu_sfx.set_volume(first_sound_volume)
@@ -153,9 +157,11 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
     menu_ui_inventory.select_sfx.set_volume(first_sound_volume)
     menu_ui_skills.select_sfx.set_volume(first_sound_volume)
     menu_ui_achievement.select_sfx.set_volume(first_sound_volume)
+    menu_ui_turn_based.select_sfx.set_volume(first_sound_volume)
 
     player.equip_sfx.set_volume(first_sound_volume)
     player.unequip_sfx.set_volume(first_sound_volume)
+    player.consume_sfx.set_volume(first_sound_volume)
 
     item_data = json_loader(f'{full_path}game_data/data/items.json')
     item_dict = {}
@@ -167,7 +173,9 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
             img=asset_loader('sprite', data['img']),
             description=data['description'],
             is_key_item=data['key_item'],
-            is_equipable=data['equipable']
+            is_equipable=data['equipable'],
+            is_consumable=data['consumable'],
+            consume_effect=data['consume_effect']
         )
 
     skill_data = json_loader(f'{full_path}game_data/data/skills.json')
@@ -179,7 +187,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
             name=skill_name,
             img=asset_loader('sprite', data['img']),
             description=data['description'],
-            attrs=data['attrs'],
+            effect=data['effect'],
         )
 
     player.skill_dict = skill_dict
@@ -244,7 +252,7 @@ def load_game(player_start_pos, start_map, db, screen, save_file_path):
                     show=data['show'],
                     img=img,
                     has_collision=data['has_collision'],
-                    map_name=command_json.split('/')[-1].replace('.json',''),
+                    map_name=command_json.replace('\\','/').split('/')[-1].replace('.json',''),
                     run_in_loop=data['run_in_loop']
                 )
             )
@@ -263,6 +271,7 @@ async def main():
     pg.display.set_caption(db["main"]["main_title"])
     start_map = db["start_map"]
     player_start_pos = db["player_start_position"]
+    player_start_hp = db["player_start_hp"]
 
     clock = pg.time.Clock()
 
@@ -369,7 +378,7 @@ async def main():
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
            menu_ui_achievement, menu_ui_turn_based, music_player, command_list, item_dict, skill_dict = load_game(
-                player_start_pos, start_map, db, screen, False)
+                player_start_pos, player_start_hp, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
                 pg.display.toggle_fullscreen()
@@ -406,7 +415,7 @@ async def main():
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
            menu_ui_achievement, menu_ui_turn_based, music_player, command_list, item_dict, skill_dict = load_game(
-                player_start_pos, start_map, db, screen, app_storage_path())
+                player_start_pos, player_start_hp, start_map, db, screen, app_storage_path())
 
             game_input = GameInput('android', g['game_size'], full_path)
             opengl = False

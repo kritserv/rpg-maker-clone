@@ -21,7 +21,7 @@ class MenuUISkills(BaseMenuUI):
             self.menu_y = menu_y_finish
 
         menu_x = 2
-        menu_w = 150
+        menu_w = 120
         menu_h = 127
         pg.draw.rect(display, self.DARKBLUE, (menu_x, self.menu_y, menu_w, menu_h))
         menu_text_y = self.menu_y + 6
@@ -45,7 +45,7 @@ class MenuUISkills(BaseMenuUI):
         if select_skill:
             width = display.get_width()
             height = display.get_height()
-            blit_img(display, select_skill.img, (width//2 + width//7, 5))
-            blit_text(display, select_skill.description, self.menu_font, self.WHITE, (width//2 + width//10, height//2+5))
+            blit_img(display, select_skill.img, (menu_w + width//20, 5))
+            blit_text(display, select_skill.description, self.menu_font, self.WHITE, (menu_w + width//20, height//2+5))
 
         return slide_in

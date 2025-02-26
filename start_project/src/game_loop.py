@@ -104,7 +104,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 case 6:
                     achievement_update(new_size, menu_ui_achievement, display, dt, current_time, key, game_input, mobile_key, platform, menu_ui, pygame_event)
                 case 7:
-                    turn_based_update(new_size, display, dt, current_time, key, game_input, mobile_key, player, rpgmap, platform, menu_ui, pygame_event, menu_ui_turn_based)
+                    turn_based_update(new_size, display, dt, current_time, key, game_input, mobile_key, player, rpgmap, platform, menu_ui, pygame_event, menu_ui_turn_based, item_dict)
 
             pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
@@ -121,13 +121,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
     # Debug
     if menu_ui_settings.debug:
-        debug_message = ""
-        try:
-            debug_message = f"state: {pygame_event.game_state}\npos: {player.pos}\nmap: {rpgmap.curr_map}"
-        except Exception as e:
-            debug_message = f"{e}"
-        blit_text(display, f"{debug_message}", g['font']['font_9'], g['colors']['black'], (5, 5))
-        debug_ui.draw_fps(display, clock)
+        debug_ui.draw(display, clock, pygame_event, player, rpgmap)
 
     match pygame_event.game_state:
         case -1:

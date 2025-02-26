@@ -4,17 +4,24 @@ from .text_blit import blit_text
 
 class DebugUI:
     def __init__(self, g):
-        self.fps_font = g['font']['font_9']
-        self.fps = 0
-        self.fps_update_timer = Timer()
-        self.fps_update_timer.start()
+        self.font = g['font']['font_9']
+        self.text = ""
+        self.fast_text = ""
+        self.update_timer = Timer()
+        self.update_timer.start()
         self.game_size = g['game_size']
 
-        self.black = g['colors']['black']
+        self.white = g['colors']['white']
+        self.bg = pg.Surface((110, 50))
+        self.bg.set_alpha(200)
+        self.bg.fill(g['colors']['black'])
 
-    def draw_fps(self, display, clock):
-        if self.fps_update_timer.get_elapsed_time() >= 0.5:
-            self.fps = "{:.2f}".format(clock.get_fps())
-            self.fps_update_timer.restart()
+    def draw(self, display, clock, pygame_event, player, rpgmap):
+        if self.update_timer.get_elapsed_time() >= 0.5:
+            self.text = 'fps: ' + "{:.2f}".format(clock.get_fps())
+            self.update_timer.restart()
+        self.fast_text = f"\nmap: {rpgmap.curr_map}\npos: {player.pos}\nstate: {pygame_event.game_state}"
 
-        blit_text(display, f'fps :{self.fps}', self.fps_font, self.black, (display.get_width()-75, 5))
+        if pygame_event.game_state not in (4, 5, 6):
+            display.blit(self.bg, (0, 0))
+            blit_text(display, self.text + self.fast_text, self.font, self.white, (5, 5))

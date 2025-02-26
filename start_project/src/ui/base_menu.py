@@ -107,8 +107,6 @@ class BaseMenuUI:
 
         elif cancel:
             select_submenu = 'Back'
-            if self.play_sound:
-                self.select_sfx.play()
 
         return select_submenu
 
@@ -150,7 +148,5 @@ class BaseMenuUI:
 
         elif cancel:
             select_submenu = 'Back'
-            if self.play_sound:
-                self.select_sfx.play()
 
         return select_submenu
