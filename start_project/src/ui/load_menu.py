@@ -45,6 +45,7 @@ class MenuUILoad(BaseMenuUI):
 
         if select_save_slot:
             player.pos = pg.math.Vector2(select_save_slot.get('player_pos'))
+            player.rect.topleft = player.pos
             player.last_pos = pg.math.Vector2(select_save_slot.get('player_pos'))
             player.next_pos = pg.math.Vector2(select_save_slot.get('player_pos'))
             player.direction = select_save_slot.get('player_direction')

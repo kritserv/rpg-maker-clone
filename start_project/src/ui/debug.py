@@ -22,6 +22,6 @@ class DebugUI:
             self.update_timer.restart()
         self.fast_text = f"\nmap: {rpgmap.curr_map}\npos: {player.pos}\nstate: {pygame_event.game_state}"
 
-        if pygame_event.game_state not in (4, 5, 6):
-            display.blit(self.bg, (0, 0))
-            blit_text(display, self.text + self.fast_text, self.font, self.white, (5, 5))
+        # if pygame_event.game_state not in (4, 5, 6):
+        display.blit(self.bg, (0, 0))
+        blit_text(display, self.text + self.fast_text, self.font, self.white, (5, 5))

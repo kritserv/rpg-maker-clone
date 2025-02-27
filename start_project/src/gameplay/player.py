@@ -59,6 +59,7 @@ class Player(pg.sprite.Sprite):
 		self.max_hp = self.start_hp
 		self.hp = self.start_hp
 		self.pos = pg.math.Vector2(self.start_position)
+		self.rect.topleft = self.pos
 		self.dirvec = pg.math.Vector2(0, 0)
 		self.last_pos = self.pos
 		self.next_pos = self.pos

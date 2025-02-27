@@ -105,19 +105,26 @@ def load_asset(db):
     equip_sfx = asset_loader('sfx', 'unequip')
     unequip_sfx = asset_loader('sfx', 'select')
     consume_sfx = asset_loader('sfx', 'consume')
+    battle_start_sfx = asset_loader('sfx', 'battle_start')
+    enemy_attack_sfx = asset_loader('sfx', 'enemy_attack')
+    player_attack_sfx = asset_loader('sfx', 'player_attack')
+    consume_sfx = asset_loader('sfx', 'consume')
     font_9 = asset_loader('font', 'PixelatedElegance', 9)
     font_18 = asset_loader('font', 'PixelatedElegance', 18)
     title_screen_bg = asset_loader('sprite', 'title_screen')
-    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, font_9, font_18, title_screen_bg
+    return player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, battle_start_sfx, enemy_attack_sfx, player_attack_sfx, font_9, font_18, title_screen_bg
 
 def load_game(player_start_pos, player_start_hp, start_map, db, screen, save_file_path):
-    player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, font_9, font_18, title_screen_bg = load_asset(db)
+    player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, battle_start_sfx, enemy_attack_sfx, player_attack_sfx, font_9, font_18, title_screen_bg = load_asset(db)
     g['font']['font_9'] = font_9
     g['font']['font_18'] = font_18
     player = Player(player_start_pos, player_start_hp, player_img)
     player.equip_sfx = equip_sfx
     player.unequip_sfx = unequip_sfx
     player.consume_sfx = consume_sfx
+    player.battle_start_sfx = battle_start_sfx
+    player.enemy_attack_sfx = enemy_attack_sfx
+    player.player_attack_sfx = player_attack_sfx
 
     enemies_data = json_loader(f'{full_path}game_data/data/enemies.json')
 
@@ -177,6 +184,9 @@ def load_game(player_start_pos, player_start_hp, start_map, db, screen, save_fil
     player.equip_sfx.set_volume(first_sound_volume)
     player.unequip_sfx.set_volume(first_sound_volume)
     player.consume_sfx.set_volume(first_sound_volume)
+    player.battle_start_sfx.set_volume(first_sound_volume)
+    player.enemy_attack_sfx.set_volume(first_sound_volume)
+    player.player_attack_sfx.set_volume(first_sound_volume)
 
     item_data = json_loader(f'{full_path}game_data/data/items.json')
     item_dict = {}

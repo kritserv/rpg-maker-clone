@@ -5,49 +5,12 @@ from ..ui import blit_img, blit_text
 import random
 
 def turn_based_update(new_size, display, dt, current_time, key, game_input, mobile_key, player, rpgmap, platform, menu_ui, pygame_event, menu_ui_turn_based, item_dict, enemy_dict):
-    display.fill('black')
+
     slide_in = False
     select_submenu = False
     enemy = enemy_dict[menu_ui_turn_based.current_enemy]
 
-    if player.hp < 0:
-        player.hp = 0
-    if enemy.hp < 0:
-        enemy.hp = 0
-
-    if enemy.hp > 0:
-        blit_img(display, enemy.img, enemy.img.get_rect(center=(display.get_width()//2, display.get_height()//4)))
-
-    player_hp = player.hp/player.max_hp
-    if 0.4 > player_hp >= 0:
-        rect_col = 'red'
-        font_col = 'darkred'
-    elif 0.7 > player_hp >= 0.4:
-        rect_col = 'yellow'
-        font_col = 'orange'
-    else:
-        rect_col = 'green'
-        font_col = 'darkgreen'
-
-    blit_text(display, f'player: {player.hp} / {player.max_hp}', menu_ui_turn_based.menu_font, pg.Color(font_col), (5,70))
-    pg.draw.rect(display, pg.Color('grey20'), (5, 80, 100, 6))
-    pg.draw.rect(display, pg.Color(rect_col), (5, 80, int(player.hp/player.max_hp*100), 6))
-
-    enemy_hp = enemy.hp/enemy.max_hp
-    if 0.4 > enemy_hp >= 0:
-        rect_col = 'red'
-        font_col = 'darkred'
-    elif 0.7 > enemy_hp >= 0.4:
-        rect_col = 'yellow'
-        font_col = 'orange'
-    else:
-        rect_col = 'green'
-        font_col = 'darkgreen'
-
-    blit_text(display, f'{enemy.name}: {enemy.hp} / {enemy.max_hp}', menu_ui_turn_based.menu_font, font_col, (display.get_width()-135,5))
-    pg.draw.rect(display, pg.Color('grey20'), (display.get_width()-135, 15, 100, 6))
-    pg.draw.rect(display, rect_col, (display.get_width()-135, 15, int(enemy.hp/enemy.max_hp*100), 6))
-
+    menu_ui_turn_based.draw2(display, dt, current_time, player, enemy)
     if not menu_ui_turn_based.state == 'show infomation':
         slide_in = menu_ui_turn_based.draw(display, dt, current_time)
         if not slide_in:
@@ -60,6 +23,8 @@ def turn_based_update(new_size, display, dt, current_time, key, game_input, mobi
                     select_submenu = menu_ui_turn_based.update_for_pc(key, game_input.joysticks, dt, current_time)
 
     if select_submenu:
+        player_hp_before_turn_start = player.hp
+        enemy_hp_before_turn_start = enemy.hp
         if select_submenu == 'Skill' and menu_ui_turn_based.state == 'main':
             menu_ui_turn_based.state = 'skill'
             if player.skills:
@@ -168,6 +133,11 @@ def turn_based_update(new_size, display, dt, current_time, key, game_input, mobi
 
         elif select_submenu == 'Back' and menu_ui_turn_based.state == 'main':
             pass
+
+        if player.hp < player_hp_before_turn_start:
+            player.enemy_attack_sfx.play()
+        if enemy.hp < enemy_hp_before_turn_start:
+            player.player_attack_sfx.play()
 
     if menu_ui_turn_based.state == 'show infomation':
         menu_ui_turn_based.infomation.draw(display, dt, current_time)
