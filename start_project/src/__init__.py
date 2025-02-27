@@ -1,5 +1,5 @@
-from .gameplay import Player, RpgMap, Camera, MusicPlayer, \
-    Item, Skill, \
+from .gameplay import Player, Enemy, RpgMap, Camera, \
+    MusicPlayer, Item, Skill, \
     Command, PythonScript, AddItem, RemoveItem, AddSkill, RemoveSkill, \
     Teleport, FadeIn, FadeOut
 

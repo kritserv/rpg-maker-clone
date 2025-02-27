@@ -49,7 +49,7 @@ with open(f"{full_path}/game_data/game_mode.txt") as f:
 
 g = {
     'game_mode': game_mode,
-    'game_size': [256, 144],
+    'game_size': [256, 154],
     'font': {},
     'full_path': full_path,
     'colors': {
@@ -80,7 +80,7 @@ if g['game_mode'] == 'android':
         g['game_size'][0] += 1
 
 from src import json_loader, run_game_loop, \
-    Player, RpgMap, Camera, MusicPlayer, \
+    Player, Enemy, RpgMap, Camera, MusicPlayer, \
     Item, Skill, \
     Command, Conversation, Alert, PythonScript, \
     AddItem, RemoveItem, AddSkill, RemoveSkill, \
@@ -118,6 +118,20 @@ def load_game(player_start_pos, player_start_hp, start_map, db, screen, save_fil
     player.equip_sfx = equip_sfx
     player.unequip_sfx = unequip_sfx
     player.consume_sfx = consume_sfx
+
+    enemies_data = json_loader(f'{full_path}game_data/data/enemies.json')
+
+    enemy_dict = {}
+    for enemy_name in enemies_data:
+        enemy_data = enemies_data[enemy_name]
+        enemy_dict[enemy_name] = Enemy(
+            name=enemy_name,
+            hp=enemy_data['hp'],
+            enemy_img=enemy_data['img'],
+            moves=enemy_data['moves'],
+            defeat_reward=enemy_data['defeat_reward']
+        )
+
     rpgmap = RpgMap(start_map, g, load_map_data(db["maps"], all_tile_imgs))
     camera_width, camera_height = screen.get_size()
     camera = Camera(camera_width, camera_height, g)
@@ -204,33 +218,40 @@ def load_game(player_start_pos, player_start_hp, start_map, db, screen, save_fil
             for sequence_data in data['sequence']:
                 match sequence_data['type']:
                     case 'python_script':
-                        sequence.append(
-                            PythonScript(sequence_data['script'])
-                        )
+                        if sequence_data.get('script'):
+                            sequence.append(
+                                PythonScript(sequence_data['script'])
+                            )
                     case 'conversation':
-                        sequence.append(
-                            Conversation(font_9, sequence_data['dialogs'])
-                        )
+                        if sequence_data.get('dialogs'):
+                            sequence.append(
+                                Conversation(font_9, sequence_data['dialogs'])
+                            )
                     case 'add_item':
-                        sequence.append(
-                            AddItem(item_dict[sequence_data['item']], sequence_data['quant'])
-                        )
+                        if sequence_data.get('item') and sequence_data.get('quant'):
+                            sequence.append(
+                                AddItem(item_dict[sequence_data['item']], sequence_data['quant'])
+                            )
                     case 'remove_item':
-                        sequence.append(
-                            RemoveItem(item_dict[sequence_data['item']], sequence_data['quant'])
-                        )
+                        if sequence_data.get('item') and sequence_data.get('quant'):
+                            sequence.append(
+                                RemoveItem(item_dict[sequence_data['item']], sequence_data['quant'])
+                            )
                     case 'add_skill':
-                        sequence.append(
-                            AddSkill(skill_dict[sequence_data['skill']])
-                        )
+                        if sequence_data.get('skill'):
+                            sequence.append(
+                                AddSkill(skill_dict[sequence_data['skill']])
+                            )
                     case 'remove_skill':
-                        sequence.append(
-                            RemoveSkill(skill_dict[sequence_data['skill']])
-                        )
+                        if sequence_data.get('skill'):
+                            sequence.append(
+                                RemoveSkill(skill_dict[sequence_data['skill']])
+                            )
                     case 'teleport':
-                        sequence.append(
-                            Teleport(sequence_data['map_name'], sequence_data['position'])
-                        )
+                        if sequence_data.get('map_name') and sequence_data.get('position'):
+                            sequence.append(
+                                Teleport(sequence_data['map_name'], sequence_data['position'])
+                            )
                     case 'fade_in':
                         sequence.append(
                             FadeIn()
@@ -262,7 +283,7 @@ def load_game(player_start_pos, player_start_hp, start_map, db, screen, save_fil
         menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, \
         menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
         menu_ui_achievement, menu_ui_turn_based, alert, music_player, \
-        command_list, item_dict, skill_dict
+        command_list, item_dict, skill_dict, enemy_dict
 
 async def main():
     delta_time = DeltaTime()
@@ -380,7 +401,7 @@ async def main():
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
            menu_ui_achievement, menu_ui_turn_based, alert, music_player, \
-           command_list, item_dict, skill_dict = load_game(
+           command_list, item_dict, skill_dict, enemy_dict = load_game(
                 player_start_pos, player_start_hp, start_map, db, screen, False)
             load_settings = json_loader(menu_ui_settings.settings_path)
             if load_settings['Fullscreen']:
@@ -396,7 +417,7 @@ async def main():
                     debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, \
                     menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
                     menu_ui_achievement, menu_ui_turn_based, alert, screen, music_player, \
-                    command_list, item_dict, skill_dict)
+                    command_list, item_dict, skill_dict, enemy_dict)
 
         case 'android':
 
@@ -418,7 +439,7 @@ async def main():
 
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, menu_ui_turn_based, alert, music_player, command_list, item_dict, skill_dict = load_game(
+           menu_ui_achievement, menu_ui_turn_based, alert, music_player, command_list, item_dict, skill_dict, enemy_dict = load_game(
                 player_start_pos, player_start_hp, start_map, db, screen, app_storage_path())
 
             game_input = GameInput('android', g['game_size'], full_path)
@@ -430,7 +451,8 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills,
-                    menu_ui_achievement, menu_ui_turn_based, alert, screen, music_player, command_list, item_dict, skill_dict)
+                    menu_ui_achievement, menu_ui_turn_based, alert, screen, music_player,
+                    command_list, item_dict, skill_dict, enemy_dict)
 
         case 'web':
             import sys, platform
@@ -441,7 +463,7 @@ async def main():
                 pg.RESIZABLE)
             player, rpgmap, camera, debug_ui, menu_ui, menu_ui_save, menu_ui_load, \
             menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, \
-           menu_ui_achievement, menu_ui_turn_based, alert, music_player, command_list, item_dict, skill_dict = load_game(
+           menu_ui_achievement, menu_ui_turn_based, alert, music_player, command_list, item_dict, skill_dict, enemy_dict = load_game(
                 player_start_pos, player_start_hp, start_map, db, screen, False)
 
             game_input = GameInput('web')
@@ -452,7 +474,7 @@ async def main():
                     rpgmap, player, camera, debug_ui, debug_message, opengl,
                     menu_ui, menu_ui_save, menu_ui_load, menu_ui_title,
                     menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, alert,
-                    screen, music_player, command_list, item_dict, skill_dict)
+                    screen, music_player, command_list, item_dict, skill_dict, enemy_dict)
                 await asyncio.sleep(0)
 
     pg.quit()

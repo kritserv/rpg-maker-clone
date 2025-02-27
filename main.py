@@ -401,6 +401,7 @@ def database():
     itemsjson = {}
     tilesetsjson = {}
     commandsjson = {}
+    enemiesjson = {}
 
     if current_project and project_folder:
         folder_path = current_project['project_folder']
@@ -409,6 +410,7 @@ def database():
         skillsjson = json_loader(f"{game_data_folder_path}/data/skills.json")
         itemsjson = json_loader(f"{game_data_folder_path}/data/items.json")
         tilesetsjson = json_loader(f"{game_data_folder_path}/data/maps/tilesets.json")
+        enemiesjson = json_loader(f"{game_data_folder_path}/data/enemies.json")
 
         for file in glob(f"{game_data_folder_path}/data/commands/*"):
             commandsjson[file.replace('\\', '/').split('/')[-1].replace('.json','')] = json_loader(file)
@@ -419,7 +421,7 @@ def database():
 
         if 'add_skill' in data:
             # Add new empty skill
-            new_skill_name = data['skill_name']
+            new_skill_name = data['new_skill_name']
             skillsjson[new_skill_name] = {
                 "img": "",
                 "description": "",
@@ -441,6 +443,34 @@ def database():
                         "effect": skill_effects[i]
                     }
             skillsjson = new_skillsjson
+
+        elif 'add_enemy' in data:
+            # Add new empty enemy
+            new_enemy_name = data['new_enemy_name']
+            enemiesjson[new_enemy_name] = {
+                "img": "",
+                "hp": 100,
+                "moves": "",
+                "defeat_reward": ""
+            }
+        elif 'save_enemies' in data:
+            # Update existing enemies
+            new_enemiesjson = {}
+            enemy_names = request.form.getlist('enemy_name')
+            enemy_imgs = request.form.getlist('enemy_img')
+            enemy_hps = request.form.getlist('enemy_hp')
+            enemy_moves = request.form.getlist('enemy_move')
+            enemy_defeat_rewards = request.form.getlist('enemy_defeat_reward')
+
+            for i in range(len(enemy_names)):
+                if enemy_names[i]:  # Only save if name exists
+                    new_enemiesjson[enemy_names[i]] = {
+                        "img": enemy_imgs[i],
+                        "hp": int(enemy_hps[i]),
+                        "moves": enemy_moves[i],
+                        "defeat_reward": enemy_defeat_rewards[i]
+                    }
+            enemiesjson = new_enemiesjson
 
         elif 'add_item' in data:
             # Add new empty item
@@ -590,6 +620,8 @@ def database():
             new_sequence_type = data['new_sequence_type']
             if new_sequence_type == 'conversation':
                 commandsjson[new_sequence_location][new_sequence_command_name]['sequence'].append({'type':new_sequence_type, 'dialogs': ['...']})
+            elif new_sequence_type == 'teleport':
+                commandsjson[new_sequence_location][new_sequence_command_name]['sequence'].append({'type':new_sequence_type, 'map_name': '...', 'position': [0, 0]})
             else:
                 commandsjson[new_sequence_location][new_sequence_command_name]['sequence'].append({'type':new_sequence_type})
 
@@ -696,6 +728,10 @@ def database():
         if 'add_skill' in request.form or 'save_skills' in request.form:
             json_saver(skillsjson, f"{game_data_folder_path}/data/skills.json")
 
+        # Save Enemy to file
+        if 'add_enemy' in request.form or 'save_enemies' in request.form:
+            json_saver(enemiesjson, f"{game_data_folder_path}/data/enemies.json")
+
         # Save Item to file
         if 'add_item' in request.form or 'save_items' in request.form:
             json_saver(itemsjson, f"{game_data_folder_path}/data/items.json")
@@ -715,6 +751,7 @@ def database():
         "game_data_folder_path": game_data_folder_path,
         "dbjson": dbjson,
         "skillsjson": skillsjson,
+        "enemiesjson": enemiesjson,
         "itemsjson": itemsjson,
         "tilesetsjson": tilesetsjson,
         "commandsjson": commandsjson,

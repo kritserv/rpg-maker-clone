@@ -1,7 +1,7 @@
 {
-  "Fullscreen": false,
-  "Sound": 50,
-  "Music": 50,
-  "Fps": 0,
-  "Debug": false
+    "Fullscreen": false,
+    "Sound": 50,
+    "Music": 50,
+    "Fps": 0,
+    "Debug": false
 }

@@ -1,47 +1,9 @@
 {
-    "Slot 0": {
-        "name": "Slot 0 20250226",
-        "player_levels": 1,
-        "player_xp": 0,
-        "player_items": {
-            "HP Potion": {
-                "desc": "restore HP\r\nby 30",
-                "quant": 5,
-                "is_equip": false
-            },
-            "Iron sword": {
-                "desc": "add slash skill",
-                "quant": 1,
-                "is_equip": true
-            }
-        },
-        "player_variables": {},
-        "player_skills": [
-            "Punch",
-            "Slash"
-        ],
-        "player_max_hp": 100,
-        "player_hp": 100,
-        "player_pos": [
-            128.0,
-            96.0
-        ],
-        "player_direction": "left",
-        "player_clear_commands": [
-            "fade at the beginning",
-            "game start",
-            "open the chest"
-        ],
-        "player_clear_achievements": [
-            "Learn Slash"
-        ],
-        "current_map": "map001",
-        "time": "2025:02:26 17:43:46"
-    },
-    "Slot 1": {},
-    "Slot 2": {},
-    "Slot 3": {},
-    "Slot 4": {},
-    "Slot 5": {},
-    "Slot 6": {}
+  "Slot 0": {},
+  "Slot 1": {},
+  "Slot 2": {},
+  "Slot 3": {},
+  "Slot 4": {},
+  "Slot 5": {},
+  "Slot 6": {}
 }

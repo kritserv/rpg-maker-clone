@@ -1,4 +1,5 @@
 from .player import Player
+from .enemy import Enemy
 from .rpgmap import RpgMap
 from .camera import Camera
 from .music_player import MusicPlayer

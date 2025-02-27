@@ -25,7 +25,7 @@
         "has_collision": true,
         "run_in_loop": false
     },
-    "test step on 2": {
+    "exit house": {
         "trigger_by": "step on",
         "sequence": [
             {

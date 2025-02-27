@@ -1,6 +1,5 @@
 from .base_menu import BaseMenuUI
 from .text_blit import blit_text
-from .image_blit import blit_img
 from ..utils import Timer
 import pygame as pg
 

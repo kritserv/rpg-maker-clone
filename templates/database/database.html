@@ -6,20 +6,6 @@ block content %}
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
         <button
-            class="nav-link active"
-            id="pills-characters-tab"
-            data-bs-toggle="pill"
-            data-bs-target="#pills-characters"
-            type="button"
-            role="tab"
-            aria-controls="pills-characters"
-            aria-selected="true"
-        >
-            Characters 🦹‍♂️
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button
             class="nav-link"
             id="pills-commands-tab"
             data-bs-toggle="pill"
@@ -77,20 +63,6 @@ block content %}
     <li class="nav-item" role="presentation">
         <button
             class="nav-link"
-            id="pills-battles-tab"
-            data-bs-toggle="pill"
-            data-bs-target="#pills-battles"
-            type="button"
-            role="tab"
-            aria-controls="pills-battles"
-            aria-selected="false"
-        >
-            Battles ⚔️
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button
-            class="nav-link"
             id="pills-enemies-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-enemies"
@@ -119,14 +91,6 @@ block content %}
 </ul>
 <div class="tab-content" id="pills-tabContent">
     <div
-        class="tab-pane fade show active"
-        id="pills-characters"
-        role="tabpanel"
-        aria-labelledby="pills-characters-tab"
-    >
-        characters...
-    </div>
-    <div
         class="tab-pane fade"
         id="pills-skills"
         role="tabpanel"
@@ -144,7 +108,7 @@ block content %}
                         <th>Skill Name</th>
                         <th>Image</th>
                         <th>Description</th>
-                        <th>Skill Effect</th>
+                        <th style="width: 40%">Skill Effect</th>
                         <th style="width: 5%"></th>
                     </tr>
                 </thead>
@@ -198,7 +162,7 @@ block content %}
             <div class="input-group">
                 <input
                     type="text"
-                    name="skill_name"
+                    name="new_skill_name"
                     class="form-control"
                     placeholder="New skill name"
                     required
@@ -799,7 +763,7 @@ block content %}
                         <th style="width: 10%">Is Key Item</th>
                         <th style="width: 10%">Is Equipable</th>
                         <th style="width: 10%">Is Consumable</th>
-                        <th>Consume Effect</th>
+                        <th style="width: 40%">Consume Effect</th>
                         <th style="width: 5%"></th>
                     </tr>
                 </thead>
@@ -1032,19 +996,98 @@ block content %}
     </div>
     <div
         class="tab-pane fade"
-        id="pills-battles"
-        role="tabpanel"
-        aria-labelledby="pills-battles-tab"
-    >
-        battles...
-    </div>
-    <div
-        class="tab-pane fade"
         id="pills-enemies"
         role="tabpanel"
         aria-labelledby="pills-enemies-tab"
     >
-        enemies...
+        <!-- Enemies table form -->
+        <form method="POST">
+            <button type="submit" name="save_enemies" class="btn btn-success">
+                💾 Save
+            </button>
+            <div style="height: 22px"></div>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Enemy Name</th>
+                        <th>Image</th>
+                        <th style="width: 15%">HP</th>
+                        <th style="width: 30%">Moves</th>
+                        <th style="width: 30%">Defeat Reward</th>
+                        <th style="width: 5%"></th>
+                    </tr>
+                </thead>
+                <tbody id="enemiessTableBody">
+                    {% for enemy_name, enemy_data in context.enemiesjson.items()
+                    %}
+                    <tr>
+                        <td>
+                            <input
+                                type="text"
+                                name="enemy_name"
+                                value="{{ enemy_name }}"
+                                class="form-control"
+                                required
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                name="enemy_img"
+                                value="{{ enemy_data.img }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                name="enemy_hp"
+                                value="{{ enemy_data.hp }}"
+                                class="form-control"
+                            />
+                        </td>
+                        <td>
+                            <textarea name="enemy_move" class="form-control">
+{{ enemy_data.moves }}</textarea
+                            >
+                        </td>
+                        <td>
+                            <textarea
+                                name="enemy_defeat_reward"
+                                class="form-control"
+                            >
+{{ enemy_data.defeat_reward }}</textarea
+                            >
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                onclick="this.closest('tr').remove()"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        <!-- Add new enemy form -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="new_enemy_name"
+                    class="form-control"
+                    placeholder="New enemy name"
+                    required
+                />
+                <button type="submit" name="add_enemy" class="btn btn-primary">
+                    Add Enemy
+                </button>
+            </div>
+        </form>
     </div>
     <div
         class="tab-pane fade"

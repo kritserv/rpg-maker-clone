@@ -12,6 +12,7 @@ class MenuUITurnbased(BaseMenuUI):
         self.play_sound = True
         self.state = 'exit'
         self.infomation = Conversation(self.menu_font, [' '])
+        self.current_enemy = ''
 
     def draw(self, display, dt, current_time):
         menu_y_finish = self.game_size[1]-55

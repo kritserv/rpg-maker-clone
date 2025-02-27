@@ -3,7 +3,7 @@ import pygame as pg
 from .utils import asset_loader
 from .state import title_screen_update, reset_title_screen, load_game_update, settings_update, main_game_update, pause_game_update, save_load_game_update, inventory_update, skill_update,achievement_update, turn_based_update, reset_menu
 
-def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, alert, screen, music_player, command_list, item_dict, skill_dict):
+def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgmap, player, camera, debug_ui, debug_message, opengl, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, alert, screen, music_player, command_list, item_dict, skill_dict, enemy_dict):
     platform = g['game_mode']
     dt = delta_time.get()
 
@@ -30,13 +30,13 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
     match pygame_event.game_state:
         case -1:
-            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, rpgmap, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings, command_list)
+            title_screen_update(menu_ui_title, display, dt, current_time, platform, key, game_input, mobile_key, player, rpgmap, pygame_event, menu_ui, menu_ui_save, menu_ui_load, menu_ui_settings, command_list, enemy_dict)
 
         case -2:
             reset_title_screen(menu_ui_title, display, pygame_event)
 
         case -3:
-            load_game_update(new_size, menu_ui, menu_ui_load, menu_ui_save, display, dt, current_time, key, game_input, platform, mobile_key, player, rpgmap, pygame_event, command_list)
+            load_game_update(new_size, menu_ui, menu_ui_load, menu_ui_save, display, dt, current_time, key, game_input, platform, mobile_key, player, rpgmap, pygame_event, command_list, enemy_dict)
 
         case -4:
             settings_update(-2, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
@@ -49,7 +49,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
             center_x = display.get_width()//2
             center_y = display.get_height()//2
-            player.collision = pg.Rect(center_x-16, center_y-2, 16, 16)
+            player.collision = pg.Rect(center_x-16, center_y-2, 16, 15)
 
             # Graphic
             collision_rects = []
@@ -70,9 +70,9 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 for command in command_list:
                     match platform:
                         case 'android':
-                            command.update_for_android(display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict, pygame_event.game_state)
+                            command.update_for_android(display, dt, current_time, pygame_event, mobile_key, player, rpgmap, camera, item_dict, pygame_event.game_state, menu_ui_turn_based, command_list)
                         case _:
-                            command.update_for_pc(display, dt, current_time, key, game_input.joysticks, player, rpgmap, camera, item_dict, pygame_event.game_state)
+                            command.update_for_pc(display, dt, current_time, pygame_event, key, game_input.joysticks, player, rpgmap, camera, item_dict, pygame_event.game_state, menu_ui_turn_based, command_list)
 
                     if command.has_triggered and not command.finish:
                         game_pause = True
@@ -84,6 +84,23 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 filter_effect(display, 'darken')
                 filter_effect(display, 'blur')
 
+            player_ui_x = display.get_width()-55
+            pg.draw.rect(display, pg.Color('black'), (player_ui_x, 9, 50, 9))
+            player_hp = player.hp/player.max_hp
+            if 0.4 > player_hp >= 0:
+                pg.draw.rect(display, pg.Color('red'), (player_ui_x, 9, int(player.hp/player.max_hp*50), 9))
+                blit_text(display, f'HP: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('darkred'), (player_ui_x+5, 10))
+            elif 0.7 > player_hp >= 0.4:
+                pg.draw.rect(display, pg.Color('yellow'), (player_ui_x, 9, int(player.hp/player.max_hp*50), 9))
+                blit_text(display, f'HP: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('orange'), (player_ui_x+5, 10))
+            else:
+                pg.draw.rect(display, pg.Color('green'), (player_ui_x, 9, int(player.hp/player.max_hp*50), 9))
+                blit_text(display, f'HP: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('darkgreen'), (player_ui_x+5, 10))
+
+            pg.draw.rect(display, pg.Color('black'), (player_ui_x, 20, 50, 9))
+            pg.draw.rect(display, pg.Color('white'), (player_ui_x, 20, int(player.xp/100*50), 9))
+            blit_text(display, f'LV: {player.levels}', menu_ui_turn_based.menu_font, pg.Color('grey20'), (player_ui_x+5, 21))
+
             match pygame_event.game_state:
                 case 1:
                     if not game_pause:
@@ -91,7 +108,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                     else:
                         pygame_event.game_state = 0
                 case 2:
-                    save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui, command_list)
+                    save_load_game_update(pygame_event, new_size, menu_ui_save, display, dt, current_time, platform, key, mobile_key, game_input, player, rpgmap, menu_ui_load, menu_ui, command_list, enemy_dict)
 
                 case 3:
                     settings_update(1, menu_ui_settings, menu_ui, menu_ui_save, menu_ui_load, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, menu_ui_turn_based, player, new_size, display, dt, current_time, platform, key, mobile_key, game_input, pygame_event)
@@ -104,20 +121,10 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
                 case 6:
                     achievement_update(new_size, menu_ui_achievement, display, dt, player, current_time, key, game_input, mobile_key, platform, menu_ui, pygame_event)
                 case 7:
-                    turn_based_update(new_size, display, dt, current_time, key, game_input, mobile_key, player, rpgmap, platform, menu_ui, pygame_event, menu_ui_turn_based, item_dict)
+                    turn_based_update(new_size, display, dt, current_time, key, game_input, mobile_key, player, rpgmap, platform, menu_ui, pygame_event, menu_ui_turn_based, item_dict, enemy_dict)
 
             pg.draw.line(display, g['colors']['black'], (0,0), (0,display.get_size()[1]))
             pg.draw.line(display, g['colors']['black'], (display.get_size()[0]-1,0), (display.get_size()[0]-1,display.get_size()[1]))
-
-            if player.pos == [128, 32]:
-                pygame_event.game_state = 7
-                menu_ui_turn_based.state = 'main'
-                player.pos = pg.math.Vector2([112 , 32])
-                player.dirvec = pg.math.Vector2(0, 0)
-                player.last_pos = player.pos
-                player.next_pos = player.pos
-                player.focus_point = player.pos
-                player.direction = "bottom"
 
     # Debug
     if menu_ui_settings.debug:

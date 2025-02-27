@@ -1,4 +1,5 @@
 from .menu_reset import reset_menu
+import pygame as pg
 
 def main_game_update(platform, game_pause, player, key, mobile_key, game_input, dt, collision_rects, camera, menu_ui, menu_ui_save, menu_ui_load, menu_ui_title, menu_ui_settings, menu_ui_inventory, menu_ui_skills, menu_ui_achievement, display):
     match platform:

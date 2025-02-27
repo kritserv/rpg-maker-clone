@@ -1,5 +1,5 @@
 import pygame as pg
-from ..ui import blit_img
+from ..ui import blit_img, Conversation
 
 class Command(pg.sprite.Sprite):
     def __init__(self, name, trigger_by, sequence, xy, show, img, has_collision, map_name, run_in_loop):
@@ -43,7 +43,7 @@ class Command(pg.sprite.Sprite):
                     return pg.Rect(adjusted_x, adjusted_y, self.tile_size, self.tile_size)
         return False
 
-    def update_for_pc(self, display, dt, current_time, key, joysticks, player, rpgmap, camera, item_dict, game_state):
+    def update_for_pc(self, display, dt, current_time, pygame_event, key, joysticks, player, rpgmap, camera, item_dict, game_state, menu_ui_turn_based, command_list):
         if not self.name in player.clear_commands and (rpgmap.curr_map==self.map_name or self.map_name=='all_map'):
             finish_sequence = 0
             for i, sequence in enumerate(self.sequence):
@@ -54,7 +54,7 @@ class Command(pg.sprite.Sprite):
                                 self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_pc(key, joysticks, player, rpgmap)
+                                sequence.update_for_pc(dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
                         case 'action':
                             if not self.has_triggered:
                                 action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE]
@@ -65,7 +65,7 @@ class Command(pg.sprite.Sprite):
                                         self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_pc(key, joysticks, player, rpgmap)
+                                sequence.update_for_pc(dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
                         case 'step on':
                             if not self.has_triggered:
                                 step_on = player.last_pos == self.pos or player.pos == self.pos
@@ -73,7 +73,7 @@ class Command(pg.sprite.Sprite):
                                     self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_pc(key, joysticks, player, rpgmap)
+                                sequence.update_for_pc(dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
 
                 if sequence.finish:
                     finish_sequence += 1
@@ -82,18 +82,18 @@ class Command(pg.sprite.Sprite):
                 player.clear_commands.append(self.name)
                 self.finish = True
 
-        if self.trigger_by == 'always on':
+        if self.trigger_by == 'always on' and (rpgmap.curr_map==self.map_name or self.map_name=='all_map'):
             for sequence in self.sequence:
                 sequence.always_on = True
                 sequence.draw(display, dt, current_time)
-                sequence.update_for_pc(key, joysticks, player, rpgmap)
+                sequence.update_for_pc(dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
 
         if self.run_in_loop and self.name in player.clear_commands:
             player.clear_commands.remove(self.name)
             self.reset()
 
 
-    def update_for_android(self, display, dt, current_time, mobile_key, player, rpgmap, camera, item_dict, game_state):
+    def update_for_android(self, display, dt, current_time, pygame_event, mobile_key, player, rpgmap, camera, item_dict, game_state, menu_ui_turn_based, command_list):
         if not self.name in player.clear_commands and (rpgmap.curr_map==self.map_name or self.map_name=='all_map'):
             finish_sequence = 0
             for i, sequence in enumerate(self.sequence):
@@ -104,7 +104,7 @@ class Command(pg.sprite.Sprite):
                                 self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_android(mobile_key, player, rpgmap)
+                                sequence.update_for_android(dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
                         case 'action':
                             if not self.has_triggered:
                                 action = mobile_key["K_A"]
@@ -113,7 +113,7 @@ class Command(pg.sprite.Sprite):
                                         self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_android(mobile_key, player, rpgmap)
+                                sequence.update_for_android(dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
                         case 'step on':
                             if not self.has_triggered:
                                 step_on = int(player.pos.x) == int(self.pos.x) and int(player.pos.y) == int(self.pos.y)
@@ -121,7 +121,7 @@ class Command(pg.sprite.Sprite):
                                     self.has_triggered = True
                             if self.has_triggered:
                                 sequence.draw(display, dt, current_time)
-                                sequence.update_for_android(mobile_key, player, rpgmap)
+                                sequence.update_for_android(dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
 
                 if sequence.finish:
                     finish_sequence += 1
@@ -130,12 +130,12 @@ class Command(pg.sprite.Sprite):
                 player.clear_commands.append(self.name)
                 self.finish = True
 
-        if self.trigger_by == 'always on':
+        if self.trigger_by == 'always on' and (rpgmap.curr_map==self.map_name or self.map_name=='all_map'):
             require_game_to_pause = False
             for sequence in self.sequence:
                 sequence.always_on = True
                 sequence.draw(display, dt, current_time)
-                sequence.update_for_android(mobile_key, player, rpgmap)
+                sequence.update_for_android(dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
 
         if self.run_in_loop and self.name in player.clear_commands:
             player.clear_commands.remove(self.name)
@@ -147,7 +147,7 @@ class PythonScript:
         self.finish = False
         self.always_on = False
 
-    def update(self, player, rpgmap):
+    def update(self, dt, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         if not self.finish:
             exec(self.script)
             if not self.always_on:
@@ -156,11 +156,11 @@ class PythonScript:
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
-        self.update(player, rpgmap)
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
+        self.update(dt, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
-        self.update(player, rpgmap)
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
+        self.update(dt, player, rpgmap, pygame_event, menu_ui_turn_based, command_list)
 
 class AddItem:
     def __init__(self, item, quant):
@@ -182,10 +182,10 @@ class AddItem:
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
 class RemoveItem:
@@ -210,10 +210,10 @@ class RemoveItem:
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
 class AddSkill:
@@ -233,10 +233,10 @@ class AddSkill:
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
 class RemoveSkill:
@@ -256,10 +256,10 @@ class RemoveSkill:
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player)
 
 class Teleport:
@@ -289,10 +289,10 @@ class Teleport:
     def draw(self, display, dt, current_time):
         pass
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player, rpgmap)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update(player, rpgmap)
 
 class FadeOut:
@@ -319,10 +319,10 @@ class FadeOut:
             else:
                 self.fade_level = 255
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update()
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update()
 
 class FadeIn:
@@ -346,8 +346,8 @@ class FadeIn:
                 self.finish = True
                 self.fade_level = 255
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update()
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         self.update()

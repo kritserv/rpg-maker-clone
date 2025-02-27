@@ -1,0 +1,8 @@
+{
+    "Slime": {
+        "img": "slime",
+        "hp": 100,
+        "moves": "enemy.battle_info=[f'{enemy.name} using Tackle']\r\nif random.random() < 0.8:\r\n    player_hp_before_skill = player.hp\r\n    player.hp -= 10\r\n    enemy.battle_info.append(f'You take {player_hp_before_skill-player.hp} damage\\nto HP')\r\nelse:    enemy.battle_info.append(f'You have dodge\\n{enemy.name} attack')",
+        "defeat_reward": "player.xp += 20\r\nenemy.battle_info=[f'{enemy.name} have been defeated', 'You earn 20 XP']\r\nif player.xp >= 100:\r\n    player.levels += 1\r\n    player.xp -= 100\r\n    enemy.battle_info.append(f'Level Up!\\nYour New Level is {player.levels}')\r\nplayer.variables['is fighting slime'] = False"
+    }
+}

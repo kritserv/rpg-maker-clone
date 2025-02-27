@@ -5,7 +5,7 @@
         "key_item": false,
         "equipable": true,
         "consumable": false,
-        "consume_effect": "False"
+        "consume_effect": ""
     },
     "HP Potion": {
         "img": "hp_potion",
@@ -13,6 +13,6 @@
         "key_item": false,
         "equipable": false,
         "consumable": true,
-        "consume_effect": "player.hp += 30\r\nif player.hp > player.max_hp:\r\n    player.hp = player.max_hp"
+        "consume_effect": "player_hp_before_consume = player.hp\r\nplayer.battle_info = ['Using HP Potion']\r\nplayer.hp += 30\r\nif player.hp > player.max_hp:\r\n    player.hp = player.max_hp\r\nplayer.battle_info.append(f'Your HP got restore\\nby {player.hp-player_hp_before_consume}')"
     }
 }

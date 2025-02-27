@@ -1,5 +1,4 @@
 import pygame as pg
-from ..utils import asset_loader
 from math import floor, ceil
 
 class Player(pg.sprite.Sprite):
@@ -14,6 +13,7 @@ class Player(pg.sprite.Sprite):
 		self.clear_commands = []
 		self.clear_achievements = []
 		self.alert = ''
+		self.battle_info = []
 
 		self.start_hp = hp
 		self.max_hp = self.start_hp

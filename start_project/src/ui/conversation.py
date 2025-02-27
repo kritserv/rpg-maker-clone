@@ -67,7 +67,7 @@ class Conversation:
         else:
             self.speed = 20
 
-    def update_for_pc(self, key, joysticks, player, rpgmap):
+    def update_for_pc(self, dt, key, joysticks, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         # use any key to progress conversation
         action = key[pg.K_RETURN] or key[pg.K_KP_ENTER] or key[pg.K_z] or key[pg.K_SPACE] or key[pg.K_x] or key[pg.K_ESCAPE] or key[pg.K_KP_0]
         for joystick in joysticks:
@@ -76,7 +76,7 @@ class Conversation:
                 action = joystick.get_button(1)
         self.update(action, player)
 
-    def update_for_android(self, mobile_key, player, rpgmap):
+    def update_for_android(self, dt, mobile_key, player, rpgmap, pygame_event, menu_ui_turn_based, command_list):
         # use any key to progress conversation
         action = mobile_key["K_A"] or mobile_key["K_B"]
         self.update(action, player)
