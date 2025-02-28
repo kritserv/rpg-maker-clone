@@ -65,10 +65,41 @@ def load_player_sprite():
 
 class Tile(pg.sprite.Sprite):
     """Represents a single tile in the game."""
-    def __init__(self, img, pos):
-        super().__init__()
+    def __init__(self, img, pos, is_animated, speed):
+        pg.sprite.Sprite.__init__(self)
         self.img = img
         self.rect = self.img.get_rect(topleft=pos)
+        self.is_animated = is_animated
+        if self.is_animated:
+            self.frames = []
+            self.current_frame = 0
+            self.animation_timer = 0
+            self.speed = speed/1000
+
+            sheet_width = self.img.get_width()
+            frame_width = 16
+            num_frames = int(sheet_width / frame_width)
+
+            for i in range(num_frames):
+                frame = pg.Surface((frame_width, self.img.get_height()), pg.SRCALPHA)
+                frame.blit(self.img, (0, 0), (i * frame_width, 0, frame_width, self.img.get_height()))
+                self.frames.append(frame)
+
+            if self.frames:
+                self.img = self.frames[0]
+                self.rect = self.img.get_rect(topleft=pos)
+
+    def animate(self, dt):
+        if not self.is_animated:
+            return
+
+        self.animation_timer += dt
+
+        if self.animation_timer >= self.speed:
+            self.current_frame = (self.current_frame + 1) % len(self.frames)
+            self.img = self.frames[self.current_frame]
+
+            self.animation_timer %= self.speed
 
 def _load_layer(csv_path, tileset, all_tile_imgs) -> list:
     """
@@ -82,7 +113,12 @@ def _load_layer(csv_path, tileset, all_tile_imgs) -> list:
             for x, tile_id in enumerate(row):
                 if tile_id.strip():  # Ignore empty tiles
                     img_name = tileset[tile_id]
-                    layer_tiles.append(Tile(all_tile_imgs[img_name], (x * tile_size, y * tile_size)))
+                    is_animated = False
+                    speed = False
+                    if '_is_animated_' in img_name:
+                        is_animated = True
+                        speed = int(img_name.split('speed_')[-1])
+                    layer_tiles.append(Tile(all_tile_imgs[img_name], (x * tile_size, y * tile_size), is_animated, speed))
     return layer_tiles
 
 def load_map_data(map_json, all_tile_imgs):

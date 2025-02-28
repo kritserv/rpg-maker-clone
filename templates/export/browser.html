@@ -28,60 +28,72 @@ block navbar %}
     </div>
 </nav>
 {% endblock %} {% block content %}
-<h1>Browser Export Instructions</h1>
-<p>
-    Make sure you've backup your game project and/or commit to git before export
-    your game.
-</p>
-<div class="mb-3">
+<strong
+    >Always back up your project and/or commit to git before exporting.</strong
+>
+<div class="mb-4">
+    <h2>Browser Export Instructions</h2>
     <p>
-        <strong>1. Open game folder</strong>
+        <strong>1. Open your game folder</strong>
     </p>
     <p>
-        <strong>2. Edit <code>game_data/game_mode.txt</code>:</strong>
+        <strong>2. Edit game mode setting:</strong>
     </p>
     <ul>
-        <li><code>web</code></li>
+        <li>
+            Open <code>game_data/game_mode.txt</code> and set it to
+            <code>web</code>
+        </li>
     </ul>
     <p>
-        <strong
-            >3. If you have previously exported to Android and/or Desktop,
-            ensure you delete the <code>folder names 'bin', 'build'</code> and
-            <code>hidden folder names '.buildozer'</code> before proceeding.
-            Otherwise, Pygbag might attempt to include the binary file alongside
-            WebAssembly, causing an error.</strong
-        >
+        <strong>3. Clean up previous builds:</strong>
     </p>
-    <p><strong>4. Build and Run:</strong></p>
+    <p>If you previously exported to Android or Desktop, delete:</p>
+    <ul>
+        <li>Folder named <code>bin</code></li>
+        <li>Folder named <code>build</code></li>
+        <li>Hidden folder named <code>.buildozer</code></li>
+    </ul>
+    <p>
+        This prevents Pygbag from including binary files alongside WebAssembly,
+        which can cause errors.
+    </p>
+
+    <p><strong>4. Build and run:</strong></p>
+    <ul>
+        <li>For local testing, run: <code>pygbag .</code></li>
+        <li>
+            For deployment package, run: <code>pygbag --archive .</code>
+            <br />
+            <small
+                >(Creates a compressed file that can be hosted on any static
+                website like GitHub Pages or itch.io)</small
+            >
+        </li>
+    </ul>
+
+    <p><strong>5. Test locally:</strong></p>
     <ul>
         <li>
-            Run <code>pygbag .</code> for test locally or
-            <code>pygbag --archive .</code> for a compressed file which can be
-            host on any static website such as github page or itch.io.
-        </li>
-        <li>
-            The process may take some time initially, but subsequent builds will
-            be faster.
-        </li>
-        <li>
-            Test on
+            Open
             <a href="http://localhost:8000/" target="_blank"
                 >http://localhost:8000/</a
             >
+            or
         </li>
         <li>
-            or
+            Open
             <a href="http://localhost:8000/?-i" target="_blank"
                 >http://localhost:8000/?-i</a
             >
         </li>
-        <li>
-            check
-            <a target="_blank" href="https://pygame-web.github.io/wiki/pygbag/"
-                >documentation</a
-            >
-            for more info.
-        </li>
     </ul>
+
+    <p>
+        For more information, see the
+        <a target="_blank" href="https://pygame-web.github.io/wiki/pygbag/"
+            >Pygbag documentation</a
+        >
+    </p>
 </div>
 {% endblock %}

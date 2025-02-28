@@ -53,15 +53,15 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
 
             # Graphic
             collision_rects = []
-            draw_count = rpgmap.draw(display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
+            draw_count = rpgmap.draw(dt, display, camera, player.rect, layers=['layer1', 'layer2'], get_collision=False)
             for command in command_list:
                 collision = command.draw(display, player, rpgmap, camera)
                 if collision:
                     collision_rects.append(collision)
-            collision_rects += rpgmap.draw(display, camera, player.rect, layers=['layer3'], get_collision=True)
+            collision_rects += rpgmap.draw(dt, display, camera, player.rect, layers=['layer3'], get_collision=True)
             # pg.draw.rect(display, g['colors']['green'], player.collision) # player collision box
             blit_img(display, player.img, (center_x-16, center_y-18))
-            draw_count += rpgmap.draw(display, camera, player.rect, layers=['layer4'], get_collision=False)
+            draw_count += rpgmap.draw(dt, display, camera, player.rect, layers=['layer4'], get_collision=False)
 
             # Logic
 

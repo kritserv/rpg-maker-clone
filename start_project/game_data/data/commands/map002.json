@@ -48,5 +48,39 @@
         "img": false,
         "has_collision": false,
         "run_in_loop": true
+    },
+    "sleep on bed": {
+        "trigger_by": "step on",
+        "sequence": [
+            {
+                "type": "python_script",
+                "script": "player.hp = player.max_hp"
+            },
+            {
+                "type": "conversation",
+                "dialogs": [
+                    "You're resting and\r\nrecovering HP"
+                ]
+            },
+            {
+                "type": "fade_out"
+            },
+            {
+                "type": "teleport",
+                "map_name": "map002",
+                "position": [
+                    144,
+                    80
+                ]
+            }
+        ],
+        "position": [
+            160,
+            80
+        ],
+        "show": false,
+        "img": false,
+        "has_collision": false,
+        "run_in_loop": true
     }
 }

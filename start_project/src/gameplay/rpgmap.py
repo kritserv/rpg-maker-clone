@@ -4,7 +4,7 @@ import pygame as pg
 class RpgMap(pg.sprite.Sprite):
     """Handles loading and rendering of RPG map layers."""
     def __init__(self, start_map, g, map_data):
-        super().__init__()
+        pg.sprite.Sprite.__init__(self)
         self.tile_size = 16  # Standard tile size
         self.map_data = map_data   # Stores map layers for each map
         self.start_map = start_map
@@ -26,7 +26,7 @@ class RpgMap(pg.sprite.Sprite):
             self.view_height = self.game_size[1]//2+self.tile_size
             self.view_width = self.game_size[0]//2+self.tile_size
 
-    def draw(self, display, camera, player_rect, layers=None, get_collision=False):
+    def draw(self, dt, display, camera, player_rect, layers=None, get_collision=False):
         """
         Draw specified layers of the current map onto the display.
         If no layers are specified, all layers will be drawn.
@@ -40,7 +40,9 @@ class RpgMap(pg.sprite.Sprite):
         left_edge = player_rect.x + self.view_width
         right_edge = player_rect.x - self.view_width
         for layer_name in layers_to_draw:
+
             for tile in self.map_data[self.curr_map].get(layer_name, []):
+                tile.animate(dt)
                 if bottom_edge < tile.rect.y < top_edge and right_edge < tile.rect.x < left_edge:
                     if get_collision:
                         adjusted_x = tile.rect.x - camera.offset_x + display.get_size()[0] // 2

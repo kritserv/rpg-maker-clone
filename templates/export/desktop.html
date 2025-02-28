@@ -28,59 +28,69 @@ block navbar %}
     </div>
 </nav>
 {% endblock %} {% block content %}
-<h1>Desktop Export Instructions</h1>
-<p>
-    Make sure you've backup your game project and/or commit to git before export
-    your game.
-</p>
-<div class="mb-3">
+<strong
+    >Always back up your project and/or commit to git before exporting.</strong
+>
+<div class="mb-4">
+    <h2>Desktop Export Instructions</h2>
     <p>
-        <strong>1. Open game folder</strong>
+        <strong>1. Open your game folder</strong>
     </p>
     <p>
-        <strong>2. Edit <code>game_data/game_mode.txt</code>:</strong>
+        <strong>2. Edit game mode setting:</strong>
     </p>
     <ul>
-        <li><code>pc</code></li>
+        <li>
+            Open <code>game_data/game_mode.txt</code> and set it to
+            <code>pc</code>
+        </li>
     </ul>
     <p>
-        <strong
-            >3. If you have previously exported to Android and/or Browser,
-            ensure you delete the <code>folder names 'bin', 'build'</code> and
-            <code>hidden folder names '.buildozer'</code> before proceeding.
-            Otherwise, Pyinstaller might attempt to include unnecessary
-            file.</strong
+        <strong>3. Clean up previous builds:</strong>
+    </p>
+    <p>If you previously exported to Android or Browser, delete:</p>
+    <ul>
+        <li>Folder named <code>bin</code></li>
+        <li>Folder named <code>build</code></li>
+        <li>Hidden folder named <code>.buildozer</code></li>
+    </ul>
+    <p>This prevents PyInstaller from including unnecessary files.</p>
+
+    <p><strong>4. Create executable file:</strong></p>
+    <ul>
+        <li>Run: <code>pyinstaller --onefile --noconsole main.py</code></li>
+        <li>
+            Move the executable from the <code>dist</code> folder to your root
+            game folder
+        </li>
+        <li>Test the executable to ensure it works properly</li>
+    </ul>
+
+    <p><strong>5. Prepare for distribution:</strong></p>
+    <ul>
+        <li>
+            Remove the following items:
+            <ul>
+                <li>Folder named <code>src</code></li>
+                <li>Folder named <code>build</code></li>
+                <li>
+                    Hidden folder named <code>.git</code> and
+                    <code>.gitignore</code> (if using git)
+                </li>
+                <li><code>requirements.txt</code></li>
+            </ul>
+        </li>
+        <li>Zip all remaining files in the root game folder</li>
+        <li>
+            The executable should run on users' PCs without Python installed
+        </li>
+    </ul>
+
+    <p>
+        For more information, see the
+        <a target="_blank" href="https://pyinstaller.org/en/stable/"
+            >PyInstaller documentation</a
         >
     </p>
-    <p><strong>4. Create Executable file.</strong></p>
-    <ul>
-        <li>Run <code>pyinstaller --onefile --noconsole main.py</code></li>
-        <li>
-            The created executable file will be inside dist folder, move it
-            outside (to the root game folder) and try to run the game.
-        </li>
-        <li>
-            Finally, remove the following:
-            <ul>
-                <li>folder name 'src'</li>
-                <li>folder name 'build'</li>
-                <li>hidden folder name '.git' and .gitignore (if using git)</li>
-                <li>requirements.txt</li>
-            </ul>
-            Then, Pack every file in root game folder to zip and shipping your
-            game to any platform.
-        </li>
-        <li>
-            The executable file should be able to execute without python install
-            on user's pc.
-        </li>
-        <li>
-            check
-            <a target="_blank" href="https://pyinstaller.org/en/stable/"
-                >documentation</a
-            >
-            for more info.
-        </li>
-    </ul>
 </div>
 {% endblock %}

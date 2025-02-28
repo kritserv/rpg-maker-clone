@@ -28,100 +28,113 @@ block navbar %}
     </div>
 </nav>
 {% endblock %} {% block content %}
-<h1>Android Build Instructions</h1>
-<p>
-    Make sure you've backup your game project and/or commit to git before export
-    your game.
-</p>
-<div class="mb-3">
+<strong
+    >Always back up your project and/or commit to git before exporting.</strong
+>
+<div class="mb-4">
+    <h2>Android Export Instructions</h2>
     <p>
-        <strong>1. Open game folder</strong>
+        <strong>1. Open your game folder</strong>
     </p>
     <p>
-        <strong>2. Edit <code>game_data/game_mode.txt</code>:</strong>
-    </p>
-    <ul>
-        <li><code>android</code></li>
-    </ul>
-    <p>
-        <strong
-            >3. If you have previously exported to Browser and/or Desktop,
-            ensure you delete the <code>folder name 'build'</code> before
-            proceeding. Otherwise, Buildozer might attempt to include the
-            browser file alongside, causing an error.</strong
-        >
-    </p>
-    <p>
-        <strong
-            >4. Install Buildozer
-            <a
-                href="https://buildozer.readthedocs.io/en/latest/installation.html"
-                target="_blank"
-                >readthedocs</a
-            ></strong
-        >
+        <strong>2. Edit game mode setting:</strong>
     </p>
     <ul>
-        <li><code>sudo apt update -y</code></li>
         <li>
-            <code
-                >sudo apt install -y git zip unzip openjdk-17-jdk python3-pip
-                autoconf libtool pkg-config zlib1g-dev libncurses5-dev
-                libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev</code
-            >
+            Open <code>game_data/game_mode.txt</code> and set it to
+            <code>android</code>
         </li>
     </ul>
+    <p>
+        <strong>3. Clean up previous builds:</strong>
+    </p>
+    <p>If you previously exported to Browser or Desktop, either:</p>
+    <ul>
+        <li>Delete the <code>build</code> folder</li>
+        <li>
+            Or edit <code>source.exclude_dirs</code> in the buildozer.spec file
+            (step 6)
+        </li>
+    </ul>
+    <p>
+        This prevents Buildozer from including browser files, which can cause
+        errors.
+    </p>
+
+    <p>
+        <strong>4. Install Buildozer dependencies:</strong>
+    </p>
+    <pre><code>sudo apt update -y
+sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev</code></pre>
 
     <p><strong>5. Initialize Buildozer:</strong></p>
     <ul>
-        <li>Run <code>buildozer init</code></li>
+        <li>Run: <code>buildozer init</code></li>
     </ul>
 
     <p>
-        <strong
-            >6. Modify the following parameters in
-            <code>buildozer.spec</code>:</strong
-        >
+        <strong>6. Configure buildozer.spec file:</strong>
     </p>
+    <p>Modify these parameters:</p>
+    <pre><code>source.include_exts =
+requirements = python3==3.10.12, kivy==2.3.0, hostpython3==3.10.12, pygame, pyjnius, jnius, sdl2, sdl2_image, sdl2_mixer, sdl2_ttf, png, jpeg, pillow
+presplash.filename = %(source.dir)s/android_presplash.png
+icon.filename = %(source.dir)s/android_icon.png
+orientation = landscape
+fullscreen = 1
+android.presplash_color = black
+android.permissions = android.permission.READ_EXTERNAL_STORAGE, android.permission.WRITE_EXTERNAL_STORAGE, android.permission.MANAGE_EXTERNAL_STORAGE, android.permission.READ_PHONE_STATE</code></pre>
     <ul>
-        <li><code>source.include_exts = </code></li>
         <li>
-            <code
-                >requirements = python3==3.10.12, kivy==2.3.0,
-                hostpython3==3.10.12, pygame, pyjnius, jnius, sdl2, sdl2_image,
-                sdl2_mixer, sdl2_ttf, png, jpeg, pillow</code
-            >
-        </li>
-        <li>
-            <code
-                >presplash.filename = %(source.dir)s/android_presplash.png</code
-            >
-        </li>
-        <li><code>icon.filename = %(source.dir)s/android_icon.png</code></li>
-        <li><code>orientation = landscape</code></li>
-        <li><code>fullscreen = 1</code></li>
-        <li><code>android.presplash_color = black</code></li>
-        <li>
-            <code
-                >android.permissions = android.permission.READ_EXTERNAL_STORAGE,
-                android.permission.WRITE_EXTERNAL_STORAGE,
-                android.permission.MANAGE_EXTERNAL_STORAGE,
-                android.permission.READ_PHONE_STATE</code
-            >
+            You can also customize: title, package.name, package.domain, etc.
         </li>
     </ul>
 
-    <p><strong>7. Build and Run:</strong></p>
+    <p><strong>7. Prepare your Android device:</strong></p>
     <ul>
-        <li>Run <code>buildozer android debug deploy run logcat</code></li>
+        <li>Connect your Android phone via USB</li>
+        <li>Set USB mode to "Transfer files / Android Auto"</li>
         <li>
-            The first time you build with Buildozer, accept any required
-            licenses.
+            Enable Developer Mode:
+            <ol>
+                <li>
+                    Go to <strong>Settings</strong> →
+                    <strong>About phone</strong>
+                </li>
+                <li>Tap <strong>Build number</strong> seven times</li>
+            </ol>
         </li>
         <li>
-            The process may take some time initially, but subsequent builds will
-            be faster.
+            Enable USB Debugging:
+            <ol>
+                <li>
+                    Go to <strong>Settings</strong> →
+                    <strong>System & updates</strong> →
+                    <strong>Developer options</strong>
+                </li>
+                <li>Turn on <strong>USB Debugging</strong></li>
+            </ol>
         </li>
     </ul>
+
+    <p><strong>8. Build and deploy:</strong></p>
+    <ul>
+        <li>Run: <code>buildozer android debug deploy run logcat</code></li>
+        <li>Accept any required licenses when prompted</li>
+        <li>Allow USB debugging on your phone when asked</li>
+        <li>
+            Note: First build may take significant time; subsequent builds will
+            be faster
+        </li>
+    </ul>
+
+    <p>
+        For more information, see the
+        <a
+            target="_blank"
+            href="https://buildozer.readthedocs.io/en/latest/installation.html"
+            >Buildozer documentation</a
+        >
+    </p>
 </div>
 {% endblock %}
