@@ -1,12 +1,12 @@
 {
     "Slash": {
         "img": "slash",
-        "description": "dmg: 20\r\nacc: 0.80\r\nRequire skill\r\nto start your\r\njourney.",
+        "description": "†: 20\r\nacc: 0.80\r\nRequire skill\r\nto start your\r\njourney.",
         "effect": "player.battle_info=['Using Slash']\r\nif random.random() < 0.8:\r\n    enemy_hp_before_skill = enemy.hp\r\n    enemy.hp -= int(player.levels * 1.2 + 20)\r\n    player.battle_info.append(f'{enemy.name} take {enemy_hp_before_skill-enemy.hp} damage\\nto HP')\r\nelse:\r\n    player.battle_info.append(f'{enemy.name} have dodge\\nyour attack')"
     },
     "Punch": {
         "img": "punch",
-        "description": "dmg: 5\r\nacc: 1.00\r\nYour most\r\nreliable weapon.",
+        "description": "†: 5\r\nacc: 1.00\r\nYour most\r\nreliable weapon.",
         "effect": "player.battle_info=['Using Punch']\r\nenemy_hp_before_skill = enemy.hp\r\nenemy.hp -= int(player.levels * 1.2 + 5)\r\nplayer.battle_info.append(f'{enemy.name} take {enemy_hp_before_skill-enemy.hp} damage\\nto HP')"
     }
 }

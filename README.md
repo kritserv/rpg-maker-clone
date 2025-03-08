@@ -25,8 +25,7 @@ python main.py
 
 ## Credits
 
-- **Fonts**: [Pixelated Elegance Font](https://ggbot.itch.io/pixelated-elegance-font) by GGBot
-- **Game Assets**: All other game assets created by kritserv
+- **Game Assets**: All game assets created by kritserv
 
 ## Contributing
 

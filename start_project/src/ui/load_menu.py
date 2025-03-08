@@ -37,12 +37,7 @@ class MenuUILoad(BaseMenuUI):
         super().__init__(menu_items, g)
         self.play_sound = True
 
-    def load_game(self, select_slot, player, rpgmap):
-        select_slot = f"Slot {self.cursor}"
-        save_slots = json_loader(self.save_path)
-
-        select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
-
+    def load_player_and_map(self, select_save_slot, player, rpgmap):
         if select_save_slot:
             player.pos = pg.math.Vector2(select_save_slot.get('player_pos'))
             player.rect.topleft = player.pos
@@ -58,10 +53,19 @@ class MenuUILoad(BaseMenuUI):
             player.hp = select_save_slot.get('player_hp')
             player.clear_commands = select_save_slot['player_clear_commands']
             player.clear_achievements = select_save_slot['player_clear_achievements']
-            player.remembered_obstacle_pos = {}
             rpgmap.curr_map = select_save_slot.get('current_map')
+            player.remembered_obstacle_pos = {}
             return True
         return False
+
+    def load_game(self, select_slot, player, rpgmap):
+        select_slot = f"Slot {self.cursor}"
+        save_slots = json_loader(self.save_path)
+
+        select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
+        
+        res = self.load_player_and_map(select_save_slot, player, rpgmap)
+        return res
 
     def update_for_pc(self, key, joysticks, dt, current_time, player, rpgmap):
         select_slot = super(MenuUILoad, self).update_for_pc(key, joysticks, dt, current_time)

@@ -53,10 +53,6 @@
         "trigger_by": "step on",
         "sequence": [
             {
-                "type": "python_script",
-                "script": "player.hp = player.max_hp"
-            },
-            {
                 "type": "conversation",
                 "dialogs": [
                     "You're resting and\r\nrecovering HP"
@@ -64,6 +60,10 @@
             },
             {
                 "type": "fade_out"
+            },
+            {
+                "type": "python_script",
+                "script": "player.hp = player.max_hp"
             },
             {
                 "type": "teleport",

@@ -48,7 +48,7 @@ class Conversation:
             if self.message_done:
                 blink_on = (current_time // self.blink_interval) % 2 == 0
                 if blink_on:
-                    blit_text(display, '->', self.font, self.WHITE, (width//2-8, height-height_div_3+45))
+                    blit_text(display, '▼', self.font, self.WHITE, (width//2-8, height-height_div_3+45))
             blit_text(display, show_text, self.font, self.WHITE, (width//5, height-height_div_3+5))
 
     def update(self, action, player):

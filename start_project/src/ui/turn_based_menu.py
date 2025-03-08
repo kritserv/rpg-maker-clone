@@ -34,9 +34,9 @@ class MenuUITurnbased(BaseMenuUI):
             if i == self.cursor:
                 pg.draw.rect(display, self.BLUE, (menu_x, menu_text_y-3, menu_w, 12))
                 if blink_on:
-                    blit_text(display, '> ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                    blit_text(display, '→ ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
                 else:
-                    blit_text(display, '  ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
+                    blit_text(display, '    ' + menu_text, self.menu_font, self.YELLOW, (menu_x+12, menu_text_y))
             else:
                 blit_text(display, menu_text, self.menu_font, self.WHITE, (menu_x+12, menu_text_y))
             menu_text_y += 12

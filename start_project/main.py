@@ -109,8 +109,8 @@ def load_asset(db):
     enemy_attack_sfx = asset_loader('sfx', 'enemy_attack')
     player_attack_sfx = asset_loader('sfx', 'player_attack')
     consume_sfx = asset_loader('sfx', 'consume')
-    font_9 = asset_loader('font', 'PixelatedElegance', 9)
-    font_18 = asset_loader('font', 'PixelatedElegance', 18)
+    font_9 = asset_loader('font', 'neatsquare', 9)
+    font_18 = asset_loader('font', 'neatsquare', 18)
     title_screen_bg = asset_loader('sprite', 'title_screen')
     return player_img, all_tile_imgs, open_menu_sfx, select_sfx, equip_sfx, unequip_sfx, consume_sfx, battle_start_sfx, enemy_attack_sfx, player_attack_sfx, font_9, font_18, title_screen_bg
 
