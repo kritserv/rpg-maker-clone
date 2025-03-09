@@ -209,7 +209,7 @@ class Player(pg.sprite.Sprite):
 
 			delta = self.next_pos - self.pos
 			if delta.length() > (self.dirvec * self.speed * dt).length():
-				if self.remembered_obstacle_pos.get((self.pos.x, self.pos.y), '') != self.direction:
+				if not self.remembered_obstacle_pos.get((self.pos.x, self.pos.y, self.direction)):
 					self.pos += self.dirvec * self.speed * dt
 				else:
 					self.pos = self.last_pos
@@ -226,8 +226,8 @@ class Player(pg.sprite.Sprite):
 		# check collision
 		for rect in collision_rects:
 			if self.collision.colliderect(rect):
-				if (self.last_pos.x, self.last_pos.y) not in self.remembered_obstacle_pos:
-					self.remembered_obstacle_pos[(self.last_pos.x, self.last_pos.y)] = self.direction
+				if (self.last_pos.x, self.last_pos.y, self.direction) not in self.remembered_obstacle_pos:
+					self.remembered_obstacle_pos[(self.last_pos.x, self.last_pos.y, self.direction)] = True
 				self.pos = self.last_pos
 				self.next_pos = self.last_pos
 				self.dirvec = pg.math.Vector2(0, 0)

@@ -39,11 +39,18 @@ class MenuUILoad(BaseMenuUI):
 
     def load_player_and_map(self, select_save_slot, player, rpgmap):
         if select_save_slot:
-            player.pos = pg.math.Vector2(select_save_slot.get('player_pos'))
-            player.rect.topleft = player.pos
+
             player.last_pos = pg.math.Vector2(select_save_slot.get('player_pos'))
-            player.next_pos = pg.math.Vector2(select_save_slot.get('player_pos'))
+            rpgmap.curr_map = select_save_slot.get('current_map')
+
+            player.pos = player.last_pos
+            player.next_pos = player.last_pos
+            player.dirvec = pg.math.Vector2(0, 0)
+            player.between_tiles = False
+            player.rect.topleft = player.pos
+
             player.direction = select_save_slot.get('player_direction')
+            player.remembered_obstacle_pos = {(player.pos.x, player.pos.y, player.direction): False}
             player.levels = select_save_slot.get('player_levels')
             player.xp = select_save_slot.get('player_xp')
             player.items = select_save_slot.get('player_items')
@@ -53,8 +60,6 @@ class MenuUILoad(BaseMenuUI):
             player.hp = select_save_slot.get('player_hp')
             player.clear_commands = select_save_slot['player_clear_commands']
             player.clear_achievements = select_save_slot['player_clear_achievements']
-            rpgmap.curr_map = select_save_slot.get('current_map')
-            player.remembered_obstacle_pos = {}
             return True
         return False
 
@@ -63,7 +68,7 @@ class MenuUILoad(BaseMenuUI):
         save_slots = json_loader(self.save_path)
 
         select_save_slot = save_slots.get(select_slot, False) # check if empty and ask for confirm
-        
+
         res = self.load_player_and_map(select_save_slot, player, rpgmap)
         return res
 
