@@ -89,17 +89,17 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
             player_hp = player.hp/player.max_hp
             if 0.4 > player_hp >= 0:
                 pg.draw.rect(display, pg.Color('red'), (player_ui_x, 9, int(player.hp/player.max_hp*50), 9))
-                blit_text(display, f'♥: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('darkred'), (player_ui_x+5, 10))
+                blit_text(display, f'♥: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('darkred'), (player_ui_x+5, 9))
             elif 0.7 > player_hp >= 0.4:
                 pg.draw.rect(display, pg.Color('yellow'), (player_ui_x, 9, int(player.hp/player.max_hp*50), 9))
-                blit_text(display, f'♥: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('orange'), (player_ui_x+5, 10))
+                blit_text(display, f'♥: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('orange'), (player_ui_x+5, 9))
             else:
                 pg.draw.rect(display, pg.Color('green'), (player_ui_x, 9, int(player.hp/player.max_hp*50), 9))
-                blit_text(display, f'♥: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('darkgreen'), (player_ui_x+5, 10))
+                blit_text(display, f'♥: {player.hp}', menu_ui_turn_based.menu_font, pg.Color('darkgreen'), (player_ui_x+5, 9))
 
             pg.draw.rect(display, pg.Color('black'), (player_ui_x, 20, 50, 9))
             pg.draw.rect(display, pg.Color('white'), (player_ui_x, 20, int(player.xp/100*50), 9))
-            blit_text(display, f'LV: {player.levels}', menu_ui_turn_based.menu_font, pg.Color('grey20'), (player_ui_x+5, 21))
+            blit_text(display, f'LV: {player.levels}', menu_ui_turn_based.menu_font, pg.Color('lightblue'), (player_ui_x+5, 20))
 
             match pygame_event.game_state:
                 case 1:
@@ -143,7 +143,7 @@ def run_game_loop(g, delta_time, clock, pygame_event, game_input, display, rpgma
             music_player.current_music = 'forest'
         case 7:
             music_player.current_music = 'battle'
-    music_player.update()
+    music_player.update(menu_ui_settings.music_slider.save_value/100)
 
     match platform:
         case 'pc':
